@@ -11,4 +11,6 @@ urlpatterns = [
     path('logout', logout_page, name='logout_page'),
     path('logout', logout_page, name='logout_page'),
     path('verify/<account_type>/<auth_token>', verify, name='verify'),
+    path('profile', profile, name='profile'),
+
 ]

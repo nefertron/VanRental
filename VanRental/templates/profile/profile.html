@@ -1,0 +1,195 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>My Profile | VAN Rental</title>
+
+        <!-- CSS FILES -->        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+        
+    </head>
+    
+    <body class="topics-listing-page" id="top">
+
+        <main>
+
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="index.html">
+                        <i class="bi-back"></i>
+                        <span>Van Rental</span>
+                    </a>
+
+                    <div class="d-lg-none ms-auto me-4">
+                        <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                    </div>
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_1">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_2">Browse Topics</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_3">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_4">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_5">Contact</a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
+
+                                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
+                                    <li><a class="dropdown-item active" href="topics-listing.html">Topics Listing</a></li>
+
+                                    <li><a class="dropdown-item" href="contact.html">Contact Form</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                        <div class="d-none d-lg-block">
+                            <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row align-items-center">
+
+                        <div class="col-lg-5 col-12">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
+
+                                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5">
+                            <div class="d-flex">
+                                <div class="profile-bg" style="margin-top: auto; margin-bottom: auto;">
+                                    <img src="{% static 'assets/images/topics/undraw_Remote_design_team_re_urdx.png' %}" class="" alt="">
+                                </div>
+                                
+
+                                <div class="custom-block-topics-listing-info d-flex">
+                                    <div>
+                                        <h5 class="mb-2">{{profile.user_id.first_name}} {{profile.user_id.last_name}}</h5>
+                                        <p style="font-size: 0.875rem;">{{account_id}} || <b>{{account_type}}</b></p>
+                                        <p class="mb-0">{{profile.user_id.email}}</p>
+                                        <p class="mb-0">{{profile.contact_no}}</p>
+                                        <p class="mb-0">{{profile.bday.date}}</p>
+                                        <p class="mb-0">{{profile.address}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('update_modal')">Update</button>
+  
+                        </div>
+                        
+                    </div>
+                </div>
+            </header>
+            <div class="modal-overlay" id="update_modal">
+                <div class="modal">
+                    <div class="modal-body">
+                        <h2 class="modal-title">Update Profile</h2>
+
+                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                            {% csrf_token %}
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" value="{{profile.user_id.username}}" class="form-control" placeholder="Username" required>
+
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="fname" value="{{profile.user_id.first_name}}" class="form-control" placeholder="First Name" required>
+
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="lname" value="{{profile.user_id.last_name}}" class="form-control" placeholder="Last Name" required>
+
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" value="{{profile.user_id.email}}" class="form-control" placeholder="Email" required>
+
+                            <label class="form-label">Birth Date</label>
+                            <input type="date" name="bday" value="{{profile.bday}}" class="form-control" placeholder="Birth Date" required>
+
+                            <label class="form-label">Contact No.</label>
+                            <input type="text" name="contact_no" value="{{profile.contact_no}}"  class="form-control" placeholder="Contact No." required>
+
+                            <label class="form-label">Address</label>
+                            <input type="text" name="address" value="{{profile.address}}"  class="form-control" placeholder="Complete Address" required>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="form-control">Update</button>
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <div class="col-md-6">
+                                    <button type="submit" class="form-control" onclick="closeModal('update_modal')">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script>
+            function openModal(overlayId) {
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+            }
+
+            function closeModal(overlayId) {
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+        </script>
+
+    </body>
+</html>

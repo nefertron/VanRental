@@ -9,7 +9,8 @@ class AdminAccount(models.Model):
     contact_no = models.CharField(max_length=13)
     address = models.TextField()
     auth_token = models.CharField(max_length=50, null=True, blank=True)
-    profile = models.TextField()
+    profile = models.TextField(null=True, blank=True)
+    is_verified = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.user_id.first_name} {self.user_id.last_name}'
@@ -23,7 +24,7 @@ class DriverAccount(models.Model):
     address = models.TextField()
     is_verified = models.BooleanField(default=False)
     auth_token = models.CharField(max_length=50, null=True, blank=True)
-    profile = models.TextField()
+    profile = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user_id.first_name} {self.user_id.last_name}'
@@ -37,7 +38,7 @@ class PassengerAccount(models.Model):
     address = models.TextField()
     is_verified = models.BooleanField(default=False)
     auth_token = models.CharField(max_length=50, null=True, blank=True)
-    profile = models.TextField()
+    profile = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.user_id.first_name} {self.user_id.last_name}'

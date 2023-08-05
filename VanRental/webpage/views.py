@@ -219,6 +219,44 @@ def verify(request, account_type, auth_token):
 
 
 
+################ PROFILE PAGE
+def profile(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'The page you are trying to access is not available. Please login first!')
+        return redirect('/login')
+
+
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    context = {}
+
+    if not admin_account is None:
+        context['profile'] = admin_account
+        context['account_type'] = 'Admin Account'
+        context['account_id'] = f'ADM{admin_account.id}'
+
+    elif not driver_account is None:
+        context['profile'] = driver_account
+        context['account_type'] = 'Driver Account'
+        context['account_id'] = driver_account.driver_id
+
+    elif not passenger_account is None:
+        context['profile'] = passenger_account
+        context['account_type'] = 'Passenger Account'
+        context['account_id'] = passenger_account.passenger_id
+
+
+
+        
+
+
+    return render(request, 'profile/profile.html', context)
+
+
+
+
 ################ LOGOUT PAGE
 def logout_page(request):
     if request.user.is_authenticated:

@@ -1,225 +1,198 @@
 {% load static %}
-<!DOCTYPE html>
+{% load static %}
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-  <title>SIGN UP | VAN RENTAL</title>
-  <meta content="" name="description">
-  <meta content="" name="keywords">
+        <title>SIGNUP | VAN RENTAL</title>
 
-  <!-- Favicons -->
-  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
-  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
-
-  <!-- Vendor CSS Files -->
-  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/boxicons/css/boxicons.min.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
-  <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
-</head>
-
-<body>
-
-  <!-- ======= Header ======= -->
-  <header id="header" class="fixed-top header-inner-pages">
-    <div class="container d-flex align-items-center">
-
-      <h1 class="logo me-auto"><a href="index.html">VAN RENTAL</a></h1>
-      <nav id="navbar" class="navbar">
-        <ul>
-          <li><a class="nav-link scrollto " href="/index">Home</a></li>
-          <li><a class="nav-link scrollto" href="#about">About</a></li>
-          <li><a class="nav-link scrollto" href="#services">Services</a></li>
-          <li><a class="nav-link   scrollto" href="#portfolio">Portfolio</a></li>
-          <li><a class="nav-link scrollto" href="#team">Team</a></li>
-          <li class="dropdown"><a href="#"><span>Drop Down</span> <i class="bi bi-chevron-down"></i></a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="dropdown"><a href="#"><span>Deep Drop Down</span> <i class="bi bi-chevron-right"></i></a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Drop Down 2</a></li>
-              <li><a href="#">Drop Down 3</a></li>
-              <li><a href="#">Drop Down 4</a></li>
-            </ul>
-          </li>
-          {% if user.is_authenticated %}
-          <li><a class="nav-link scrollto text-danger" href="/logout">LOGOUT</a></li>
-          {% else %}
-          <li><a class="nav-link scrollto" href="/login">LOGIN</a></li>
-          <li><a class="nav-link scrollto" href="/signup">SIGNUP</a></li>
-          <li><a class="getstarted scrollto" href="#about">Get Started</a></li>
-          {% endif %}
-        </ul>
-        <i class="bi bi-list mobile-nav-toggle"></i>
-      </nav>
-
-    </div>
-  </header>
-
-  <main id="main">
-    <section id="breadcrumbs" class="breadcrumbs">
-      <div class="container">
+        <!-- CSS FILES -->        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
         
-        {% for message in messages %}
-          <div class="alert alert-info alert-dismissible fade show" role="alert">
-            {{message}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <div class='row box'>
-          <div style="text-align: center; font-size: 2rem;">
-            SIGNUP
-          </div>
-          <form class="row g-3 needs-validation" novalidate>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+
+
+    </head>
+    
+    <body id="top">
+
+        <main>
+
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="index.html">
+                        <i class="bi-back"></i>
+                        <span>Van Rental</span>
+                    </a>
+
+                    <div class="d-lg-none ms-auto me-4">
+                        <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                    </div>
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_1">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_2">Browse Topics</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_3">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_4">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html#section_5">Contact</a>
+                            </li>
+
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+                            <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
             
-            <div class="col-md-12">
-                <label class="form-label">Username</label>
-                <input type="text" class="form-control" name='username' required>
-                <div class="invalid-feedback">
-                  Please enter your preferred username.
-                </div>
-            </div>
-              
-            <div class="col-md-12">
-              <label class="form-label">First name</label>
-              <input type="text" class="form-control" name='fname' required>
-              <div class="invalid-feedback">
-                Please enter your first name.
-              </div>
-            </div>
 
-            <div class="col-md-12">
-                <label class="form-label">Last name</label>
-                <input type="text" class="form-control" name='lname' required>
-                <div class="invalid-feedback">
-                  Please your last name.
-                </div>
-            </div>
+            <header class="site-header d-flex flex-column justify-content-center align-items-center">
+                <div class="container">
+                    <div class="row justify-content-center align-items-center">
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                        <div class="container">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-12 subscribe-form-wrap d-flex justify-content-center align-items-center">
+                                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
 
-            <div class="col-md-12">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name='email' required>
-                <div class="invalid-feedback">
-                  Please enter your email.
+                                        {% csrf_token %}
+                                        <h4 class="mb-4 pb-2">Signup</h4>
+        
+                                        <input type="text" name="username" class="form-control" placeholder="Username" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your preferred username.
+                                        </div>
+
+                                        <input type="text" name="fname" class="form-control" placeholder="First Name" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your first name.
+                                        </div>
+
+                                        <input type="text" name="lname" class="form-control" placeholder="Last Name" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your last name.
+                                        </div>
+
+                                        <input type="email" name="email" class="form-control" placeholder="Email" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your email.
+                                        </div>
+
+                                        <input type="date" name="bday" class="form-control" placeholder="Birth Date" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your birthdate.
+                                        </div>
+
+                                        <input type="text" name="contact_no" class="form-control" placeholder="Contact No." required>
+                                        <div class="invalid-feedback">
+                                            Please enter your contact no.
+                                        </div>
+                                        
+                                        <input type="text" name="address" class="form-control" placeholder="Complete Address" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your complete address
+                                        </div>
+
+                                        <input type="password" name="pass1" class="form-control" placeholder="Enter your password" required>
+                                        <div class="invalid-feedback">
+                                            Please enter your password.
+                                        </div>
+
+                                        <input type="password" name="pass2" class="form-control" placeholder="Confirm your password" required>
+                                        <div class="invalid-feedback">
+                                            Confirm your password.
+                                        </div>
+
+                                        <div class="col-lg-12 col-12">
+                                            <button type="submit" class="form-control">SIGN UP</button>
+                                        </div>
+                                        
+                                        <p style="margin-top: 20px; color:whitesmoke; font-size:0.875rem;">
+                                            Already have an account ? 
+                                            <span>
+                                                <a href='/login' style='color:black;'>Login</a>
+                                            </span>
+                                        </p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </header>
+        </main>
+	
+
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script>
+            (function () {
+                'use strict'
             
-            <div class="col-md-12">
-                <label class="form-label">Birth Date</label>
-                <input type="date" class="form-control" name='bday' required>
-                <div class="invalid-feedback">
-                  Please enter your birthdate.
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Contact No.</label>
-                <input type="text" class="form-control" name='contact_no' required>
-                <div class="invalid-feedback">
-                  Please enter your contact no.
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Address</label>
-                <input type="text" class="form-control" name='address' required>
-                <div class="invalid-feedback">
-                  Please enter your address.
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">I am a :</label>
-                <select class="form-select" name="user_type" required>
-                    <option selected disabled value="">Select User Type</option>
-                    <option value="passenger">Passenger</option>
-                    <option value="driver">Driver</option>
-                  </select>
-                  <div class="invalid-feedback">
-                    Please select your user type.
-                  </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-control" name='pass1' required>
-                <div class="invalid-feedback">
-                  Please enter your password.
-                </div>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" name='pass2' required>
-                <div class="invalid-feedback">
-                  Please enter your password.
-                </div>
-            </div>
-
-            <button class="btn btn-primary" type="submit">Signup</button>
-          </form>
-        </div>
-
-      </div>
-    </section><!-- End Breadcrumbs -->
-  </main><!-- End #main -->
-
-
-  <div id="preloader"></div>
-  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="{% static 'assets/vendor/aos/aos.js' %}' %}"></script>
-  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
-  <script src="{% static 'assets/vendor/waypoints/noframework.waypoints.js' %}"></script>
-  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
-
-  <!-- Template Main JS File -->
-  <script src="{% static 'assets/js/main.js' %}"></script>
-
-  <script>
-      (function () {
-    'use strict'
-
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    var forms = document.querySelectorAll('.needs-validation')
-
-    // Loop over them and prevent submission
-    Array.prototype.slice.call(forms)
-      .forEach(function (form) {
-        form.addEventListener('submit', function (event) {
-          if (!form.checkValidity()) {
-            event.preventDefault()
-            event.stopPropagation()
-          }
-
-          form.classList.add('was-validated')
-        }, false)
-      })
-  })()
-  </script>
-
-</body>
-
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.querySelectorAll('.needs-validation')
+            
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms)
+                  .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                      if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                      }
+            
+                      form.classList.add('was-validated')
+                    }, false)
+                  })
+              })()
+        </script>
+    </body>
 </html>
