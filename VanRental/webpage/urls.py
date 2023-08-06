@@ -13,6 +13,9 @@ urlpatterns = [
     path('verify/<account_type>/<auth_token>', verify, name='verify'),
     path('profile', profile, name='profile'),
     path('pending-drivers', pending_drivers, name='pending_drivers'),
+
+    path('open/notification/<id>/', open_notification, name='open_notification'),
     path('approve-pending-driver/<id>/', approve_pending_driver, name='approve_pending_driver'),
+    path('pending-driver-info/<id>/', get_pending_driver_info, name='get_pending_driver_info'),
 
 ]

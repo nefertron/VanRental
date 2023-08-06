@@ -11,9 +11,9 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 from django.http import JsonResponse
-
+from json import dumps
+import json
 # Create your views here.
-
 
 def RemoveSpaces(username):
     li = list(username.split(" "))
@@ -21,9 +21,15 @@ def RemoveSpaces(username):
 
     return temp_container
             
+def create_notification(request, user_id, message):
+    create_notif = Notification.objects.create(receiver_id = user_id,
+                                                        message = message,
+                                                        date_recorded = datetime.now())
+    create_notif.notification_id = f'NOTF{create_notif.id}'
+    create_notif.save()
+
 
 def index(request):
-
     return render(request, 'homepage/index.html')
 
 
@@ -155,6 +161,9 @@ def signup_page(request):
                 host = request.get_host()
                 send_registration_email(new_user, 'passenger', auth_token, host)
                 
+                message = 'Your account has been successfully created.'
+                create_notification(request, new_user, message)
+
                 messages.info(request, f'Your account has been successfully created. Please check your email to verify your account!')
                 return redirect('/login')
 
@@ -201,12 +210,8 @@ def verify(request, account_type, auth_token):
             messages.info(request, 'Your account has been verified successfully! Please login your account')
 
             message = f'Hello {pending_passenger.user_id.first_name}! Thank you for signing on our page! Enjoy renting!'
-            create_notification = Notification.objects.create(receiver_id = pending_passenger.user_id,
-                                                                message = message,
-                                                                date_recorded = datetime.now())
-            create_notification.notification_id = f'NOTF{create_notification.id}'
-            create_notification.save()
-
+            create_notification(request, pending_passenger.user_id, message)
+            
             return redirect('/login')
         else:
             messages.info(request, f'Sorry, the page you are trying to access is invalid or expired. Please try another!')
@@ -222,11 +227,7 @@ def verify(request, account_type, auth_token):
             messages.info(request, 'Your account has been verified successfully! Please login your account')
 
             message = f'Hello {pending_driver.user_id.first_name}! Thank you for signing on our page! Happy driving!'
-            create_notification = Notification.objects.create(receiver_id = pending_driver.user_id,
-                                                                message = message,
-                                                                date_recorded = datetime.now())
-            create_notification.notification_id = f'NOTF{create_notification.id}'
-            create_notification.save()
+            create_notification(request, pending_driver.user_id, message)
 
             return redirect('/login')
         else:
@@ -364,41 +365,35 @@ def profile(request):
 
 ################ LOGOUT PAGE
 def pending_drivers(request):
-    all_pending_drivers = DriverAccount.objects.filter(is_verified = False).all()
+    all_pending_drivers = DriverAccount.objects.filter(is_verified = False, auth_token = None).all()
 
     context = {
         'all_pending_drivers' : all_pending_drivers
     }
 
+
+    if request.method == 'POST':
+        send_email_to_this_id = request.POST.get('send_email_to_this_id')
+
+        driver_account = DriverAccount.objects.filter(id = send_email_to_this_id).first()
+
+        if driver_account:
+            auth_token = str(uuid.uuid4())
+            driver_account.auth_token = auth_token
+            driver_account.save()
+
+            host = request.get_host()
+            send_registration_email(driver_account.user_id, 'driver', auth_token, host)
+
+            messages.info(request, f'An email verification is sent to {driver_account.user_id.first_name} {driver_account.user_id.first_name} with email {driver_account.user_id.email}. If you want to contact him, use this number ({driver_account.contact_no})')
+            return redirect('/pending-drivers')
+        
+        else:
+            messages.info(request, f'Sorry, something went wrong. Please try again!')
+            return redirect('/pending-drivers')
+
     return render(request, 'pending/pending-drivers.html', context)
 
-def approve_pending_driver(request, id):
-    driver_account = DriverAccount.objects.filter(user_id__id = id).first()
-    
-    if driver_account:
-        auth_token = str(uuid.uuid4())
-        driver_account.auth_token = auth_token
-        driver_account.save()
-
-        message = f'You successfully sent an email verification to {driver_account.user_id.first_name} {driver_account.user_id.first_name}! Please inform your driver about this update!'
-
-        create_notification = Notification.objects.create(receiver_id = request.user,
-                                                            message = message,
-                                                            date_recorded = datetime.now())
-        create_notification.notification_id = f'NOTF{create_notification.id}'
-        create_notification.save()
-
-        response_data = {
-            'message' : message
-        }
-        return JsonResponse(response_data)
-    
-    else:
-        response_data = {
-            'message' : message
-        }
-
-        return JsonResponse(response_data)
 
 
 ################ LOGOUT PAGE
@@ -414,3 +409,65 @@ def logout_page(request):
 
 
 # the admin must send auth_token to driver account
+
+
+
+############################ THESE ARE USED FOR FETCHING USING JS ####################################################
+
+################ GET PENDING DRIVER INFO PAGE
+def get_pending_driver_info(request, id):
+    driver_account = DriverAccount.objects.filter(user_id__id = id).first()
+    
+    if driver_account:
+        driver_data = {
+            'driver_id' : driver_account.driver_id,
+            'email' : driver_account.user_id.email,
+            'id' : driver_account.id
+        }
+
+        return JsonResponse(driver_data, safe=False)
+    
+    else:
+        error = {
+            'error' : 'Driver account not found'
+        }
+        return JsonResponse(json.dumps(error), status = 404)
+
+
+
+def approve_pending_driver(request, id):
+    driver_account = DriverAccount.objects.filter(user_id__id = id).first()
+    
+    if driver_account:
+        auth_token = str(uuid.uuid4())
+        driver_account.auth_token = auth_token
+        driver_account.save()
+
+        message = f'You successfully sent an email verification to {driver_account.user_id.first_name} {driver_account.user_id.first_name}! Please inform your driver about this update!'
+        create_notification(request, request.user, message)
+
+        return JsonResponse(message)
+    
+    else:
+        message = f'Sorry, the system couldn`t find an account with User ID {id}'
+        return JsonResponse(message)
+    
+
+
+def open_notification(request, id):
+    notification = Notification.objects.filter(id = id).first()
+    notification.is_seen = True
+    notification.save()
+
+    message_content = {
+        'notification_id' : str(notification.notification_id),
+        'message' : str(notification.message),
+        'date_recorded' : str(notification.date_recorded),
+        'messages' : 'You`ve seen this notification!'
+    }
+
+    return JsonResponse(message_content)
+
+
+    
+############################ THESE ARE USED FOR FETCHING USING JS ####################################################

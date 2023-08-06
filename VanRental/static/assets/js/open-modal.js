@@ -15,32 +15,52 @@ function closeModal(overlayId) {
 
 
 function openPendingDriverModal(button) {
-    var modalOverlay = document.getElementById('pending_driver');
-    var modal = modalOverlay.querySelector(".modal");
-    modalOverlay.classList.add("active");
-    modal.classList.add("active");
+    
     var userId = button.getAttribute('data-userid');
-    console.log("Opening modal for User ID:", userId);
+    var email = undefined;
 
-
-    var apiUrl = `approve-pending-driver/${userId}/`;
-
-    // Data to be sent to the backend
-    var data = {
-        user_id: userId
-    };
-
-    // Fetch API POST request
-    fetch(apiUrl)
+    fetch(`pending-driver-info/${userId}/`)
         .then(response => response.json())
         .then(data => {
-            // Handle the response from the backend (if needed)
-            console.log("Response from the backend:", data);
-            // You can perform further actions based on the response here.
+            email = `${data.email}`;
+
+            if (email !== undefined){
+                var modalOverlay = document.getElementById('pending_driver');
+                var modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+            }
+
+            var modal_title_holder = document.getElementById('modal-title-holder');
+            modal_title_holder.textContent = `Are you sure you want to approve this account ? ${email}`
+
+            const send_email_input_field = document.querySelector('input[name="send_email_to_this_id"]');
+            send_email_input_field.value = data.id
+
         })
         .catch(error => {
             console.error("Error:", error);
         });
+    
+
+    
+    
+    // var userId = button.getAttribute('data-userid');
+    // console.log("Opening modal for User ID:", userId);
+
+
+
+
+    // var apiUrl = `approve-pending-driver/${userId}/`;
+    
+    // fetch(apiUrl)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         console.log("Response from the backend:", data.message);
+    //     })
+    //     .catch(error => {
+    //         console.error("Error:", error);
+    //     });
 }
 
 function closePendingDriverModal() {

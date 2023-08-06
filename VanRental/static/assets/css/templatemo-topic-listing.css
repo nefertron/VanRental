@@ -1396,6 +1396,10 @@ blockquote {
   margin-right: 20px;
 }
 
+.mr-30{
+  margin-right: 30px;
+}
+
 
 .mr-100{
   margin-right: 100px;
@@ -1409,11 +1413,20 @@ blockquote {
   width: 30px;
 }
 
+.not-seen-bg{
+  background-color: #f0efef;
+}
+
+.not-seen-bg p{
+  font-weight: bolder;
+}
+
 
 .message-box{
   background-color: whitesmoke;
   width: 300px;
-  height: 200px; 
+  height: auto; 
+  overflow-x: auto;
   position: absolute; 
   right:0; 
   border-radius: 20px;
@@ -1429,14 +1442,22 @@ blockquote {
 .message-box ul li{
   padding: 5px;
   margin-left: -30px;
-  margin-top: 10px;
+  border-bottom: 1px solid #2ca0a9;
 }
 
 .message-box ul li a{ 
   margin-left: 30px;
-
+  font-size: 0.875rem;
+  margin-right: 25px;
 }
 
+.message-box ul li p{ 
+  margin-top: 10px;
+  margin-left: 30px;
+  font-size: 0.875rem;
+  margin-right: 25px;
+  color: #13547a;
+}
 
 .message-box ul li:hover{
   transform: scale(1.02);
@@ -1445,11 +1466,25 @@ blockquote {
 }
 
 
-
 .message-box.active{
   display: block;
 }
 
+.message-box-header{
+  margin-top: -20px;
+  border-bottom: 1px solid #2ca0a9;
+}
+
+.message-box-header p{
+  color: #13547a;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-left: 30px;
+}
+
+.custom-button{
+  cursor: pointer;
+}
 
 .upload-image-button{
   margin-left:55px; 

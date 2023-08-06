@@ -1,4 +1,5 @@
 {% load static %}
+{% load vanrental_templatetags %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -70,20 +71,24 @@
                         </div>
 
                         <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
                             <ul>
-                                <li>
-                                    <a href="topics-listing.html">
-                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
-                                        This is a notification
-                                    </a>
-                                </li>
-
-                                <li>
-                                    <a href="contact.html">
-                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
-                                        This is another notification
-                                    </a>
-                                </li>
+                                {% get_my_notifications user as all_notifications %}
+                                {% if all_notifications|length > 0 %}
+                                    {% for notif in all_notifications %}
+                                        <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                            <p>{{notif.message}}</p>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li>
+                                        <p>Cannot find new notifications.</p>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </div>
 
@@ -130,12 +135,22 @@
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
                             </button>
-
+                            
                             <button class="profile-button" onclick="openProfile('desktop');">
-                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
                             </button>
 
                             <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
                                 <ul>
                                     <li>
                                         <a href="topics-listing.html">
@@ -154,20 +169,24 @@
                             </div>
 
                             <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
                                 <ul>
-                                    <li>
-                                        <a href="topics-listing.html">
-                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
-                                            This is a notification
-                                        </a>
-                                    </li>
-    
-                                    <li>
-                                        <a href="contact.html">
-                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
-                                            This is another notification
-                                        </a>
-                                    </li>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                             
@@ -818,7 +837,7 @@
             </section>
         </main>
 
-<footer class="site-footer section-padding">
+        <footer class="site-footer section-padding">
             <div class="container">
                 <div class="row">
 
@@ -890,68 +909,75 @@
             </div>
         </footer>
 
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        By proceeding, the account owner will receive an email to verify his/her address. 
+                        Please inform your driver in order to verify his account.
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
 
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
         <script src="{% static 'assets/js/click-scroll.js' %}"></script>
         <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script src="{% static 'assets/js/open-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/open-modal.js' %}"></script> 
+
         <script>
-            function openSideBar(){
-
-                var side_bar = document.getElementById('van-rental-sidebar')
-                side_bar.classList.add('active')
-
-                var open_sidebar_btn = document.getElementById('menu-btn').style.display = "none";
-                var close_sidebar_btn = document.getElementById('close-menu-btn').style.display = "block";
-            }
-
-            function closeSideBar(){
-                var side_bar = document.getElementById('van-rental-sidebar')
-                side_bar.classList.remove('active')
-
-                var open_sidebar_btn = document.getElementById('menu-btn').style.display = "block";
-                var close_sidebar_btn = document.getElementById('close-menu-btn').style.display = "none";
-
-            }
-
-            function openNotification(mode){
-                var my_notif = document.getElementById(`my-notification-${mode}`);
-
-                if (my_notif.classList.contains('active')){
-                    my_notif.classList.remove('active');
-                }
-                else{
-                    my_notif.classList.add('active');
-                }
-
-                var my_profiles = document.querySelectorAll('[id^="my-profile"]');
-                for (var x = 0; x < my_profiles; x++){
-                    if (my_profiles[x].classList.contains('active')){
-                        my_profiles[x].classList.remove('active');
-                    }
-                }
-            }
-
-            function openProfile(mode) {
-                var my_profile = document.getElementById(`my-profile-${mode}`);
+            const listItems = document.querySelectorAll('.custom-button');
+            
+            listItems.forEach(item => {
+              item.addEventListener('click', function(event) {
+                const id_of_notif = item.dataset.message; // Get the message from the <p> tag
                 
-                if (my_profile.classList.contains('active')){
-                    my_profile.classList.remove('active');
-                }
-                else{
-                    my_profile.classList.add('active');
-                }
-                    
+                fetch(`open/notification/${id_of_notif}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const message = data['messages'];
+                        const notification = data['message'];
+                        const notification_id = data['notification_id'];
+                        const date_recorded = data['date_recorded'];
 
-                var my_notifs = document.querySelectorAll('[id^="my-notification"]');
-                for (var x = 0; x < my_notifs.length; x++) {
-                    if (my_notifs[x].classList.contains('active')) {
-                    my_notifs[x].classList.remove('active');
-                    }
-                }
-            }
+            
+                        if (message !== undefined){
+                            var modalOverlay = document.getElementById('seen_message');
+                            var modal = modalOverlay.querySelector(".modal");
+                            modalOverlay.classList.add("active");
+                            modal.classList.add("active");
+                        }
+            
+                        var modal_title_holder = document.getElementById('modal-title-holder');
+                        modal_title_holder.textContent = message
+
+                        var modal_body_holder = document.getElementById('modal-body-holder');
+                        modal_body_holder.textContent = notification
+
+                        var modal_footer = document.getElementById('modal-footer');
+                        modal_footer.textContent = `Date Recorded : ${date_recorded} || ID : ${notification_id}`
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+                
+              });
+            });
         </script>
+
     </body>
 </html>
