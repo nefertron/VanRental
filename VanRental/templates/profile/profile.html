@@ -1,4 +1,6 @@
 {% load static %}
+{% load tz %}
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -85,26 +87,42 @@
             </nav>
 
 
-            <header class="site-header d-flex flex-column justify-content-center align-items-center">
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">
                     <div class="row align-items-center">
-
                         <div class="col-lg-5 col-12">
                             <nav aria-label="breadcrumb">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-
                                     <li class="breadcrumb-item active" aria-current="page">Profile</li>
                                 </ol>
                             </nav>
                         </div>
 
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
                         <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5">
                             <div class="d-flex">
                                 <div class="profile-bg" style="margin-top: auto; margin-bottom: auto;">
-                                    <img src="{% static 'assets/images/topics/undraw_Remote_design_team_re_urdx.png' %}" class="" alt="">
-                                </div>
-                                
+                                    {% if profile.profile %}
+                                        <img src="{{profile.profile}}" class="" alt="">
+                                    {% else %}
+                                        <img src="{% static 'assets/images/default-profile.png' %}" class="" alt="">
+                                    {% endif %}
+
+                                    <button class="upload-image-button" onclick="openModal('upload-image-modal')">
+                                        <img src="{% static 'assets/images/camera.svg' %}" class="" alt="">
+                                    </button>
+
+                                    <button class="remove-profile" onclick="openModal('remove-profile')">
+                                        Remove Profile
+                                    </button>
+                                </div> <br>
 
                                 <div class="custom-block-topics-listing-info d-flex">
                                     <div>
@@ -117,13 +135,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('update_modal')">Update</button>
-  
+                            <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('update_modal')">Update</button>
                         </div>
-                        
                     </div>
                 </div>
             </header>
+            
             <div class="modal-overlay" id="update_modal">
                 <div class="modal">
                     <div class="modal-body">
@@ -144,7 +161,7 @@
                             <input type="email" name="email" value="{{profile.user_id.email}}" class="form-control" placeholder="Email" required>
 
                             <label class="form-label">Birth Date</label>
-                            <input type="date" name="bday" value="{{profile.bday}}" class="form-control" placeholder="Birth Date" required>
+                            <input type="date" name="bday" value="{{ profile.bday|date:'Y-m-d' }}" max="{% now 'Y-m-d' %}" id="birthdate-input" class="form-control" placeholder="Birth Date" required>
 
                             <label class="form-label">Contact No.</label>
                             <input type="text" name="contact_no" value="{{profile.contact_no}}"  class="form-control" placeholder="Contact No." required>
@@ -160,7 +177,67 @@
                                 <br/>
                                 <br/>
                                 <div class="col-md-6">
-                                    <button type="submit" class="form-control" onclick="closeModal('update_modal')">Close</button>
+                                    <button type='button' class="form-control" onclick="closeModal('update_modal')">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="modal-overlay" id="upload-image-modal">
+                <div class="modal">
+                    <div class="modal-body">
+                        <h2 class="modal-title">Upload your image</h2>
+
+                        <div id="uploaded-image-holder" style="display: none;">
+                            <div class="profile-bg" style="margin:auto;">
+                                <img src="{% static 'assets/images/default-profile.png' %}" id="uploaded-image" class="" alt="">
+                            </div><br>
+                            <h2 class="text-center">New Profile</h2>
+                        </div>
+
+                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                            {% csrf_token %}
+                            <label class="form-label">Attach image</label>
+                            <input type="file" name="profile" class="form-control" placeholder="" required  onchange="displayUploadedPreview(event)">
+                            <input type="hidden" name="new_profile" class="form-control" placeholder="" required  id="new_profile">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="form-control">Upload</button>
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <div class="col-md-6">
+                                    <button type='button' class="form-control" onclick="closeModal('upload-image-modal')">Close</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-overlay" id="remove-profile">
+                <div class="modal">
+                    <div class="modal-body">
+                        <h2 class="modal-title text-sm">Are you sure you want to remove your profile</h2>
+
+                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                            {% csrf_token %}
+                            <input type="hidden" name="remove_profile" value="True" class="form-control" placeholder="" required>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button type="submit" class="form-control">Remove now</button>
+                                </div>
+                                <br/>
+                                <br/>
+                                <br/>
+                                <div class="col-md-6">
+                                    <button type='button' class="form-control" onclick="closeModal('remove-profile')">Cancel</button>
                                 </div>
                             </div>
                         </form>
@@ -175,21 +252,37 @@
         <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
         <script src="{% static 'assets/js/custom.js' %}"></script>
 
-        <script>
-            function openModal(overlayId) {
-                const modalOverlay = document.getElementById(overlayId);
-                const modal = modalOverlay.querySelector(".modal");
-                modalOverlay.classList.add("active");
-                modal.classList.add("active");
-            }
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/birthdate-checker.js' %}"></script>
 
-            function closeModal(overlayId) {
-                const modalOverlay = document.getElementById(overlayId);
-                const modal = modalOverlay.querySelector(".modal");
-                modalOverlay.classList.remove("active");
-                modal.classList.remove("active");
+
+        <script>
+            function displayUploadedPreview(event) {
+                const uploadedImageHolder = document.getElementById('uploaded-image-holder');
+                const uploadedImage = document.getElementById('uploaded-image');
+                const file = event.target.files[0];
+                
+                if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    uploadedImage.src = e.target.result;
+                    uploadedImageHolder.style.display = 'block';
+
+                    document.getElementById('new_profile').value = uploadedImage.src
+                }
+                
+                
+                
+                reader.readAsDataURL(file);
+                } else {
+                uploadedImage.src = "{% static 'assets/images/default-profile.png' %}";
+                uploadedImageHolder.style.display = 'none';
+                }
+
+
             }
         </script>
-
     </body>
 </html>

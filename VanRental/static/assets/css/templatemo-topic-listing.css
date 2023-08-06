@@ -51,6 +51,30 @@ body {
 }
 
 
+
+/* width */
+::-webkit-scrollbar {
+  width: 1px;
+  height: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: whitesmoke;
+  border-radius: 2px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #999;
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: whitesmoke;
+}
+
 /*---------------------------------------
   TYPOGRAPHY               
 -----------------------------------------*/
@@ -1180,6 +1204,10 @@ blockquote {
     margin-right: auto;
   }
 
+  .x-button{
+    display: none;
+  }
+
 }
 
 .hidden{
@@ -1255,3 +1283,248 @@ blockquote {
   margin-left: 10px;
   margin-bottom: -5px;
 }
+
+.sidebar-button{
+  background-color: #80d0c7;
+  height: 40px; width:40px;
+  border-radius:50%;
+  border-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.sidebar-button:hover{
+  transform: scale(1.05);
+}
+
+.sidebar-x-button{
+  display: none;
+  background-color: #80d0c7;
+  height: 40px; width:40px;
+  border-radius:50%;
+  border-color: transparent;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.sidebar-x-button:hover{
+  transform: scale(1.05);
+}
+
+
+.side-bar-header{
+  position: fixed;
+  margin-top: 100px;
+  z-index: 1000;
+}
+
+
+.side-bar{
+  position: absolute;
+  margin-left: 0.75rem;
+  margin-right: 0.75rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+  padding-top: 1.25rem;
+  border-radius: 0.375rem;
+  padding-bottom: 7rem;
+  background-color: #5ca9ae;
+  width: 18rem;
+  height: 100vh;
+  border-width: 1px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  border-color: #4b5563;
+  display: none;
+}
+
+.side-bar.active{
+  display: block;
+}
+
+
+.van-nav-items{
+  font-weight: 900;
+}
+
+.van-nav-items ul{
+  list-style-type: none;
+}
+
+.van-nav-items ul li{
+  padding: 5px;
+  margin-left: -30px;
+  margin-top: 10px;
+}
+
+.van-nav-items ul li a{ 
+  color: whitesmoke;
+  margin-left: 30px;
+}
+
+.van-nav-items ul li:hover{
+  transform: scale(1.02);
+  background-color: #2ca0a9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3)
+}
+
+
+.profile-button{
+  background-color: transparent;
+  border-color: transparent;
+  border-radius: 50%;
+}
+
+
+.profile-button img{
+  height: 40px; width:40px;
+  background-color: none;
+  border-color: transparent;
+  border-radius: 50%;
+}
+
+.profile-button img:hover{
+  transform: scale(1.05);
+}
+
+.font-bold{
+  font-weight: bolder;
+}
+
+.-mt-50{
+  margin-top: -50px;
+}
+
+.mr-20{
+  margin-right: 20px;
+}
+
+
+.mr-100{
+  margin-right: 100px;
+}
+
+.h-30{
+  height: 30px;
+}
+
+.w-30{
+  width: 30px;
+}
+
+
+.message-box{
+  background-color: whitesmoke;
+  width: 300px;
+  height: 200px; 
+  position: absolute; 
+  right:0; 
+  border-radius: 20px;
+  padding-top: 2rem;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.message-box ul{
+  list-style-type: none;
+}
+
+.message-box ul li{
+  padding: 5px;
+  margin-left: -30px;
+  margin-top: 10px;
+}
+
+.message-box ul li a{ 
+  margin-left: 30px;
+
+}
+
+
+.message-box ul li:hover{
+  transform: scale(1.02);
+  background-color: #2ca0a9;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+
+
+.message-box.active{
+  display: block;
+}
+
+
+.upload-image-button{
+  margin-left:55px; 
+  margin-top: -35px; 
+  border: transparent; 
+  display: flex; 
+  position: absolute;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%;
+  padding: 5px;
+}
+
+.upload-image-button img{
+  height: 30px;
+  width:30px;
+}
+
+.upload-image-button:hover{
+  background-color: rgb(197, 195, 195);
+}
+
+
+.remove-profile{
+  margin:auto;
+  background-color: #dc3545; 
+  color: whitesmoke; 
+  font-size: 0.7rem ; 
+  margin-top: 10px; padding: 5px; 
+  border-radius: 50px; 
+  border: transparent; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+  margin-top: 10px;
+}
+
+.remove-profile:hover{
+  background-color: #ec384a; 
+  transform: scale(1.02);
+}
+
+
+.table-x-overflow{
+  overflow-x: auto;
+  width: 100%;
+}
+
+
+.table-full{
+  width: 100%; 
+  margin:0; 
+  padding:0; 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-full tbody tr:hover{
+  transform: scale(1.02);
+  border-bottom: 2px solid #13547a;
+}
+
+.approve-button{
+  background-color: #22b254; 
+  color: whitesmoke; 
+  font-weight: 600; 
+  font-size: 0.75rem; 
+  padding: 10px; 
+  border-radius: 10px; 
+  border: transparent;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.approve-button:hover{
+  transform: scale(1.05);
+}
+
+

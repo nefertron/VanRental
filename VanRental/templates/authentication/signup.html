@@ -85,7 +85,7 @@
             </nav>
             
 
-            <header class="site-header d-flex flex-column justify-content-center align-items-center">
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">
                     <div class="row justify-content-center align-items-center">
                         {% for message in messages %}
@@ -101,7 +101,16 @@
 
                                         {% csrf_token %}
                                         <h4 class="mb-4 pb-2">Signup</h4>
-        
+
+                                        <select name="user_type" class="form-control" required>
+                                            <option disabled selected>--- Choose an account type --- </option>
+                                            <option value="passenger">I am a passenger</option>
+                                            <option value="driver">I am a driver</option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please enter your preferred username.
+                                        </div>
+
                                         <input type="text" name="username" class="form-control" placeholder="Username" required>
                                         <div class="invalid-feedback">
                                             Please enter your preferred username.
@@ -122,7 +131,7 @@
                                             Please enter your email.
                                         </div>
 
-                                        <input type="date" name="bday" class="form-control" placeholder="Birth Date" required>
+                                        <input type="date" name="bday" class="form-control" max="{% now 'Y-m-d' %}" id="birthdate-input" placeholder="Birth Date" required>
                                         <div class="invalid-feedback">
                                             Please enter your birthdate.
                                         </div>
@@ -172,27 +181,8 @@
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
         <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
         <script src="{% static 'assets/js/custom.js' %}"></script>
+
         <script src="{% static 'assets/js/form-validator.js' %}"></script>
-        <script>
-            (function () {
-                'use strict'
-            
-                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                var forms = document.querySelectorAll('.needs-validation')
-            
-                // Loop over them and prevent submission
-                Array.prototype.slice.call(forms)
-                  .forEach(function (form) {
-                    form.addEventListener('submit', function (event) {
-                      if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                      }
-            
-                      form.classList.add('was-validated')
-                    }, false)
-                  })
-              })()
-        </script>
+        <script src="{% static 'assets/js/birthdate-checker.js' %}"></script>
     </body>
 </html>

@@ -12,5 +12,7 @@ urlpatterns = [
     path('logout', logout_page, name='logout_page'),
     path('verify/<account_type>/<auth_token>', verify, name='verify'),
     path('profile', profile, name='profile'),
+    path('pending-drivers', pending_drivers, name='pending_drivers'),
+    path('approve-pending-driver/<id>/', approve_pending_driver, name='approve_pending_driver'),
 
 ]

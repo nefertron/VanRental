@@ -8,7 +8,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Topic Listing Bootstrap 5 Template</title>
+        <title>Homepage</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +28,6 @@
     <body id="top">
 
         <main>
-
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     <a class="navbar-brand" href="index.html">
@@ -36,8 +35,58 @@
                         <span>Van Rental</span>
                     </a>
 
+                    {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+                            <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
+                            <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
+                        </div>
+                    {% endif %}
+
                     <div class="d-lg-none ms-auto me-4">
-                        <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            <img src="{% static 'assets/images/default-profile.png' %}"/>
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="topics-listing.html">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="contact.html">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <ul>
+                                <li>
+                                    <a href="topics-listing.html">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        This is a notification
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="contact.html">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        This is another notification
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,12 +127,85 @@
 
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
-                            <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            </button>
+
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <ul>
+                                    <li>
+                                        <a href="topics-listing.html">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="contact.html">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <ul>
+                                    <li>
+                                        <a href="topics-listing.html">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            This is a notification
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="contact.html">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            This is another notification
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            
                         </div>
+                        
                         {% endif %}
                     </div>
                 </div>
             </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index">
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/profile">
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/pending-drivers">
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    Pending Drivers
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             
 
             <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
@@ -775,6 +897,61 @@
         <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
         <script src="{% static 'assets/js/click-scroll.js' %}"></script>
         <script src="{% static 'assets/js/custom.js' %}"></script>
+        <script>
+            function openSideBar(){
 
+                var side_bar = document.getElementById('van-rental-sidebar')
+                side_bar.classList.add('active')
+
+                var open_sidebar_btn = document.getElementById('menu-btn').style.display = "none";
+                var close_sidebar_btn = document.getElementById('close-menu-btn').style.display = "block";
+            }
+
+            function closeSideBar(){
+                var side_bar = document.getElementById('van-rental-sidebar')
+                side_bar.classList.remove('active')
+
+                var open_sidebar_btn = document.getElementById('menu-btn').style.display = "block";
+                var close_sidebar_btn = document.getElementById('close-menu-btn').style.display = "none";
+
+            }
+
+            function openNotification(mode){
+                var my_notif = document.getElementById(`my-notification-${mode}`);
+
+                if (my_notif.classList.contains('active')){
+                    my_notif.classList.remove('active');
+                }
+                else{
+                    my_notif.classList.add('active');
+                }
+
+                var my_profiles = document.querySelectorAll('[id^="my-profile"]');
+                for (var x = 0; x < my_profiles; x++){
+                    if (my_profiles[x].classList.contains('active')){
+                        my_profiles[x].classList.remove('active');
+                    }
+                }
+            }
+
+            function openProfile(mode) {
+                var my_profile = document.getElementById(`my-profile-${mode}`);
+                
+                if (my_profile.classList.contains('active')){
+                    my_profile.classList.remove('active');
+                }
+                else{
+                    my_profile.classList.add('active');
+                }
+                    
+
+                var my_notifs = document.querySelectorAll('[id^="my-notification"]');
+                for (var x = 0; x < my_notifs.length; x++) {
+                    if (my_notifs[x].classList.contains('active')) {
+                    my_notifs[x].classList.remove('active');
+                    }
+                }
+            }
+        </script>
     </body>
 </html>

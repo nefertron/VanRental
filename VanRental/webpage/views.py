@@ -10,8 +10,17 @@ import uuid
 from django.conf import settings
 from django.core.mail import send_mail
 
+from django.http import JsonResponse
+
 # Create your views here.
 
+
+def RemoveSpaces(username):
+    li = list(username.split(" "))
+    temp_container = ''.join(li)
+
+    return temp_container
+            
 
 def index(request):
 
@@ -28,11 +37,7 @@ def login_page(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        def UsernameConverter(username):
-                li = list(username.split(" "))
-                return li
-        temp_username_id = UsernameConverter(username.lower())
-        username = ''.join(temp_username_id)
+        username = RemoveSpaces(username.lower())
 
         if '@' in username:
             user = User.objects.filter(email = username).first()
@@ -126,15 +131,9 @@ def signup_page(request):
             return render(request, 'authentication/signup.html', context)
 
         else:
-            def UsernameConverter(username):
-                li = list(username.split(" "))
-                return li
-            
-            temp_username = UsernameConverter(username.lower())
-            username = ''.join(temp_username)
+            username = RemoveSpaces(username.lower())
 
-            temp_email = UsernameConverter(email.lower())
-            email = ''.join(temp_email)
+            email = RemoveSpaces(email.lower())
         
             if driverOrPassenger == 'passenger':
                 new_user = User.objects.create(email = email, username = username, first_name = fname, last_name = lname)
@@ -155,6 +154,8 @@ def signup_page(request):
 
                 host = request.get_host()
                 send_registration_email(new_user, 'passenger', auth_token, host)
+                
+                messages.info(request, f'Your account has been successfully created. Please check your email to verify your account!')
                 return redirect('/login')
 
             else:
@@ -181,7 +182,7 @@ def signup_page(request):
 ################ EMAIL GENERATOR
 def send_registration_email(account, account_type, auth_token, host):
     subject = 'Welcome to VAN RENTAL online portal!'
-    message = f'Thank you for signing up on our page.\nPlease click the link below to complete the account activation process.\nhttps://{host}/verify/{account_type}/{auth_token}'
+    message = f'Thank you for signing up on our page.\nPlease click the link below to complete the account activation process.\nhttp://{host}/verify/{account_type}/{auth_token}'
     from_mail = settings.EMAIL_HOST_USER
     recipient_list = [account.email]
 
@@ -198,6 +199,14 @@ def verify(request, account_type, auth_token):
             pending_passenger.save()
 
             messages.info(request, 'Your account has been verified successfully! Please login your account')
+
+            message = f'Hello {pending_passenger.user_id.first_name}! Thank you for signing on our page! Enjoy renting!'
+            create_notification = Notification.objects.create(receiver_id = pending_passenger.user_id,
+                                                                message = message,
+                                                                date_recorded = datetime.now())
+            create_notification.notification_id = f'NOTF{create_notification.id}'
+            create_notification.save()
+
             return redirect('/login')
         else:
             messages.info(request, f'Sorry, the page you are trying to access is invalid or expired. Please try another!')
@@ -211,6 +220,14 @@ def verify(request, account_type, auth_token):
             pending_driver.save()
 
             messages.info(request, 'Your account has been verified successfully! Please login your account')
+
+            message = f'Hello {pending_driver.user_id.first_name}! Thank you for signing on our page! Happy driving!'
+            create_notification = Notification.objects.create(receiver_id = pending_driver.user_id,
+                                                                message = message,
+                                                                date_recorded = datetime.now())
+            create_notification.notification_id = f'NOTF{create_notification.id}'
+            create_notification.save()
+
             return redirect('/login')
         else:
             messages.info(request, f'Sorry, the page you are trying to access is invalid or expired. Please try another!')
@@ -248,6 +265,94 @@ def profile(request):
         context['account_id'] = passenger_account.passenger_id
 
 
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        fname = request.POST.get('fname')
+        lname = request.POST.get('lname')
+        email = request.POST.get('email')
+        bday = request.POST.get('bday')
+        contact_no = request.POST.get('contact_no')
+        address = request.POST.get('address')
+
+        new_profile  = request.POST.get('new_profile')
+        remove_profile = request.POST.get('remove_profile')
+
+        if new_profile:
+            if len(new_profile) > 0:
+                context['profile'].profile = new_profile
+                context['profile'].save()
+                messages.info(request, f'Your profile has been saved!')
+                return redirect('/profile')
+
+        if remove_profile:
+            if remove_profile == "True":
+                context['profile'].profile = None
+                context['profile'].save()
+                messages.info(request, f'Your profile has been removed!')
+                return redirect('/profile')
+        
+        if User.objects.filter(email = email).count() > 1:
+            messages.info(request, f'Sorry, the email you entered is not available. Please try another!')
+            return redirect('/profile')
+        
+        elif User.objects.filter(username = username).count() > 1:
+            messages.info(request, f'Sorry, the username you entered is not available. Please try another!')
+            return redirect('/profile')
+
+        else:
+            username = RemoveSpaces(username.lower())
+            email = RemoveSpaces(email.lower())
+
+            all_changes = []
+
+            if username != context["profile"].user_id.username:
+                all_changes.append('username')
+            
+            if fname != context["profile"].user_id.first_name:
+                all_changes.append('first name')
+
+            if lname != context["profile"].user_id.last_name:
+                all_changes.append('last name')
+
+            if email != context["profile"].user_id.email:
+                all_changes.append('email')
+            
+            if bday != context["profile"].bday:
+                all_changes.append('birth date')
+            
+            if contact_no != context["profile"].contact_no:
+                all_changes.append('contact no.')
+
+            if address != context["profile"].address:
+                all_changes.append('address')
+
+            User.objects.filter().update(first_name = fname,
+                                        last_name = lname,
+                                        email = email,
+                                        username = username)
+
+            context['profile'].bday = bday
+            context['profile'].contact_no = contact_no
+            context['profile'].address = address
+            context['profile'].save()
+
+
+            list_of_changes = ", ".join(all_changes)
+
+            if len(all_changes) > 1:
+                message = f"The changes in fields {list_of_changes} have been saved."
+                messages.info(request, message)
+            elif len(all_changes) == 1 and all_changes[0] != 'birth date':
+                message = f"The change in your {list_of_changes} has been saved."
+                messages.info(request, message)
+            else:
+                messages.info(request, 'It seems like you made no changes')
+
+            return redirect('/profile')
+
+
+
+
 
         
 
@@ -255,6 +360,45 @@ def profile(request):
     return render(request, 'profile/profile.html', context)
 
 
+
+
+################ LOGOUT PAGE
+def pending_drivers(request):
+    all_pending_drivers = DriverAccount.objects.filter(is_verified = False).all()
+
+    context = {
+        'all_pending_drivers' : all_pending_drivers
+    }
+
+    return render(request, 'pending/pending-drivers.html', context)
+
+def approve_pending_driver(request, id):
+    driver_account = DriverAccount.objects.filter(user_id__id = id).first()
+    
+    if driver_account:
+        auth_token = str(uuid.uuid4())
+        driver_account.auth_token = auth_token
+        driver_account.save()
+
+        message = f'You successfully sent an email verification to {driver_account.user_id.first_name} {driver_account.user_id.first_name}! Please inform your driver about this update!'
+
+        create_notification = Notification.objects.create(receiver_id = request.user,
+                                                            message = message,
+                                                            date_recorded = datetime.now())
+        create_notification.notification_id = f'NOTF{create_notification.id}'
+        create_notification.save()
+
+        response_data = {
+            'message' : message
+        }
+        return JsonResponse(response_data)
+    
+    else:
+        response_data = {
+            'message' : message
+        }
+
+        return JsonResponse(response_data)
 
 
 ################ LOGOUT PAGE
