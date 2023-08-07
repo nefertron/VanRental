@@ -41,7 +41,6 @@
                             <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
                             <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
                         </div>
-                    {% endif %}
 
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
@@ -91,8 +90,10 @@
                                 {% endif %}
                             </ul>
                         </div>
-
                     </div>
+
+                    {% endif %}
+
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -212,6 +213,12 @@
                                 <a href="/profile">
                                     <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
                                     Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/list-of-cars">
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    All Vans
                                 </a>
                             </li>
                             <li>

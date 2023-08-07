@@ -30,7 +30,7 @@ https://templatemo.com/tm-590-topic-listing
   --h4-font-size:                 28px;
   --h5-font-size:                 24px;
   --h6-font-size:                 22px;
-  --p-font-size:                  20px;
+  --p-font-size:                  0.875rem;
   --menu-font-size:               14px;
   --btn-font-size:                18px;
   --copyright-font-size:          16px;
@@ -578,12 +578,16 @@ strong {
   width: 100%;
 }
 
+.custom-block button{
+  width: 100%;
+}
+
 .custom-block-image {
   display: block;
   width: 100%;
   height: 200px;
   object-fit: cover;
-  margin-top: 35px;
+  /* margin-top: 35px; */
 }
 
 .custom-block .rounded-pill {
@@ -1560,6 +1564,32 @@ blockquote {
 
 .approve-button:hover{
   transform: scale(1.05);
+}
+
+.add-btn{
+  margin-left: 20px;
+  border-radius: 10px;
+  border: transparent;
+  height: 35px;
+  width: auto;
+  margin-top: -5px;
+  background-color: #13547a;
+  color: whitesmoke;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.add-btn:hover{
+  transform: scale(1.02);
+}
+
+
+.van-slider{
+  border-radius: 10px; 
+  margin-left: auto; 
+  margin-right: auto; 
+  background-color: black; 
+  width: 300px; 
+  height: 300px;
 }
 
 

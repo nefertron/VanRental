@@ -395,6 +395,24 @@ def pending_drivers(request):
     return render(request, 'pending/pending-drivers.html', context)
 
 
+def list_of_cars(request):
+
+    if request.method == "POST":
+        images = request.POST.get('images')
+        plate_no = request.POST.get('plate_no')
+        color = request.POST.get('color')
+        number_of_seats = request.POST.get('number_of_seats')
+
+        image_list = images.split('||')
+        
+        # if len(images) > 0:
+        #     for image in images:
+        #         messages.info(request, f'Image : {image}')
+
+    return render(request, 'vans/list-of-vans.html')
+
+
+
 
 ################ LOGOUT PAGE
 def logout_page(request):

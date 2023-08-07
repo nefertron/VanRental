@@ -59,7 +59,6 @@ class Notification(models.Model):
 class Van(models.Model):
     plate_no = models.CharField(max_length=20)
     color = models.CharField(max_length=20)
-    vehicle_image = models.TextField()
     number_of_seats = models.IntegerField(default=0)
     is_rented = models.BooleanField(default=False)
     is_carpooled = models.BooleanField(default=False)
@@ -67,6 +66,14 @@ class Van(models.Model):
     def __str__(self):
         return f'PLATE NO. : {self.plate_no} || COLOR : {self.color}'
     
+
+class VanImages(models.Model):
+    van_image_id = models.ForeignKey(Van, on_delete=models.CASCADE)
+    vehicle_image = models.TextField()
+
+    def __str__(self):
+        return f'PLATE NO : {self.van_image_id.plate_no}'
+
 
 class RentedVan(models.Model):
     rent_id = models.CharField(max_length=20)
