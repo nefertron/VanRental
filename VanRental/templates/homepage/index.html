@@ -820,7 +820,7 @@
         </main>
 
 
-        <div class="modal-overlay" id="loginFirst">
+        <div class="modal-overlay" id="loginFirst" style='width:40%;'>
             <div class="modal">
                 <div class="modal-body">
                     <h2 class="modal-title text-sm">
@@ -896,9 +896,37 @@
                         {% csrf_token %}
                         <label class="form-label">Package Rent (in Php)</label>
                         <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required>
+                        <input type="hidden" name="van_id" class="form-control" id='van_id' required>
                         
-                        <label class="form-label"></label>
-                        <input type="password" name="password" class="form-control" placeholder="Password..." required>
+                        <label class="form-label">From Destination</label>
+                        <select name="from_destination_municipality" class="form-control" required id="from_destination_municipality" onchange="getDestination('from_destination_municipality', 'from_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="from_destination" class="form-control" required id="from_destination">
+                            <option disabled selected>--- Select From Destination --- </option>
+                        </select>
+
+                        <label class="form-label">To Destination</label>
+                        <select name="to_destination_municipality" class="form-control" required id="to_destination_municipality" onchange="getDestination('to_destination_municipality', 'to_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="to_destination" class="form-control" required id="to_destination">
+                            <option disabled selected>--- Select To Destination --- </option>
+                        </select>
+
+                        <label class="form-label">Travel Date</label>
+                        <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required>
+
 
                         <div class="row">
                             <div class="col-md-6">
@@ -929,6 +957,7 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-comments.js' %}"></script> 
         <script src="{% static 'assets/js/display-fetched-images.js' %}"></script> 
+        <script src="{% static 'assets/js/book-date-checker.js' %}"></script> 
 
         <script>
             function setRent(button, plate_no, package_rent){
@@ -943,16 +972,53 @@
                         brand_name.textContent = data['brand_name']
 
                         var plate_no = document.getElementById('rent-van-plate-no');
-                        plate_no.textContent = data['plate_no']
+                        plate_no.textContent = `Plate No. : ${data['plate_no']}`
 
                         var package_rent = document.getElementById('package_rent');
                         package_rent.value = data['package_rent']
 
+                        var van_id = document.getElementById('van_id');
+                        van_id.value = rent_data_id;
 
                     })
                     .catch(error => {
                         console.error("Error:", error);
                     });
+            }
+        </script>
+
+        <script>
+            function getDestination(parent_id, child_id){
+
+                var parent_select = document.getElementById(parent_id);
+                municipality_id = parent_select.value;
+
+                fetch(`get-address-destination/${municipality_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        all_places = data['destinations'];
+
+                        var to_destination_select = document.getElementById(child_id);
+                        to_destination_select.innerHTML = ''; 
+
+                        var defaultOption = document.createElement('option');
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        defaultOption.textContent = '--- Select To Destination ---';
+                        to_destination_select.appendChild(defaultOption);
+
+                        all_places.forEach(place => {
+                            var option = document.createElement('option');
+                            option.value = place;
+                            option.textContent = place;
+                            to_destination_select.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+
             }
         </script>
     </body>

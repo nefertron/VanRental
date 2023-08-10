@@ -1180,6 +1180,10 @@ blockquote {
   h5 {
     font-size: 20px;
   }
+
+  .modal-body{
+    width: 100%;
+  }
 }
 
 
@@ -1202,17 +1206,6 @@ blockquote {
   transform: scale(1.05);
 }
 
-@media (max-width: 480px) {
-  .profile-bg{
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .x-button{
-    display: none;
-  }
-
-}
 
 .hidden{
   display: none;
@@ -1273,8 +1266,9 @@ blockquote {
   background-color: whitesmoke;
   border-radius: 20px;
   padding: 1rem;
-  
+  width: 40%;
 }
+
 
 
 .modal-title{
@@ -1282,6 +1276,24 @@ blockquote {
   font-size: 2rem;
   margin-bottom: 30px;
 }
+
+
+@media (max-width: 480px) { /* mobile view */ 
+  .profile-bg{
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .x-button{
+    display: none;
+  }
+
+  .modal-body{
+    width: 100%;
+  }
+
+}
+
 
 .form-label{
   margin-left: 10px;

@@ -129,6 +129,11 @@ def get_rating():
 
 
 
+@register.simple_tag
+def get_all_municipality():
+    return ListOfMunicipalities.objects.filter().all()
+
+
 
 
         

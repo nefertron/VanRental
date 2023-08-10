@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.http import JsonResponse
 from json import dumps
 import json
+
+from django.db import transaction
 # Create your views here.
 
 def RemoveSpaces(name):
@@ -543,5 +545,65 @@ def rent_a_van(request, id):
     return JsonResponse(response)
 
 
+def get_destination_address(request, id):
+    destination_container = []
+
+    for destination in ListOfDestinations.objects.filter(municipality__id = id).all():
+        destination_container.append(destination.destination_name)
+
+    response = {
+        'destinations' : destination_container
+    }
+
+    return JsonResponse(response)
+
+
     
 ############################ THESE ARE USED FOR FETCHING USING JS ####################################################
+
+
+
+
+
+
+
+
+
+
+def add_municipality(request):
+    add_destinations(request)
+    return render(request, 'authentication/blank.html')
+
+
+
+@transaction.atomic
+def add_destinations(request):
+
+    # with transaction.atomic():
+    #     municipality = ['Quezon', 'Laguna', 'Rizal', 'Metro Manila', 'Cavite', 'Batangas', 'Benguet', 'Mountain Province', 'Isabela', 'Cagayan', 'Nueva Vizcaya', 'Nueva Ecija', 'Pangasinan', 'La Union']
+
+    #     x = 0
+    #     for i in municipality:
+    #         create_municipality = ListOfMunicipalities.objects.create(municipality_name = i)
+    #         create_municipality.save()
+    #         x = x + 1
+        
+    #     return messages.info(request, f'{x} municipality saved')
+
+    # with transaction.atomic():
+    #     list_of_destinations = ["Lucban|| Quezon", "Lucena City|| Quezon", "Sta. Rosa|| Laguna", "Calamba|| Laguna", "Los Baños|| Laguna", "Binangonan|| Rizal", "Antipolo|| Rizal", "Angono|| Rizal", "Taytay|| Rizal", "Cainta|| Rizal", "Marikina City|| Metro Manila", "San Juan City|| Metro Manila", "Mandaluyong City|| Metro Manila", "Pasig City|| Metro Manila", "Quezon City|| Metro Manila", "Caloocan City|| Metro Manila", "Valenzuela City|| Metro Manila", "Malabon City|| Metro Manila", "Navotas City|| Metro Manila", "Manila City|| Metro Manila", "Makati City|| Metro Manila", "Taguig City|| Metro Manila", "Pasay City|| Metro Manila", "Parañaque City|| Metro Manila", "Las Piñas City|| Metro Manila", "Muntinlupa City|| Metro Manila", "Pateros|| Metro Manila", "San Pedro|| Laguna", "Biñan|| Laguna", "Cabuyao|| Laguna", "San Pablo City|| Laguna", "Calauan|| Laguna", "Santa Cruz|| Laguna", "Victoria|| Laguna", "Lumban|| Laguna", "Pila|| Laguna", "Bay|| Laguna", "Paete|| Laguna", "Pagsanjan|| Laguna", "Magdalena|| Laguna", "Mabitac|| Laguna", "Siniloan|| Laguna", "Famy|| Laguna", "Luisiana|| Laguna", "Pakil|| Laguna", "Nagcarlan|| Laguna", "Rizal|| Laguna", "Santa Maria|| Laguna", "Liliw|| Laguna", "Sta. Cruz|| Laguna", "Carmona|| Cavite", "Cavite City|| Cavite", "Tagaytay City|| Cavite", "Dasmariñas City|| Cavite", "Trece Martires City|| Cavite", "Imus City|| Cavite", "Bacoor City|| Cavite", "General Trias City|| Cavite", "Noveleta|| Cavite", "Kawit|| Cavite", "Rosario|| Cavite", "Tanza|| Cavite", "Naic|| Cavite", "Amadeo|| Cavite", "Gen. Mariano Alvarez|| Cavite", "Indang|| Cavite", "Silang|| Cavite", "Maragondon|| Cavite", "Ternate|| Cavite", "Alfonso|| Cavite", "Magallanes|| Cavite", "Cuenca|| Batangas", "San Juan|| Batangas", "Balayan|| Batangas", "Tuy|| Batangas", "Nasugbu|| Batangas", "Calatagan|| Batangas", "Lian|| Batangas", "Laurel|| Batangas", "Talisay|| Batangas", "San Jose|| Batangas", "Lipa City|| Batangas", "Tanauan City|| Batangas", "Sto. Tomas City|| Batangas", "Malvar|| Batangas", "Ibaan|| Batangas", "Batangas City|| Batangas", "Lobo|| Batangas", "Tingloy|| Batangas", "San Pascual|| Batangas", "Bauan|| Batangas", "Mabini|| Batangas", "Padre Garcia|| Batangas", "San Luis|| Batangas", "Agoncillo|| Batangas", "San Nicolas|| Batangas", "Taal|| Batangas", "Santa Teresita|| Batangas", "Rosario|| Batangas", "Balete|| Batangas", "Sto. Tomas|| Batangas", "Lemery|| Batangas", "Calaca|| Batangas", "Baguio City|| Benguet", "La Trinidad|| Benguet", "Itogon|| Benguet", "Tuba|| Benguet", "Tublay|| Benguet", "Bokod|| Benguet", "Kabayan|| Benguet", "Atok|| Benguet", "Kapangan|| Benguet", "Bauko|| Mountain Province", "Bontoc|| Mountain Province", "Sadanga|| Mountain Province", "Sabangan|| Mountain Province", "Sagada|| Mountain Province", "Besao|| Mountain Province", "Tadian|| Mountain Province", "Barlig|| Mountain Province", "Paracelis|| Mountain Province", "Cauayan City|| Isabela", "Ilagan City|| Isabela", "Santiago City|| Isabela", "Aurora|| Isabela", "Cabagan|| Isabela", "Tuguegarao City|| Cagayan", "Aparri|| Cagayan", "Lal-lo|| Cagayan", "Gattaran|| Cagayan", "Santa Ana|| Cagayan", "Enrile|| Cagayan", "Peñablanca|| Cagayan", "Solana|| Cagayan", "Rizal|| Cagayan", "Baggao|| Cagayan", "Alcala|| Cagayan", "Iguig|| Cagayan", "Calayan|| Cagayan", "Bambang|| Nueva Vizcaya", "Bayombong|| Nueva Vizcaya", "Solano|| Nueva Vizcaya", "Bagabag|| Nueva Vizcaya", "Diadi|| Nueva Vizcaya", "Kayapa|| Nueva Vizcaya", "Quezon|| Nueva Vizcaya", "Santa Fe|| Nueva Vizcaya", "Villaverde|| Nueva Vizcaya", "Dupax del Norte|| Nueva Vizcaya", "Dupax del Sur|| Nueva Vizcaya", "Santo Domingo|| Nueva Ecija", "Cabiao|| Nueva Ecija", "San Isidro|| Nueva Ecija", "Aliaga|| Nueva Ecija", "Licab|| Nueva Ecija", "Zaragoza|| Nueva Ecija", "Talavera|| Nueva Ecija", "Guimba|| Nueva Ecija", "Quezon|| Nueva Ecija", "Cabanatuan City|| Nueva Ecija", "Palayan City|| Nueva Ecija", "Gapan City|| Nueva Ecija", "Muñoz City|| Nueva Ecija", "San Jose City|| Nueva Ecija", "Santa Rosa|| Nueva Ecija", "San Leonardo|| Nueva Ecija", "Peñaranda|| Nueva Ecija", "Talugtug|| Nueva Ecija", "Roxas|| Isabela", "San Manuel|| Isabela", "Benito Soliven|| Isabela", "Naguilian|| Isabela", "Reina Mercedes|| Isabela", "Alicia|| Isabela", "Angadanan|| Isabela", "San Guillermo|| Isabela", "San Mateo|| Isabela", "Jones|| Isabela", "San Agustin|| Isabela", "San Isidro|| Isabela", "Echague|| Isabela", "San Mariano|| Isabela", "Ramón|| Isabela", "Cordon|| Isabela", "Luna|| Isabela", "Cabatuan|| Isabela", "Maconacon|| Isabela", "Delfin Albano|| Isabela", "Tumauini|| Isabela", "Santa Maria|| Isabela", "San Pablo|| Isabela", "Tayug|| Pangasinan", "Umingan|| Pangasinan", "Balungao|| Pangasinan", "Binalonan|| Pangasinan", "San Manuel|| Pangasinan", "Asingan|| Pangasinan", "Urdaneta City|| Pangasinan", "Sison|| Pangasinan", "Pozorrubio|| Pangasinan", "Lingayen|| Pangasinan", "Dagupan City|| Pangasinan", "San Carlos City|| Pangasinan", "Alaminos City|| Pangasinan", "Bayambang|| Pangasinan", "Basista|| Pangasinan", "Bautista|| Pangasinan", "Malasiqui|| Pangasinan", "Villasis|| Pangasinan", "Sual|| Pangasinan", "Pozzorubio|| Pangasinan", "Mangaldan|| Pangasinan", "San Fabian|| Pangasinan", "Rosales|| Pangasinan", "Sta. Maria|| Pangasinan", "Manaoag|| Pangasinan", "Calasiao|| Pangasinan", "Binmaley|| Pangasinan", "Laoac|| Pangasinan", "San Quintin|| Pangasinan", "Mangatarem|| Pangasinan", "Aguilar|| Pangasinan", "Bugallon|| Pangasinan", "Infanta|| Pangasinan", "Dasol|| Pangasinan", "Mabini|| Pangasinan", "Burgos|| Pangasinan", "Alcala|| Pangasinan", "San Jacinto|| Pangasinan", "Bani|| Pangasinan", "Santo Tomas|| Pangasinan", "Santa Barbara|| Pangasinan", "Agoo|| La Union", "Aringay|| La Union", "Bacnotan|| La Union", "Bagulin|| La Union", "Balaoan|| La Union", "Bangar|| La Union", "Bauang|| La Union", "Burgos|| La Union", "Caba|| La Union", "Luna|| La Union", "Naguilian|| La Union", "Pugo|| La Union", "Rosario|| La Union", "San Fernando City|| La Union", "San Gabriel|| La Union", "San Juan|| La Union", "Santo Tomas|| La Union", "Santol|| La Union", "Sudipen|| La Union", "Tubao|| La Union", "Santa Maria|| Pangasinan", "San Nicolas|| Pangasinan"]
+
+    #     x = 0
+    #     for destination in list_of_destinations:
+    #         sliced = destination.split('|| ')
+
+    #         municipality = ListOfMunicipalities.objects.filter(municipality_name = sliced[1]).first()
+
+    #         create_destination = ListOfDestinations.objects.create(municipality = municipality, destination_name = sliced[0])
+    #         create_destination.save()
+
+    #         x = x + 1
+
+        # return messages.info(request, f'{x} destination saved')
+    
+    return messages.info(request, f'something went wrong')

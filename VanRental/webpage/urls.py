@@ -19,5 +19,7 @@ urlpatterns = [
     path('open/notification/<id>/', open_notification, name='open_notification'),
     path('approve-pending-driver/<id>/', approve_pending_driver, name='approve_pending_driver'),
     path('pending-driver-info/<id>/', get_pending_driver_info, name='get_pending_driver_info'),
+    path('get-address-destination/<id>/', get_destination_address, name='get_destination_address'),
 
+    path('test', add_municipality, name='add_municipality'),
 ]

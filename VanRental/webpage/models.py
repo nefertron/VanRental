@@ -147,4 +147,21 @@ class Review(models.Model):
         return f'REVIEW ID : {self.review_id} || RATING : {self.rating}'
 
 
+
+class ListOfMunicipalities(models.Model):
+    municipality_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.municipality_name}'
+
+
+class ListOfDestinations(models.Model):
+    municipality = models.ForeignKey(ListOfMunicipalities, on_delete=models.CASCADE)
+    destination_name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.destination_name}'
+    
+
+
     
