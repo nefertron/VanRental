@@ -1,5 +1,6 @@
 {% load static %}
 {% load tz %}
+{% load vanrental_templatetags %}
 
 <!doctype html>
 <html lang="en">
@@ -10,8 +11,8 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>All Vans | VAN Rental</title>
-        
+        <title>List of Vans | Van Rental</title>
+
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
         
@@ -24,13 +25,12 @@
         <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
 
         <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
-        
+
     </head>
     
-    <body class="topics-listing-page" id="top">
+    <body id="top">
 
         <main>
-
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     <a class="navbar-brand" href="index.html">
@@ -38,9 +38,64 @@
                         <span>Van Rental</span>
                     </a>
 
+                    {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+                            <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
+                            <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
+                        </div>
+
                     <div class="d-lg-none ms-auto me-4">
-                        <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            <img src="{% static 'assets/images/default-profile.png' %}"/>
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="topics-listing.html">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="contact.html">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
+                            <ul>
+                                {% get_my_notifications user as all_notifications %}
+                                {% if all_notifications|length > 0 %}
+                                    {% for notif in all_notifications %}
+                                        <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                            <p>{{notif.message}}</p>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li>
+                                        <p>Cannot find new notifications.</p>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
                     </div>
+
+                    {% endif %}
+
     
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
@@ -49,42 +104,136 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-lg-5 me-lg-auto">
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="index.html#section_1">Home</a>
+                                <a class="nav-link click-scroll" href="#section_1">Home</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="index.html#section_2">Browse Topics</a>
+                                <a class="nav-link click-scroll" href="#section_2">Browse Topics</a>
                             </li>
     
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="index.html#section_3">How it works</a>
+                                <a class="nav-link click-scroll" href="#section_3">How it works</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="index.html#section_4">FAQs</a>
+                                <a class="nav-link click-scroll" href="#section_4">FAQs</a>
                             </li>
     
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="index.html#section_5">Contact</a>
+                                <a class="nav-link click-scroll" href="#section_5">Contact</a>
                             </li>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#section_5" id="navbarLightDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">Pages</a>
-
-                                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="navbarLightDropdownMenuLink">
-                                    <li><a class="dropdown-item active" href="topics-listing.html">Topics Listing</a></li>
-
-                                    <li><a class="dropdown-item" href="contact.html">Contact Form</a></li>
-                                </ul>
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/signup">Signup</a>
+                            </li>
+                            {% endif %}
                         </ul>
 
+                        {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
-                            <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            </button>
+                            
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="topics-listing.html">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="contact.html">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
+                                <ul>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            
                         </div>
+                        
+                        {% endif %}
                     </div>
                 </div>
             </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index">
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/profile">
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/list-of-vans">
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    All Vans
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/pending-drivers">
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    Pending Drivers
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
 
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
@@ -109,6 +258,80 @@
                         {% endfor %}
 
                         <div class="container">
+                            {% if all_vans|length > 0 %}
+                            <div class="row">
+                                {% for van in all_vans %}
+                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class="d-flex">
+                                            <div>
+                                                <div class="mb-2">
+                                                    <h5>{{van.brand_name}}</h5>
+                                                    <p>Plate No : {{van.plate_no}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="vanSlider{{van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                            <!-- Indicators/dots -->
+                                            {% all_van_images_indices van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                            <div class="carousel-indicators">
+                                                {% for van_index in van_images_indices %}
+                                                    {% if van_index == 0 %}
+                                                        <button type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                    {% else %}
+                                                        <button type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        
+                                            <!-- The slideshow/carousel -->
+                                            {% get_all_van_images van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                            <div class="carousel-inner">
+                                                {% for van_image in all_van_images %}
+                                                    {% if forloop.counter0 == 0 %}
+                                                        <div class="carousel-item active">
+                                                            <div class='slider-image-container'>
+                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="carousel-item">
+                                                            <div class='slider-image-container'>
+                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        
+                                            <!-- Left and right controls/icons -->
+                                            <button class="carousel-control-prev" style='margin-left:-120px;' type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" style='margin-right:-120px;' type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+                                        </div>
+                                        
+                                        <p class="mb-2">{{van.description}}</p>
+                                        {% get_van_total_rental_and_carpool_service van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                        <p class="mb-0">No. of rental services : {{van_services.0}}</p> <!-- get the total rental services, can be accessed using index 0-->
+                                        <p class="mb-0">No. of rental services : {{van_services.1}}</p> <!-- get the total rental services, can be accessed using index 0-->
+
+                                        {% if van.is_rented == True %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3">Status : Rented</button>
+                                        {% elif van.is_carpooled == True %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3">Status : Carpooling</button>
+                                        {% else %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3">Status : Available</button>
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
                             <div class="row">
                                 <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
@@ -121,11 +344,8 @@
                                                     </div>
         
                                                 </div>
-        
                                                 <span class="badge bg-finance rounded-pill ms-auto">30</span>
                                             </div>
-                                            
-                                            
                                         </a>
                                         <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
                                             <!-- Indicators/dots -->
@@ -156,22 +376,23 @@
                                                 <span class="carousel-control-next-icon"></span>
                                             </button>
                                         </div>
-                    
                                         
                                         <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.</p>
                                         <p class="mb-0">No. of rental service : 12</p>
                                         <p class="mb-0">No. of carpool service : 12</p>
 
-
                                         <button class="btn custom-btn mt-2 mt-lg-3">Status : Available</button>
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </header>
         </main>
+
+
 
         <div class="modal-overlay" id="add_van_modal" style="width:40%;">
             <div class="modal">
@@ -180,10 +401,11 @@
 
                     <div id="add_van" class="carousel slide van-slider" data-bs-ride="carousel">
                         <!-- Indicators/dots -->
-                        <div class="carousel-indicators">
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                            <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                        <div class="carousel-indicators" id='carousel-indicators'>
+                            {% comment %} <button type="button" data-bs-target="#add_van" data-bs-slide-to="0" class="active"></button>
+                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="1"></button>
+                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="2"></button>
+                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="3"></button> {% endcomment %}
                         </div>
                     
                         <!-- The slideshow/carousel -->
@@ -203,24 +425,29 @@
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     </div>
-                    <h2 class="text-center">Images of your van</h2>
+                    <h2 class="text-center" id='carousel_title'>Your Van Images will appear here</h2>
 
 
                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                         {% csrf_token %}
-                        
                         <label class="form-label">Attach Images</label>
                         <input type="file" multiple name="attached_images" class="form-control"  onchange="displayUploadedPreview(event)" required>
                         <input type="hidden" multiple name="images" class="form-control" required>
 
                         <label class="form-label">Plate No.</label>
                         <input type="text" name="plate_no" class="form-control" placeholder="Plate No." required>
+                        
+                        <label class="form-label">Brand Name</label>
+                        <input type="text" name="brand_name" class="form-control" placeholder="Brand Name" required>
 
                         <label class="form-label">Color</label>
                         <input type="text" name="color" class="form-control" placeholder="Color" required>
 
                         <label class="form-label">No. of seats</label>
                         <input type="text" name="number_of_seats" class="form-control" placeholder="No. of seats" required>
+                        
+                        <label class="form-label">Van Description</label>
+                        <input type="text" name="description" class="form-control" placeholder="Van Description" required>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -238,8 +465,26 @@
             </div>
         </div>
 
-        
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        By proceeding, the account owner will receive an email to verify his/her address. 
+                        Please inform your driver in order to verify his account.
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
 
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
@@ -248,56 +493,10 @@
 
         <script src="{% static 'assets/js/form-validator.js' %}"></script>
         <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
         
-        <script>
-            
-            function displayUploadedPreview(event) {
-                const files = event.target.files;
-                const imageArray = [];
-        
-                for (let i = 0; i < files.length; i++) {
-                    const reader = new FileReader();
-        
-                    reader.onload = function (e) {
-                        imageArray.push(e.target.result);
-                        if (imageArray.length === files.length) {
-                            updateCarousel(imageArray); // create a div in carousel container which will display the to_upload images
-                            updateImagesSrcContainer(imageArray);   // update the value of images input field (hidden) which will be used in the backend
-                        }
-                    };
-        
-                    reader.readAsDataURL(files[i]);
-                }
-            }
-        
-            // create a div which will display the images inside the carousel
-            function updateCarousel(imageArray) {
-                const carouselItemsContainer = document.getElementById("carousel-inner");
-                carouselItemsContainer.innerHTML = "";
-        
-                for (let i = 0; i < imageArray.length; i++) {
-                    const carouselItem = document.createElement("div");
-                    if (i === 0){
-                        carouselItem.classList.add("carousel-item");
-                        carouselItem.classList.add("active");
-                    }
-                    else{
-                        carouselItem.classList.add("carousel-item");
-                    }
-        
-                    const imageElement = document.createElement("img");
-                    imageElement.src = imageArray[i];
-                    imageElement.classList.add("d-block", "w-100");
-        
-                    carouselItem.appendChild(imageElement);
-                    carouselItemsContainer.appendChild(carouselItem);
-                }
-            }
-
-            function updateImagesSrcContainer(imageArray) {
-                const hiddenInput = document.querySelector('input[name="images"]');
-                hiddenInput.value = imageArray.join('||');
-            }
-        </script>
     </body>
 </html>

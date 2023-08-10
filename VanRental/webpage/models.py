@@ -57,11 +57,14 @@ class Notification(models.Model):
 
 
 class Van(models.Model):
+    brand_name = models.CharField(max_length=20, default=None, blank=True, null=True)
     plate_no = models.CharField(max_length=20)
     color = models.CharField(max_length=20)
     number_of_seats = models.IntegerField(default=0)
+    description = models.TextField(default=None, null=True, blank=True)
     is_rented = models.BooleanField(default=False)
     is_carpooled = models.BooleanField(default=False)
+    package_rent = models.IntegerField(default=0)
 
     def __str__(self):
         return f'PLATE NO. : {self.plate_no} || COLOR : {self.color}'
@@ -106,7 +109,6 @@ class CarpoolVan(models.Model):
 
     def __str__(self):
         return f'PLATE NO : {self.plate_no.plate_no} || IS DONE : {self.is_done} || IS CANCELLED : {self.is_cancelled}'
-    
 
 class BookedPassenger(models.Model):
     booked_id = models.CharField(max_length=30)

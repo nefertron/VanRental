@@ -15,8 +15,8 @@ from json import dumps
 import json
 # Create your views here.
 
-def RemoveSpaces(username):
-    li = list(username.split(" "))
+def RemoveSpaces(name):
+    li = list(name.split(" "))
     temp_container = ''.join(li)
 
     return temp_container
@@ -30,8 +30,65 @@ def create_notification(request, user_id, message):
 
 
 def index(request):
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        loginAccount(request, username, password)
+
     return render(request, 'homepage/index.html')
 
+def loginAccount(request, username, password):
+    username = RemoveSpaces(username.lower())
+    if '@' in username:
+        user = User.objects.filter(email = username).first()
+
+        if user:
+            to_login = authenticate(username = user.username, password = password)
+            
+            if to_login is None:
+                messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
+                return redirect('/login')
+            else:
+                passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
+                admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
+                driver_account = DriverAccount.objects.filter(user_id = user, is_verified = True).first()
+                if passenger_account or admin_account or driver_account:
+                    login(request, user)
+                    messages.info(request, 'You logged in successfully!')
+                    return redirect('/index')
+                else:
+                    if passenger_account:
+                        messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
+                    else:
+                        messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
+                    return redirect('/login')
+        else:
+            messages.info(request, f'Sorry, we couldn`t find an account with email {username}!')
+
+    else:
+        user = User.objects.filter(username = username).first()
+        if user:
+            to_login = authenticate(username = username, password = password)
+            if to_login is None:
+                messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
+                return redirect('/login')
+            else:
+                passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
+                admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
+                driver_account = DriverAccount.objects.filter(user_id = user, is_verified = True).first()
+                if passenger_account or admin_account or driver_account:
+                    login(request, user)
+                    messages.info(request, 'You logged in successfully!')
+                    return redirect('/index')
+                else:
+                    if passenger_account:
+                        messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
+                    else:
+                        messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
+                    return redirect('/login')
+        else:
+            messages.info(request, f'Sorry, we couldn`t find an account with username {username}!')
 
 ################ LOGIN PAGE
 def login_page(request):
@@ -42,58 +99,7 @@ def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
-        username = RemoveSpaces(username.lower())
-
-        if '@' in username:
-            user = User.objects.filter(email = username).first()
-
-            if user:
-                to_login = authenticate(username = user.username, password = password)
-                
-                if to_login is None:
-                    messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
-                    return redirect('/login')
-                else:
-                    passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
-                    admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
-                    driver_account = DriverAccount.objects.filter(user_id = user, is_verified = True).first()
-                    if passenger_account or admin_account or driver_account:
-                        login(request, user)
-                        messages.info(request, 'You logged in successfully!')
-                        return redirect('/index')
-                    else:
-                        if passenger_account:
-                            messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
-                        else:
-                            messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
-                        return redirect('/login')
-            else:
-                messages.info(request, f'Sorry, we couldn`t find an account with email {username}!')
-
-        else:
-            user = User.objects.filter(username = username).first()
-            if user:
-                to_login = authenticate(username = username, password = password)
-                if to_login is None:
-                    messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
-                    return redirect('/login')
-                else:
-                    passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
-                    admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
-                    driver_account = DriverAccount.objects.filter(user_id = user, is_verified = True).first()
-                    if passenger_account or admin_account or driver_account:
-                        login(request, user)
-                        messages.info(request, 'You logged in successfully!')
-                        return redirect('/index')
-                    else:
-                        if passenger_account:
-                            messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
-                        else:
-                            messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
-                        return redirect('/login')
-            else:
-                messages.info(request, f'Sorry, we couldn`t find an account with username {username}!')
+        loginAccount(request, username, password)
 
     return render(request, 'authentication/login.html')
 
@@ -395,21 +401,53 @@ def pending_drivers(request):
     return render(request, 'pending/pending-drivers.html', context)
 
 
-def list_of_cars(request):
+def list_of_vans(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'The page you are trying to access is not available. Please login first!')
+        return redirect('/login')
+
+    context = {
+        'all_vans' : Van.objects.filter().all()
+    }
 
     if request.method == "POST":
         images = request.POST.get('images')
         plate_no = request.POST.get('plate_no')
         color = request.POST.get('color')
         number_of_seats = request.POST.get('number_of_seats')
+        description = request.POST.get('description')
+        brand_name = request.POST.get('brand_name')
 
-        image_list = images.split('||')
+        image_list = images.split('|||') # use to split the image addresses generated by the javascript
+        plate_no = RemoveSpaces(plate_no)
+
+        if Van.objects.filter(plate_no = plate_no).first():
+            messages.info(request, f'It seems like the Plate No. you entered is already existing, perhaps you made a mistake?')
+            return redirect('/list-of-vans')
         
-        # if len(images) > 0:
-        #     for image in images:
-        #         messages.info(request, f'Image : {image}')
+        else:
+            if len(image_list) > 0:
+                new_van = Van.objects.create(plate_no = plate_no, 
+                                             color = color, 
+                                             number_of_seats = number_of_seats, 
+                                             description = description,
+                                             brand_name = brand_name)
+                new_van.save()
 
-    return render(request, 'vans/list-of-vans.html')
+                for image_src in image_list:
+                    attached_image = VanImages.objects.create(van_image_id = new_van, vehicle_image = image_src)
+                    attached_image.save()
+
+                message = f'You saved new van information with Plate No. {plate_no}, and attached a total of {len(image_list)} image/s.'
+                messages.info(request, message)
+                create_notification(request, request.user, message)
+                return redirect('/list-of-vans')
+
+            else:
+                messages.info(request, f'You must attach atleast 1 image of your van. Please try again!')
+                return redirect('/list-of-vans')
+
+    return render(request, 'vans/list-of-vans.html', context)
 
 
 
@@ -485,6 +523,24 @@ def open_notification(request, id):
     }
 
     return JsonResponse(message_content)
+
+
+def rent_a_van(request, id):
+    van = Van.objects.filter(id = id).first()
+
+    all_images_container = []
+
+    for van_image in VanImages.objects.filter(van_image_id = van).all():
+        all_images_container.append(van_image.vehicle_image)
+
+    response = {    
+        'all_images' : all_images_container,
+        'plate_no' : str(van.plate_no),
+        'package_rent' : str(van.package_rent),
+        'brand_name' : str(van.brand_name)
+    }
+
+    return JsonResponse(response)
 
 
     

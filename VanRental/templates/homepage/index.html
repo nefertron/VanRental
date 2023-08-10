@@ -61,7 +61,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="contact.html">
+                                    <a href="/logout">
                                         <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                         Logout
                                     </a>
@@ -161,7 +161,7 @@
                                     </li>
     
                                     <li>
-                                        <a href="contact.html">
+                                        <a href="/logout">
                                             <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                             Logout
                                         </a>
@@ -216,7 +216,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/list-of-cars">
+                                <a href="/list-of-vans">
                                     <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
                                     All Vans
                                 </a>
@@ -245,9 +245,9 @@
                         {% endfor %}
 
                         <div class="col-lg-8 col-12 mx-auto">
-                            <h1 class="text-white text-center">Discover. Learn. Enjoy</h1>
+                            <h1 class="text-white text-center">Search. Book. Enjoy</h1>
 
-                            <h6 class="text-center">platform for creatives around the world</h6>
+                            <h6 class="text-center">platform for van rental and carpooling services</h6>
 
                             <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search">
                                 <div class="input-group input-group-lg">
@@ -255,7 +255,7 @@
                                         
                                     </span>
 
-                                    <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Design, Code, Marketing, Finance ..." aria-label="Search">
+                                    <input name="keyword" type="search" class="form-control" id="keyword" placeholder="Enter a brand name" aria-label="Search">
 
                                     <button type="submit" class="form-control">Search</button>
                                 </div>
@@ -316,26 +316,23 @@
 
                                             <li class="social-icon-item">
                                                 <a href="#" class="social-icon-link bi-facebook"></a>
-                                            </li>Designms-auto"></a>
+                                            </li>
+                                        </ul>
                                     </div>
 
                                     <div class="section-overlay"></div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </section>
 
 
             <section class="explore-section section-padding" id="section_2">
-                <div class="container">Design
-
-                        <div class="col-12 text-center">
-                            <h2 class="mb-4">Browse Topics</h1>
-                        </div>
-
+                <div class="container">
+                    <div class="col-12 text-center">
+                        <h2 class="mb-4">Browse Here</h1>
                     </div>
                 </div>
 
@@ -343,23 +340,19 @@
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="design-tab" data-bs-toggle="tab" data-bs-target="#design-tab-pane" type="button" role="tab" aria-controls="design-tab-pane" aria-selected="true">Design</button>
+                                <button class="nav-link active" id="rent-tab" data-bs-toggle="tab" data-bs-target="#rent-tab-pane" type="button" role="tab" aria-controls="rent-tab-pane" aria-selected="true">Rent</button>
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="marketing-tab" data-bs-toggle="tab" data-bs-target="#marketing-tab-pane" type="button" role="tab" aria-controls="marketing-tab-pane" aria-selected="false">Marketing</button>
+                                <button class="nav-link" id="carpool-tab" data-bs-toggle="tab" data-bs-target="#carpool-tab-pane" type="button" role="tab" aria-controls="carpool-tab-pane" aria-selected="false">Carpooling</button>
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance-tab-pane" type="button" role="tab" aria-controls="finance-tab-pane" aria-selected="false">Finance</button>
+                                <button class="nav-link" id="rent-review-tab" data-bs-toggle="tab" data-bs-target="#rent-review-tab-pane" type="button" role="tab" aria-controls="rent-review-tab-pane" aria-selected="false">Rent Reviews</button>
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="music-tab" data-bs-toggle="tab" data-bs-target="#music-tab-pane" type="button" role="tab" aria-controls="music-tab-pane" aria-selected="false">Music</button>
-                            </li>
-
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education-tab-pane" type="button" role="tab" aria-controls="education-tab-pane" aria-selected="false">Education</button>
+                                <button class="nav-link" id="carpool-review-tab" data-bs-toggle="tab" data-bs-target="#carpool-review-tab-pane" type="button" role="tab" aria-controls="carpool-review-tab-pane" aria-selected="false">Carpool Reviews</button>
                             </li>
                         </ul>
                     </div>
@@ -367,287 +360,296 @@
 
                 <div class="container">
                     <div class="row">
-
                         <div class="col-12">
                             <div class="tab-content" id="myTabContent">
-                                <div class="tab-pane fade show active" id="design-tab-pane" role="tabpanel" aria-labelledby="design-tab" tabindex="0">
+                                
+                                <!-- FOR RENT PANEL -->
+                                <div class="tab-pane fade show active" id="rent-tab-pane" role="tabpanel" aria-labelledby="rent-tab" tabindex="0">
                                     <div class="row">
+                                        {% get_rent_vans as to_rent_vans %}
+                                        {% for this_van in to_rent_vans %}
                                         <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
                                             <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Web Design</h5>
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <h5>{{this_van.brand_name}}</h5>
+                                                        <h6 style="font-size:1rem;">Php {{this_van.package_rent}}</h6>
+                                                        <p class="mb-2">Price starts at</p>
 
-                                                            <p class="mb-0">Topic Listing Template based on Bootstrap 5</p>
-                                                        </div>
-
-                                                        <span class="badge bg-design rounded-pill ms-auto">14</span>
+                                                        <p class="mb-0">Plate No. : {{this_van.plate_no}}</p>
                                                     </div>
+                                                    <span class="badge bg-design rounded-pill ms-auto">{{this_van.number_of_seats}}</span>
+                                                </div>
 
-                                                    <img src="{% static 'assets/images/topics/undraw_Remote_design_team_re_urdx.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
+                                                <div id="vanSlider{{this_van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                    <!-- Indicators/dots -->
+                                                    {% all_van_images_indices this_van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-indicators">
+                                                        {% for van_index in van_images_indices %}
+                                                            {% if van_index == 0 %}
+                                                                <button type="button" data-bs-target="#vanSlider{{this_van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                            {% else %}
+                                                                <button type="button" data-bs-target="#vanSlider{{this_van.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- The slideshow/carousel -->
+                                                    {% get_all_van_images this_van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-inner">
+                                                        {% for van_image in all_van_images %}
+                                                            {% if forloop.counter0 == 0 %}
+                                                                <div class="carousel-item active">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="carousel-item">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                    <!-- Left and right controls/icons -->
+                                                    <button class="carousel-control-prev" style='margin-left:-120px;' type="button" data-bs-target="#vanSlider{{this_van.id}}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon"></span>
+                                                    </button>
+                                                    <button class="carousel-control-next" style='margin-right:-120px;' type="button" data-bs-target="#vanSlider{{this_van.id}}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon"></span>
+                                                    </button>
+                                                </div>
+                                                
+                                                <p class="mb-0">{{this_van.description}}</p>
+                                                <br>
+
+                                                {% get_van_total_rental_and_carpool_service this_van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                                
+                                                <div>
+                                                    <p class="mb-0">No. of rental service : {{van_services.0}}</p>
+                                                    <p class="mb-0">No. of carpool service : {{van_services.1}}</p>
+                                                </div>
+
+                                                {% if this_van.is_rented == True %}
+                                                    <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{this_van.id}}" disabled>Status : Unavailable</button>
+                                                {% else %}
+                                                    {% if user.is_authenticated %}
+                                                        {% user_type_checker user as user_type %}
+                                                        {% if user_type == 'Passenger' %}
+                                                            <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{this_van.id}}" onclick="setRent(this, '{{this_van.plate_no}}', '{{this_van.package_rent}}')">Status : Available</button>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('loginFirst')">Status : Available</button>
+                                                    {% endif %}
+                                                {% endif %}
                                             </div>
                                         </div>
-
-                                        <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Graphic</h5>
-
-                                                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-design rounded-pill ms-auto">75</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_Redesign_feedback_re_jvm0.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4 col-md-6 col-12">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Logo Design</h5>
-
-                                                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-design rounded-pill ms-auto">100</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/colleagues-working-cozy-office-medium-shot.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
+                                <!-- FOR RENT PANEL -->
 
-                                <div class="tab-pane fade" id="marketing-tab-pane" role="tabpanel" aria-labelledby="marketing-tab" tabindex="0">
+
+                                <!-- FOR CARPOOL PANEL -->
+                                <div class="tab-pane fade" id="carpool-tab-pane" role="tabpanel" aria-labelledby="carpool-tab" tabindex="0">
                                     <div class="row">
-                                        <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
+                                        {% get_carpool_vans as to_carpool_vans %}
+                                        {% if to_carpool_vans %}
+                                            {% for this_carpool_van in to_carpool_vans %}
+                                            <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
                                                 <div class="custom-block bg-white shadow-lg">
-                                                    <a href="topics-detail.html">
-                                                        <div class="d-flex">
-                                                            <div>
-                                                                <h5 class="mb-2">Advertising</h5>
-
-                                                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                            </div>
-
-                                                            <span class="badge bg-advertising rounded-pill ms-auto">30</span>
+                                                    <div class="d-flex">
+                                                        <div>
+                                                            <h5 class="mb-2">{{this_carpool_van.brand_name}}</h5>
+                                                            <p class="mb-0">Plate No. : {{this_van.plate_no}}</p>
                                                         </div>
+                                                        <span class="badge bg-advertising rounded-pill ms-auto">{{this_carpool_van.number_of_seats}}</span>
+                                                    </div>
 
-                                                        <img src="{% static 'assets/images/topics/undraw_online_ad_re_ol62.png' %}" class="custom-block-image img-fluid" alt="">
-                                                    </a>
+                                                    <div id="vanCarpoolSlider{{this_carpool_van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                        <!-- Indicators/dots -->
+                                                        {% all_van_images_indices this_carpool_van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                        <div class="carousel-indicators">
+                                                            {% for van_index in van_images_indices %}
+                                                                {% if van_index == 0 %}
+                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                {% else %}
+                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    
+                                                        <!-- The slideshow/carousel -->
+                                                        {% get_all_van_images this_van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                        <div class="carousel-inner">
+                                                            {% for van_image in all_van_images %}
+                                                                {% if forloop.counter0 == 0 %}
+                                                                    <div class="carousel-item active">
+                                                                        <div class='slider-image-container'>
+                                                                            <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                        </div>
+                                                                    </div>
+                                                                {% else %}
+                                                                    <div class="carousel-item">
+                                                                        <div class='slider-image-container'>
+                                                                            <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                        </div>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                        <!-- Left and right controls/icons -->
+                                                        <button class="carousel-control-prev" style='margin-left:-120px;' type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide="prev">
+                                                            <span class="carousel-control-prev-icon"></span>
+                                                        </button>
+                                                        <button class="carousel-control-next" style='margin-right:-120px;' type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide="next">
+                                                            <span class="carousel-control-next-icon"></span>
+                                                        </button>
+                                                    </div>
+                                                    
+                                                    
+                                                    <p class="mb-0">{{this_van.description}}</p>
+                                                    <br>
+
+                                                    {% get_van_total_rental_and_carpool_service this_van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                                    
+                                                    <div>
+                                                        <p class="mb-0">No. of rental service : {{van_services.0}}</p>
+                                                        <p class="mb-0">No. of carpool service : {{van_services.1}}</p>
+                                                    </div>
+
+                                                    {% if van.is_rented == True %}
+                                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Unavailable</button>
+                                                    {% else %}
+                                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Available</button>
+                                                    {% endif %}
                                                 </div>
                                             </div>
-
-                                            <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
-                                                <div class="custom-block bg-white shadow-lg">
-                                                    <a href="topics-detail.html">
-                                                        <div class="d-flex">
-                                                            <div>
-                                                                <h5 class="mb-2">Video Content</h5>
-
-                                                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                            </div>
-
-                                                            <span class="badge bg-advertising rounded-pill ms-auto">65</span>
-                                                        </div>
-
-                                                        <img src="{% static 'assets/images/topics/undraw_Group_video_re_btu7.png' %}" class="custom-block-image img-fluid" alt="">
-                                                    </a>
+                                            {% endfor %}
+                                        {% else %}
+                                        <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
+                                            <div class="custom-block bg-white shadow-lg">
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <h5 class="mb-2">No carpool is in progress</h5>
+                                                        <p class="mb-0"></p>
+                                                    </div>
+                                                    <span class="badge bg-advertising rounded-pill ms-auto">0</span>
                                                 </div>
-                                            </div>
-
-                                            <div class="col-lg-4 col-md-6 col-12">
-                                                <div class="custom-block bg-white shadow-lg">
-                                                    <a href="topics-detail.html">
-                                                        <div class="d-flex">
-                                                            <div>
-                                                                <h5 class="mb-2">Viral Tweet</h5>
-
-                                                                <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                            </div>
-
-                                                            <span class="badge bg-advertising rounded-pill ms-auto">50</span>
-                                                        </div>
-
-                                                        <img src="{% static 'assets/images/topics/undraw_viral_tweet_gndb.png' %}" class="custom-block-image img-fluid" alt="">
-                                                    </a>
-                                                </div>
+                                                <img src="{% static 'assets/images/no-carpool.png' %}" class="custom-block-image img-fluid" alt="">
+                                                <p class="mb-0">{{this_van.description}}</p>
                                             </div>
                                         </div>
-                                  </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- FOR CARPOOL PANEL -->
 
-                                <div class="tab-pane fade" id="finance-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">   <div class="row">
+
+                                <!-- FOR RENT REVIEWS PANEL -->
+                                <div class="tab-pane fade" id="rent-review-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">   
+                                    <div class="row">
+                                        <!-- {% get_all_rented as all_rented %} -->
                                         <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
                                             <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <h5 class="mb-2">Toyota Kineme</h5>
                                                         <div>
-                                                            <h5 class="mb-2">Investment</h5>
+                                                            <p class="mb-0">
+                                                                Overall Ratings : 
+                                                                {% get_rating as rating%}
 
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
+                                                                {% for i in rating.0 %}
+                                                                    <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                {% endfor %}
+
+                                                                {% if rating.1 != 0 %}
+                                                                    <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                {% endif %}
+                                                            </p>
                                                         </div>
-
-                                                        <span class="badge bg-finance rounded-pill ms-auto">30</span>
                                                     </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_Finance_re_gnv2.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-6 col-md-6 col-12">
-                                            <div class="custom-block custom-block-overlay">
-                                                <div class="d-flex flex-column h-100">
-                                                    <img src="{% static 'assets/images/businesswoman-using-tablet-analysis-graph-company-finance-strategy-statistics-success-concept-planning-future-office-room.jpg' %}" class="custom-block-image img-fluid" alt="">
-
-                                                    <div class="custom-block-overlay-text d-flex">
-                                                        <div>
-                                                            <h5 class="text-white mb-2">Finance</h5>
-
-                                                            <p class="text-white">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sint animi necessitatibus aperiam repudiandae nam omnis</p>
-
-                                                            <a href="topics-detail.html" class="btn custom-btn mt-2 mt-lg-3">Learn More</a>
-                                                        </div>
-
-                                                        <span class="badge bg-finance rounded-pill ms-auto">25</span>
-                                                    </div>
-
-                                                    <div class="social-share d-flex">
-                                                        <p class="text-white me-4">Share:</p>
-
-                                                        <ul class="social-icon">
-                                                            <li class="social-icon-item">
-                                                                <a href="#" class="social-icon-link bi-twitter"></a>
-                                                            </li>
-
-                                                            <li class="social-icon-item">
-                                                                <a href="#" class="social-icon-link bi-facebook"></a>
-                                                            </li>
-
-                                                            <li class="social-icon-item">
-                                                                <a href="#" class="social-icon-link bi-pinterest"></a>
-                                                            </li>
-                                                        </ul>
-
-                                                        <a href="#" class="custom-icon bi-bookmark ms-auto"></a>
-                                                    </div>
-
-                                                    <div class="section-overlay"></div>
+                                                    <span class="badge bg-finance rounded-pill ms-auto">12</span>
                                                 </div>
+                                                
+
+
+                                                <img src="{% static 'assets/images/no-carpool.png' %}" class="custom-block-image img-fluid" alt="">
+                                                
+                                                <p class="mb-0">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quaerat repellat doloribus ipsum esse corrupti ex.</p>
+                                                <hr/>
+
+
+                                                <!-- ALL COMMENTS -->
+                                                {% if rating.0|length > 0 %}
+                                                    {% for b in rating.0 %}
+                                                        {% if b < 3 %}
+                                                        <div id="1_user_comments{{b}}" style="display:block;">
+                                                        {% else %}
+                                                        <div id="1_user_comments{{b}}" style="display:none;">
+                                                        {% endif %}
+                                                            <div style="display: flex; margin-bottom: 20px;">
+                                                                <img src="{% static 'assets/images/default-profile.png' %}" style="width: 30px; height: 30px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;"/>
+                                                                <div style="margin-left: 10px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); padding:10px; border-radius: 20px;">
+                                                                    <h6 style="font-size: 0.875rem;">Menard A. Menemedez</h6>
+                                                                    
+                                                                    <p style="font-size: 0.75rem;">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Eligendi, autem quaerat. Assumenda nihil natus cum odit sequi nulla nisi. Dolorem odit inventore veniam voluptatum dicta repudiandae, mollitia aliquid aperiam consectetur nihil repellat nisi veritatis numquam ad alias aspernatur molestias sed doloribus quo est aliquam voluptatem? Ratione voluptates mollitia nemo ut?</p>
+                                                                    <p class="mb-0">
+                                                                        Ratings : 
+                                                                        {% get_rating as rating %}
+        
+                                                                        {% for i in rating.0 %}
+                                                                            <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                        {% endfor %}
+        
+                                                                        {% if rating.1 != 0 %}
+                                                                            <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                        {% endif %}
+                                                                    </p>
+                                                                    <p style="font-size: 0.75rem;">Date Recorded : October 27, 1998</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                    <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                {% else %}
+                                                    <p style="font-size: 0.75rem;">No comments found</p>
+                                                {% endif %}
+                                                <!-- ALL COMMENTS -->
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+                                <!-- FOR RENT REVIEWS PANEL -->
 
-                                <div class="tab-pane fade" id="music-tab-pane" role="tabpanel" aria-labelledby="music-tab" tabindex="0">
+
+
+                                <!-- FOR CARPOOL REVIEWS PANEL -->
+                                <div class="tab-pane fade" id="carpool-review-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">   
                                     <div class="row">
-                                        <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
+                                        <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
                                             <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Composing Song</h5>
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <h5 class="mb-2">Investment</h5>
 
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-music rounded-pill ms-auto">45</span>
+                                                        <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
                                                     </div>
 
-                                                    <img src="{% static 'assets/images/topics/undraw_Compose_music_re_wpiw.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-3">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Online Music</h5>
-
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-music rounded-pill ms-auto">45</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_happy_music_g6wc.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-4 col-md-6 col-12">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Podcast</h5>
-
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-music rounded-pill ms-auto">20</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_Podcast_audience_re_4i5q.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
+                                                    <span class="badge bg-advertising rounded-pill ms-auto">30</span>
+                                                </div>
+                                                <img src="images/topics/undraw_Finance_re_gnv2.png" class="custom-block-image img-fluid" alt="">
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="tab-pane fade" id="education-tab-pane" role="tabpanel" aria-labelledby="education-tab" tabindex="0">
-                                    <div class="row">
-                                        <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-3">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Graduation</h5>
-
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-education rounded-pill ms-auto">80</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_Graduation_re_gthn.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-6 col-md-6 col-12">
-                                            <div class="custom-block bg-white shadow-lg">
-                                                <a href="topics-detail.html">
-                                                    <div class="d-flex">
-                                                        <div>
-                                                            <h5 class="mb-2">Educator</h5>
-
-                                                            <p class="mb-0">Lorem Ipsum dolor sit amet consectetur</p>
-                                                        </div>
-
-                                                        <span class="badge bg-education rounded-pill ms-auto">75</span>
-                                                    </div>
-
-                                                    <img src="{% static 'assets/images/topics/undraw_Educator_re_ju47.png' %}" class="custom-block-image img-fluid" alt="">
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- FOR CARPOOL REVIEWS PANEL -->
                             </div>
-
+                        </div>
                     </div>
                 </div>
             </section>
@@ -671,7 +673,7 @@
                                     </div>
 
                                     <li>
-                                        <h4 class="text-white mb-3">Search your favourite topic</h4>
+                                        <h4 class="text-white mb-3">Select a van of your choice</h4>
 
                                         <p class="text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis, cumque magnam? Sequi, cupiditate quibusdam alias illum sed esse ad dignissimos libero sunt, quisquam numquam aliquam? Voluptas, accusamus omnis?</p>
 
@@ -681,7 +683,7 @@
                                     </li>
                                     
                                     <li>
-                                        <h4 class="text-white mb-3">Bookmark &amp; Keep it for yourself</h4>
+                                        <h4 class="text-white mb-3">Book &amp; and wait for the confirmation</h4>
 
                                         <p class="text-white">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sint animi necessitatibus aperiam repudiandae nam omnis est vel quo, nihil repellat quia velit error modi earum similique odit labore. Doloremque, repudiandae?</p>
 
@@ -691,7 +693,7 @@
                                     </li>
 
                                     <li>
-                                        <h4 class="text-white mb-3">Read &amp; Enjoy</h4>
+                                        <h4 class="text-white mb-3">Ride &amp; Enjoy</h4>
 
                                         <p class="text-white">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Animi vero quisquam, rem assumenda similique voluptas distinctio, iste est hic eveniet debitis ut ducimus beatae id? Quam culpa deleniti officiis autem?</p>
 
@@ -702,13 +704,6 @@
                                 </ul>
                             </div>
                         </div>
-
-                        <div class="col-12 text-center mt-5">
-                            <p class="text-white">
-                                Want to learn more?
-                                <a href="#" class="btn custom-btn custom-border-btn ms-3">Check out Youtube</a>
-                            </p>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -717,7 +712,6 @@
             <section class="faq-section section-padding" id="section_4">
                 <div class="container">
                     <div class="row">
-
                         <div class="col-lg-6 col-12">
                             <h2 class="mb-4">Frequently Asked Questions</h2>
                         </div>
@@ -733,13 +727,15 @@
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingOne">
                                         <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        What is Topic Listing?
+                                        What is Van Rental?
                                         </button>
                                     </h2>
 
                                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
-                                            Topic Listing is free Bootstrap 5 CSS template. <strong>You are not allowed to redistribute this template</strong> on any other template collection website without our permission. Please contact TemplateMo for more detail. Thank you.
+                                           Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                           <strong>Lorem ipsum dolor sit amet.</strong>
+                                           Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
                                         </div>
                                     </div>
                                 </div>
@@ -747,14 +743,16 @@
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="headingTwo">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        How to find a topic?
+                                        How to book?
                                     </button>
                                     </h2>
 
                                     <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
-                                            You can search on Google with <strong>keywords</strong> such as templatemo portfolio, templatemo one-page layouts, photography, digital marketing, etc.
-                                        </div>
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                            <strong>Lorem ipsum dolor sit amet.</strong>
+                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                         </div>
                                     </div>
                                 </div>
 
@@ -767,8 +765,10 @@
 
                                     <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
                                         <div class="accordion-body">
-                                            You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                                        </div>
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                            <strong>Lorem ipsum dolor sit amet.</strong>
+                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                         </div>
                                     </div>
                                 </div>
                             </div>
@@ -791,10 +791,10 @@
                             <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2595.065641062665!2d-122.4230416990949!3d37.80335401520422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858127459fabad%3A0x808ba520e5e9edb7!2sFrancisco%20Park!5e1!3m2!1sen!2sth!4v1684340239744!5m2!1sen!2sth" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
 
-                        <div class="col-lg-3 col-md-6 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
+                        <div class="col-lg-6 col-md-6 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
                             <h4 class="mb-3">Head office</h4>
 
-                            <p>Bay St &amp;, Larkin St, San Francisco, CA 94109, United States</p>
+                            <p>Barangay Isabang, Lucena City, Quezon, Philippines 4301</p>
 
                             <hr>
 
@@ -802,139 +802,120 @@
                                 <span class="me-2">Phone</span>
 
                                 <a href="tel: 305-240-9671" class="site-footer-link">
-                                    305-240-9671
+                                    0919-473-5688
                                 </a>
                             </p>
 
                             <p class="d-flex align-items-center">
                                 <span class="me-2">Email</span>
 
-                                <a href="mailto:info@company.com" class="site-footer-link">
-                                    info@company.com
+                                <a href="mailto:vanrental@gmail.com" class="site-footer-link">
+                                    vanrental@gmail.com
                                 </a>
                             </p>
                         </div>
-
-                        <div class="col-lg-3 col-md-6 col-12 mx-auto">
-                            <h4 class="mb-3">Dubai office</h4>
-
-                            <p>Burj Park, Downtown Dubai, United Arab Emirates</p>
-
-                            <hr>
-
-                            <p class="d-flex align-items-center mb-1">
-                                <span class="me-2">Phone</span>
-
-                                <a href="tel: 110-220-3400" class="site-footer-link">
-                                    110-220-3400
-                                </a>
-                            </p>
-
-                            <p class="d-flex align-items-center">
-                                <span class="me-2">Email</span>
-
-                                <a href="mailto:info@company.com" class="site-footer-link">
-                                    info@company.com
-                                </a>
-                            </p>
-                        </div>
-
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer class="site-footer section-padding">
-            <div class="container">
-                <div class="row">
 
-                    <div class="col-lg-3 col-12 mb-4 pb-2">
-                        <a class="navbar-brand mb-2" href="index.html">
-                            <i class="bi-back"></i>
-                            <span>Topic</span>
-                        </a>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4 col-6">
-                        <h6 class="site-footer-title mb-3">Resources</h6>
-
-                        <ul class="site-footer-links">
-                            <li class="site-footer-link-item">
-                                <a href="#" class="site-footer-link">Home</a>
-                            </li>
-
-                            <li class="site-footer-link-item">
-                                <a href="#" class="site-footer-link">How it works</a>
-                            </li>
-
-                            <li class="site-footer-link-item">
-                                <a href="#" class="site-footer-link">FAQs</a>
-                            </li>
-
-                            <li class="site-footer-link-item">
-                                <a href="#" class="site-footer-link">Contact</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4 col-6 mb-4 mb-lg-0">
-                        <h6 class="site-footer-title mb-3">Information</h6>
-
-                        <p class="text-white d-flex mb-1">
-                            <a href="tel: 305-240-9671" class="site-footer-link">
-                                305-240-9671
-                            </a>
-                        </p>
-
-                        <p class="text-white d-flex">
-                            <a href="mailto:info@company.com" class="site-footer-link">
-                                info@company.com
-                            </a>
-                        </p>
-                    </div>
-
-                    <div class="col-lg-3 col-md-4 col-12 mt-4 mt-lg-0 ms-auto">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            English</button>
-
-                            <ul class="dropdown-menu">
-                                <li><button class="dropdown-item" type="button">Thai</button></li>
-
-                                <li><button class="dropdown-item" type="button">Myanmar</button></li>
-
-                                <li><button class="dropdown-item" type="button">Arabic</button></li>
-                            </ul>
-                        </div>
-
-                        <p class="copyright-text mt-lg-5 mt-4">Copyright © 2048 Topic Listing Center. All rights reserved.
-                        <br><br>Design: <a rel="nofollow" href="https://templatemo.com" target="_blank">TemplateMo</a> Distribution <a href="https://themewagon.com">ThemeWagon</a></p>
-                        
-                    </div>
-
-                </div>
-            </div>
-        </footer>
-
-        <div class="modal-overlay" id="seen_message">
+        <div class="modal-overlay" id="loginFirst">
             <div class="modal">
                 <div class="modal-body">
-                    <h2 class="modal-title text-sm" id="modal-title-holder">
-                        <!-- a header will be generated by the javascript -->
+                    <h2 class="modal-title text-sm">
+                        You must login first
                     </h2>
-                    <p id="modal-body-holder">
-                        By proceeding, the account owner will receive an email to verify his/her address. 
-                        Please inform your driver in order to verify his account.
-                        <!-- this will be changed once the admin proceeds -->
-                    </p>
+                    
+                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                        {% csrf_token %}
 
-                    <p id="modal-footer">
-                        <!-- Date Recorded : 0000-00-00 -->
-                    </p>
-                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                        <label class="form-label">Username / Email</label>
+                        <input type="text" name="username" class="form-control" placeholder="Username or email..." required>
+                        
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Password..." required>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="form-control">Login</button>
+                            </div>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div class="col-md-6">
+                                <button type='button' class="form-control" onclick="closeModal('loginFirst')">Close</button>
+                            </div>
+                        </div>
+                    </form>
+
                 </div>
             </div>
         </div>
+
+
+        <div class="modal-overlay" id="setRentVan">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Rent a van
+                    </h2>
+
+                    <div id="rent_van" class="carousel slide van-slider" data-bs-ride="carousel">
+                        <!-- Indicators/dots -->
+                        <div class="carousel-indicators" id='fetched-carousel-indicators'>
+                            <!--
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="0" class="active"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="1"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="2"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="3"></button> 
+                            -->
+                        </div>
+                    
+                        <!-- The slideshow/carousel -->
+                        <div class="carousel-inner" id="fetched-carousel-inner">
+                            <!-- images will go here using the format below, wherein the first image will have "active" class to activate the first child -->
+
+                            <!-- <div class="carousel-item active">
+                                <img src="{% static 'assets/images/van-icon.svg' %}" class="d-block w-100">
+                            </div> -->
+                        </div>
+                    
+                        <!-- Left and right controls/icons -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#rent_van" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#rent_van" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+                    <h2 class="text-center" id='rent-van-brand-name'><!--BRAND NAME WILL BE ASSIGNED HERE--></h2>
+                    <p class="text-center" id='rent-van-plate-no'><!--PLATE NUMBER WILL BE ASSIGNED HERE--></h2>
+
+                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                        {% csrf_token %}
+                        <label class="form-label">Package Rent (in Php)</label>
+                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required>
+                        
+                        <label class="form-label"></label>
+                        <input type="password" name="password" class="form-control" placeholder="Password..." required>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" class="form-control">Book Now</button>
+                            </div>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <div class="col-md-6">
+                                <button type='button' class="form-control" onclick="closeModal('setRentVan')">Close</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
@@ -945,46 +926,34 @@
         <script src="{% static 'assets/js/open-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/open-modal.js' %}"></script> 
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-comments.js' %}"></script> 
+        <script src="{% static 'assets/js/display-fetched-images.js' %}"></script> 
 
         <script>
-            const listItems = document.querySelectorAll('.custom-button');
-            
-            listItems.forEach(item => {
-              item.addEventListener('click', function(event) {
-                const id_of_notif = item.dataset.message; // Get the message from the <p> tag
-                
-                fetch(`open/notification/${id_of_notif}/`)
+            function setRent(button, plate_no, package_rent){
+                var rent_data_id = button.getAttribute('rent-data-id');
+                openModal('setRentVan')
+
+                fetch(`rent-a-van/${rent_data_id}/`)
                     .then(response => response.json())
                     .then(data => {
-                        const message = data['messages'];
-                        const notification = data['message'];
-                        const notification_id = data['notification_id'];
-                        const date_recorded = data['date_recorded'];
+                        displayFetchedImages(data['all_images'])
+                        var brand_name = document.getElementById('rent-van-brand-name');
+                        brand_name.textContent = data['brand_name']
 
-            
-                        if (message !== undefined){
-                            var modalOverlay = document.getElementById('seen_message');
-                            var modal = modalOverlay.querySelector(".modal");
-                            modalOverlay.classList.add("active");
-                            modal.classList.add("active");
-                        }
-            
-                        var modal_title_holder = document.getElementById('modal-title-holder');
-                        modal_title_holder.textContent = message
+                        var plate_no = document.getElementById('rent-van-plate-no');
+                        plate_no.textContent = data['plate_no']
 
-                        var modal_body_holder = document.getElementById('modal-body-holder');
-                        modal_body_holder.textContent = notification
+                        var package_rent = document.getElementById('package_rent');
+                        package_rent.value = data['package_rent']
 
-                        var modal_footer = document.getElementById('modal-footer');
-                        modal_footer.textContent = `Date Recorded : ${date_recorded} || ID : ${notification_id}`
+
                     })
                     .catch(error => {
                         console.error("Error:", error);
                     });
-                
-              });
-            });
+            }
         </script>
-
     </body>
 </html>
