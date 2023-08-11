@@ -14,6 +14,7 @@ urlpatterns = [
     path('profile', profile, name='profile'),
     path('pending-drivers', pending_drivers, name='pending_drivers'),
     path('list-of-vans', list_of_vans, name='list_of_vans'),
+    path('rent-booking', rent_booking_list, name='rent_booking_list'),
 
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),
     path('open/notification/<id>/', open_notification, name='open_notification'),

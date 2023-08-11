@@ -134,6 +134,13 @@ def get_all_municipality():
     return ListOfMunicipalities.objects.filter().all()
 
 
+@register.simple_tag
+def get_available_drivers():
+    all_driver_accounts = DriverAccount.objects.filter(is_available = True).all()
+
+    return all_driver_accounts 
+
+
 
 
         

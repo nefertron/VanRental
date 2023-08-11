@@ -17,12 +17,14 @@ import json
 from django.db import transaction
 # Create your views here.
 
+################ REUSABLE REMOVE SPACES DEF FUNCTION
 def RemoveSpaces(name):
     li = list(name.split(" "))
     temp_container = ''.join(li)
 
     return temp_container
-            
+
+################ REUSABLE CREATE NOTIFICATION DEF FUNCTION
 def create_notification(request, user_id, message):
     create_notif = Notification.objects.create(receiver_id = user_id,
                                                         message = message,
@@ -31,15 +33,7 @@ def create_notification(request, user_id, message):
     create_notif.save()
 
 
-def index(request):
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        loginAccount(request, username, password)
-
-    return render(request, 'homepage/index.html')
-
+################ REUSABLE LOG IN DEF FUNCTION
 def loginAccount(request, username, password):
     username = RemoveSpaces(username.lower())
     if '@' in username:
@@ -91,6 +85,53 @@ def loginAccount(request, username, password):
                     return redirect('/login')
         else:
             messages.info(request, f'Sorry, we couldn`t find an account with username {username}!')
+
+################ REUSABLE BOOKING DEF FUNCTION
+
+
+################ HOME PAGE
+def index(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        package_rent = request.POST.get('package_rent')
+        van_id = request.POST.get('van_id')
+        from_destination_municipality_id = request.POST.get('from_destination_municipality')
+        from_destination = request.POST.get('from_destination')
+        to_destination_municipality_id = request.POST.get('to_destination_municipality')
+        to_destination = request.POST.get('to_destination')
+        travel_date = request.POST.get('travel_date')
+
+
+        if username and password:
+            loginAccount(request, username, password)
+        
+        else:
+            _from_municipality = ListOfMunicipalities.objects.filter(id = from_destination_municipality_id).first()
+            _to_municipality = ListOfMunicipalities.objects.filter(id = to_destination_municipality_id).first()
+
+            create_rent_van = RentedVan.objects.create(plate_no = Van.objects.filter(id = van_id).first(),
+                                                        rented_by = request.user.passengeraccount,
+                                                        package_price = package_rent,
+                                                        from_destination = f'{from_destination}, {_from_municipality.municipality_name}',
+                                                        to_destination = f'{to_destination}, {_to_municipality.municipality_name}',
+                                                        travel_date = travel_date,
+                                                        date_recorded = datetime.now())
+            create_rent_van.rent_id = f'RENT{create_rent_van.id}'
+            create_rent_van.save()
+
+            message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent is subjected to an adjustment.'
+            create_notification(request, request.user, message)
+
+            admin_account = User.objects.filter(is_superuser = True).first()
+            message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date}. Please visit the booking section for more details.'
+            create_notification(request, admin_account, message_to_admin)
+
+            return redirect('/profile.html')
+
+
+    return render(request, 'homepage/index.html')
 
 ################ LOGIN PAGE
 def login_page(request):
@@ -451,6 +492,19 @@ def list_of_vans(request):
 
     return render(request, 'vans/list-of-vans.html', context)
 
+################ RENT BOOKING LIST PAGE
+def rent_booking_list(request):
+    if not request.user.is_superuser:
+        messages.info(request, 'The page you are trying to access is not available')
+        return redirect('/index')
+
+    all_pending_bookings = RentedVan.objects.filter(is_done=False, is_rejected=False, is_confirmed=False).all()
+
+    context = {
+        'all_pending_bookings' : all_pending_bookings,
+    }
+
+    return render(request, 'vans/rent-booking.html', context)
 
 
 

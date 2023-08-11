@@ -578,7 +578,7 @@ strong {
   width: 100%;
 }
 
-.custom-block button{
+.custom-block > button{
   width: 100%;
 }
 
@@ -1426,6 +1426,23 @@ blockquote {
   margin-right: 100px;
 }
 
+.ml-5{
+  margin-left: 5px;
+}
+
+.ml-10{
+  margin-left: 10px;
+}
+
+
+.line-height-5{
+  line-height: 5px;
+}
+
+.display-flex{
+  display: flex;
+}
+
 .h-30{
   height: 30px;
 }
@@ -1433,6 +1450,8 @@ blockquote {
 .w-30{
   width: 30px;
 }
+
+
 
 .not-seen-bg{
   background-color: #f0efef;
@@ -1624,4 +1643,9 @@ blockquote {
   object-fit: contain;
 }
 
+
+
+.btn-danger{
+  background-color: #dc3545;
+}
 

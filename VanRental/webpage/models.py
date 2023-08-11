@@ -26,6 +26,8 @@ class DriverAccount(models.Model):
     auth_token = models.CharField(max_length=50, null=True, blank=True)
     profile = models.TextField(null=True, blank=True)
 
+    is_available = models.BooleanField(default=True)
+
     def __str__(self):
         return f'{self.user_id.first_name} {self.user_id.last_name}'
     
@@ -81,7 +83,7 @@ class VanImages(models.Model):
 class RentedVan(models.Model):
     rent_id = models.CharField(max_length=20)
     plate_no = models.ForeignKey(Van, on_delete=models.CASCADE)
-    driver_id = models.ForeignKey(DriverAccount, on_delete=models.CASCADE)
+    driver_id = models.ForeignKey(DriverAccount, on_delete=models.CASCADE, default=None, blank=True, null=True)
     rented_by = models.ForeignKey(PassengerAccount, on_delete=models.CASCADE)
     package_price = models.IntegerField(default=0)
     from_destination = models.TextField()
