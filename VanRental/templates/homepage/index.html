@@ -45,6 +45,10 @@
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {{unseen_notifications}}
+                            </div>
                         </button>
 
                         <button class="profile-button" onclick="openProfile('mobile');">
@@ -133,10 +137,17 @@
 
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
+
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                    {% get_unseen_notifications user as unseen_notifications %}
+                                    {{unseen_notifications}}
+                                </div>
                             </button>
                             
+
+                                
                             <button class="profile-button" onclick="openProfile('desktop');">
                                 {% get_my_profile user as my_profile %}
                                 {% if my_profile %}
@@ -210,11 +221,38 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/rent-booking">
+                                <a href="/rent-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
-                                    Rent Bookings
+                                    Open Bookings
+                                    {% get_total_open_bookings as total_open_bookings %} 
+                                    {% if total_open_bookings > 0%}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_open_bookings}}
+                                        </div>
+                                    {% endif %}
                                 </a>
                             </li>
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    Confirmed Bookings
+                                    {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                    {% if total_confirmed_bookings > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_confirmed_bookings}}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    Past Bookings
+                                </a>
+                            </li>
+
                             <li>
                                 <a href="/profile">
                                     <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
@@ -228,9 +266,15 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/pending-drivers">
+                                <a href="/pending-drivers" class='display-flex'>
                                     <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
                                     Pending Drivers
+                                    {% get_total_pending_drivers as total_pending_drivers %}
+                                    {% if total_pending_drivers > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_pending_drivers}}
+                                        </div>
+                                    {% endif %}
                                 </a>
                             </li>
                         </ul>

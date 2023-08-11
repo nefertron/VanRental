@@ -92,6 +92,7 @@ class RentedVan(models.Model):
     date_recorded = models.DateTimeField(default=datetime.now())
     is_confirmed = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
+    is_cancelled = models.BooleanField(default=False)
     is_done = models.BooleanField(default=False)
 
     def __str__(self):

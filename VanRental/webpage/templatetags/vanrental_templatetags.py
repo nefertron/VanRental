@@ -26,6 +26,13 @@ def get_my_notifications(user):
     if user:
         my_notifications = Notification.objects.filter(receiver_id = user).all().order_by('-date_recorded')
         return my_notifications
+    
+@register.simple_tag
+def get_unseen_notifications(user):
+    if user:
+        my_notifications = Notification.objects.filter(receiver_id = user, is_seen = False).count()
+        return my_notifications
+
 
 @register.simple_tag
 def get_my_profile(user):
@@ -136,9 +143,31 @@ def get_all_municipality():
 
 @register.simple_tag
 def get_available_drivers():
-    all_driver_accounts = DriverAccount.objects.filter(is_available = True).all()
+    all_driver_accounts = DriverAccount.objects.filter(is_available = True, is_verified = True).all()
 
     return all_driver_accounts 
+
+
+@register.simple_tag
+def get_total_open_bookings():
+    total_open_bookings = RentedVan.objects.filter(is_done = False, is_rejected = False, is_confirmed = False, is_cancelled = False).count()
+
+    return total_open_bookings
+
+
+@register.simple_tag
+def get_total_confirmed_bookings():
+    total_confirmed_bookings = RentedVan.objects.filter(is_done = False, is_rejected = False, is_confirmed = True).count()
+
+    return total_confirmed_bookings
+
+
+@register.simple_tag
+def get_total_pending_drivers():
+    total_pending_drivers = DriverAccount.objects.filter(is_verified = False, auth_token = None).count()
+
+    return total_pending_drivers
+
 
 
 

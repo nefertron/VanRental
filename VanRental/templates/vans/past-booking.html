@@ -1,0 +1,454 @@
+{% load static %}
+{% load tz %}
+{% load vanrental_templatetags %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>List of Vans | Van Rental</title>
+
+        <!-- CSS FILES -->        
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+
+    </head>
+    
+    <body id="top">
+
+        <main>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="index.html">
+                        <i class="bi-back"></i>
+                        <span>Van Rental</span>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+                            <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
+                            <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
+                        </div>
+
+                    <div class="d-lg-none ms-auto me-4">
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            <img src="{% static 'assets/images/default-profile.png' %}"/>
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="topics-listing.html">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="contact.html">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
+                            <ul>
+                                {% get_my_notifications user as all_notifications %}
+                                {% if all_notifications|length > 0 %}
+                                    {% for notif in all_notifications %}
+                                        <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                            <p>{{notif.message}}</p>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <li>
+                                        <p>Cannot find new notifications.</p>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {% endif %}
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_1">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_2">Browse Topics</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_3">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_4">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="#section_5">Contact</a>
+                            </li>
+
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/signup">Signup</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            </button>
+                            
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="topics-listing.html">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="contact.html">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
+                                <ul>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            
+                        </div>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index">
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/profile">
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    Settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/list-of-vans">
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    All Vans
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/pending-drivers">
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    Pending Drivers
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-5 col-12">
+                            <nav aria-label="breadcrumb" style="display:flex;">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Past Bookings</li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        <div class="container">
+                            {% if all_done_bookings|length > 0 %}
+                                <div class="row">
+                                    {% for done_booking in all_done_bookings %}
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='done_booking_{{done_booking.id}}'>
+                                            <div class="custom-block bg-white shadow-lg">
+                                                <div>
+                                                    <div class='display-flex'>
+                                                        <p class="profile-button" style='box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);'> 
+                                                            {% if done_booking.rented_by.profile %}
+                                                                <img src="{{done_booking.rented_by.profile}}"/>
+                                                            {% else %}
+                                                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                                            {% endif %}
+                                                        </p>
+                                                        <h5 class='mt-1 ml-10'>{{done_booking.rented_by.user_id.first_name}} {{done_booking.rented_by.user_id.last_name}}</h5>
+                                                    </div>
+
+                                                    <div class='mb-3 line-height-5 mt-3'>
+                                                        <p><b>Personal Information : </b></p>
+                                                        <div class='ml-10'>
+                                                            <p><b>Address :</b> {{done_booking.rented_by.address}}</p>
+                                                            <p><b>Contact No. :</b> {{done_booking.rented_by.contact_no}} </p>
+                                                            <p><b>Email :</b> {{done_booking.rented_by.user_id.email}} </p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class='mb-2 line-height-5'>
+                                                        <p><b>Booking Information : </b></p>
+                                                        <div class='ml-10'>
+                                                            <p><b>Budget :</b> {{done_booking.package_price}} php</p>
+                                                            <p><b>From Destination :</b> {{done_booking.from_destination}} </p>
+                                                            <p><b>To Destination :</b> {{done_booking.to_destination}} </p>
+                                                            <p><b>Preferred Schedule :</b> {{done_booking.travel_date.date}} </p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class='mb-2 line-height-5'>
+                                                        <p><b>Assigned Driver : </b></p>
+                                                        <div class='ml-10'>
+                                                            <p><b>Fullname :</b> {{done_booking.driver_id.user_id.first_name}}  {{done_booking.driver_id.user_id.last_name}}</p>
+                                                            <p><b>Contact No :</b>  {{done_booking.driver_id.contact_no}}  </p>
+                                                            <p><b>Email :</b> {{done_booking.driver_id.user_id.email}} </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <h4 class='text-center'>
+                                                    Selected Van
+                                                </h4>
+                                                <div id="vanSlider{{done_booking.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                    <!-- Indicators/dots -->
+
+                                                    {% all_van_images_indices done_booking.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-indicators">
+                                                        {% for van_index in van_images_indices %}
+                                                            {% if van_index == 0 %}
+                                                                <button type="button" data-bs-target="#vanSlider{{done_booking.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                            {% else %}
+                                                                <button type="button" data-bs-target="#vanSlider{{done_booking.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- The slideshow/carousel -->
+                                                    {% get_all_van_images done_booking.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-inner">
+                                                        {% for van_image in all_van_images %}
+                                                            {% if forloop.counter0 == 0 %}
+                                                                <div class="carousel-item active">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="carousel-item">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- Left and right controls/icons -->
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#vanSlider{{done_booking.plate_no.id}}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon"></span>
+                                                    </button>
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#vanSlider{{done_booking.plate_no.id}}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon"></span>
+                                                    </button>
+
+                                                    <p>
+                                                        <b>Brand Name :</b> {{done_booking.plate_no.brand_name}} <br>
+                                                        <b>Original Rent Price :</b> {{done_booking.plate_no.package_rent}} php<br>
+                                                        <b>Plate No :</b> {{done_booking.plate_no.plate_no}} <br>
+                                                    </p>
+                                                </div>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <p class="mb-2">
+                                                    {{done_booking.plate_no.description}}
+                                                </p>
+
+                                                <br>
+                                                {% if account_type == 'Passenger' %}
+                                                    <form method='POST' id='reviewForm'>
+                                                        {% csrf_token %}
+                                                        Ratings
+                                                        <div class="star-rating">
+                                                            <input type="radio" id="star5" name="rating" value="5">
+                                                            <label for="star5"></label>
+                                                            <input type="radio" id="star4" name="rating" value="4">
+                                                            <label for="star4"></label>
+                                                            <input type="radio" id="star3" name="rating" value="3">
+                                                            <label for="star3"></label>
+                                                            <input type="radio" id="star2" name="rating" value="2">
+                                                            <label for="star2"></label>
+                                                            <input type="radio" id="star1" name="rating" value="1">
+                                                            <label for="star1"></label>
+                                                        </div>
+                                                        <br>
+                                                        <input type='hidden' name='done_rent_id' value='{{done_booking.id}}'/>
+
+                                                        <label>Comment / Suggestion / Review</label>
+                                                        <textarea type="text" name="review_or_comment" class="form-control" placeholder="Enter your comment here" required></textarea>
+                                                        <button class="btn custom-btn mt-2 mt-lg-3" type='submit'>Post Review</button>
+                                                    </form>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                        <div class="custom-block bg-white shadow-lg">
+                                            <a href="topics-detail.html">
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <div class="mb-2">
+                                                            <p><i>Confirmed Bookings not found</i></p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </main>
+
+
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        By proceeding, the account owner will receive an email to verify his/her address. 
+                        Please inform your driver in order to verify his account.
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
+
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+
+
+        
+        
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+    </body>
+</html>

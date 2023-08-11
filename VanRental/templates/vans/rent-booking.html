@@ -243,7 +243,7 @@
                             <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Bookings</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Open Bookings</li>
                                 </ol>
                             </nav>
                         </div>
@@ -298,7 +298,6 @@
                                                 </h4>
                                                 <div id="vanSlider{{pending_booking.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
                                                     <!-- Indicators/dots -->
-                                                    
 
                                                     {% all_van_images_indices pending_booking.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
                                                     <div class="carousel-indicators">
@@ -349,22 +348,27 @@
                                                 <br>
                                                 <br>
                                                 <br>
+
                                                 <p class="mb-2">
                                                     {{pending_booking.plate_no.description}}
                                                 </p>
-                                                <input type='hidden' name='booking_id' id='booking_id' value='{{pending_booking.id}}' />
-                                                {% get_available_drivers as all_available_drivers %}
 
-                                                <select name="driver_id" class="form-control" required id="driver_id" style='display:none;'>
-                                                    <option disabled selected>--- Select A Driver --- </option>
-                                                    {% for driver in all_available_drivers %}
-                                                        <option value='{{driver.id}}'>--- {{driver.user_id.first_name}} {{driver.user_id.last_name}} ({{driver.contact_no}})--- </option>
-                                                    {% endfor %}
-                                                </select>
+                                                <form id='approveBookingForm' method='POST'>
+                                                    {% csrf_token %}
+                                                    <input type='hidden' name='booking_id' id='booking_id' value='{{pending_booking.id}}' />
+                                                    {% get_available_drivers as all_available_drivers %}
 
-                                                <button class="btn custom-btn mt-2 mt-lg-3" id='approveButton' onclick="openBookingModal('pending_booking_{{pending_booking.id}}');">Approve</button>
-                                                <button class="btn custom-btn mt-2 mt-lg-3" id='submitButton' style='display:none;'>Approve</button>
-                                                <button class="custom-btn mt-2 mt-lg-3 btn-danger" id='rejectButton'>Reject</button>
+                                                    <select name="driver_id" class="form-control" required id="driver_id_{{pending_booking.id}}" style='display:none;'>
+                                                        <option disabled selected>--- Select A Driver --- </option>
+                                                        {% for driver in all_available_drivers %}
+                                                            <option value={{driver.id}}>--- {{driver.user_id.first_name}} {{driver.user_id.last_name}} ({{driver.contact_no}})--- </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </form>
+                                                
+                                                <button class="btn custom-btn mt-2 mt-lg-3" id='submitButton_{{pending_booking.id}}' style='display:none;' onclick="submitApproveBookingForm('approveBookingForm_modal_{{pending_booking.id}}');" >Submit</button>
+                                                <button class="btn custom-btn mt-2 mt-lg-3" id='approveButton_{{pending_booking.id}}' onclick="openBookingModal('{{pending_booking.id}}');">Approve</button>
+                                                <button class="custom-btn mt-2 mt-lg-3 btn-danger" id='rejectButton_{{pending_booking.id}}'>Reject</button>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -493,10 +497,12 @@
                     <h2 class="modal-title text-sm">
                         Approve a Booking
                     </h2>
+                    
                     <div id="approve-booking-body-holder">
                         <!-- this will be changed once the admin proceeds -->
                     </div>
                     
+                    <input type='hidden' name='modal_id' id='modal_id'/>
                     <button type='submit' class="form-control" onclick="closeBookingModal('approve_booking')">Close</button>
                 </div>
             </div>
@@ -514,26 +520,51 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        
         <script>
-            function openBookingModal(booking_id){
-                var rejectButton = document.getElementById("rejectButton");
+            function openBookingModal(rent_id){
+                var rejectButton = document.getElementById(`rejectButton_${rent_id}`);
                 rejectButton.style.display = "none";
 
-                var content_of_parent_booking_div = document.getElementById(booking_id).innerHTML;
+                var approveButton = document.getElementById(`approveButton_${rent_id}`);
+                approveButton.style.display = "none";
 
-                var approve_booking_body_holder = document.getElementById('approve-booking-body-holder').innerHTML = content_of_parent_booking_div;
+                var submitButton = document.getElementById(`submitButton_${rent_id}`);
+                submitButton.style.display = "block";
+
+                var select_driver = document.getElementById(`driver_id_${rent_id}`);
+                select_driver.style.display = 'block';
+
+                var content_of_parent_booking_div = document.getElementById(`pending_booking_${rent_id}`).innerHTML;
+                var modifiedContent = content_of_parent_booking_div.replace(/id="approveBookingForm/g, `id="approveBookingForm_modal_${rent_id}`);
+                
+                var approve_booking_body_holder = document.getElementById('approve-booking-body-holder').innerHTML = modifiedContent;
 
                 const modalOverlay = document.getElementById('approve_booking');
                 const modal = modalOverlay.querySelector(".modal");
                 modalOverlay.classList.add("active");
                 modal.classList.add("active");
+
+                var modal_id = document.getElementById('modal_id');
+                modal_id.value = rent_id;
             }
 
                         
             function closeBookingModal(modal_id) {
-                
-                var rejectButton = document.getElementById("rejectButton");
+                var modal_number = document.getElementById('modal_id');
+                rent_id = modal_number.value;
+
+                var rejectButton = document.getElementById(`rejectButton_${rent_id}`);
                 rejectButton.style.display = "block";
+
+                var approveButton = document.getElementById(`approveButton_${rent_id}`);
+                approveButton.style.display = "block";
+
+                var submitButton = document.getElementById(`submitButton_${rent_id}`);
+                submitButton.style.display = "none";
+
+                var select_driver = document.getElementById(`driver_id_${rent_id}`);
+                select_driver.style.display = 'none';
 
                 var approve_booking_body_holder = document.getElementById('approve-booking-body-holder').innerHTML = '';
 
@@ -543,6 +574,18 @@
                 modal.classList.remove("active");
             }
 
+        </script>
+
+
+        <script>
+            function submitApproveBookingForm(form_id){
+                var form = document.getElementById(form_id);
+                form.submit();
+            }
+
+            function setDriver(e){
+                console.log(e)
+            }
         </script>
     </body>
 </html>

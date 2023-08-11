@@ -1649,3 +1649,50 @@ blockquote {
   background-color: #dc3545;
 }
 
+
+
+
+ /* #################### FOR STAR RATING ################################# */
+.full-star-icon{
+  fill : rgb(251 191 36);
+}
+
+.half-star-icon{
+  fill : rgb(251 191 36);
+}
+
+.empty-star-icon{
+  fill : rgb(251 191 36);
+}
+
+.star-rating{
+  background-color: #80d0c7;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.star-rating > input {
+  display: none;
+}
+
+.star-rating > label {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  background-image: url('../images/empty-star.svg');
+  background-size: cover;
+  cursor: pointer;
+  transition: background-image 0.3s ease;
+}
+
+.star-rating > input:checked ~ label,
+.star-rating > input:checked ~ label ~ label {
+  background-image: url('../images/full-star.svg');
+}
+
+.star-rating > input:checked:last-child ~ label:last-child {
+  background-image: url('../images/half-star.svg');
+}
+
+ /* #################### FOR STAR RATING ################################# */
+

@@ -212,11 +212,12 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/rent-booking" style='display:flex;'>
+                                <a href="/rent-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
-                                    Rent Bookings 
+                                    Rent Bookings
+                                    {% get_total_open_bookings as total_open_bookings %} 
                                     <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
-                                        1
+                                        {{total_open_bookings}}
                                     </div>
                                 </a>
                             <li>

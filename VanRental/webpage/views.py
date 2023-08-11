@@ -121,6 +121,10 @@ def index(request):
             create_rent_van.rent_id = f'RENT{create_rent_van.id}'
             create_rent_van.save()
 
+            van = Van.objects.filter(id = create_rent_van.plate_no.id).first()
+            van.is_rented = True
+            van.save()
+
             message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent is subjected to an adjustment.'
             create_notification(request, request.user, message)
 
@@ -128,7 +132,7 @@ def index(request):
             message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date}. Please visit the booking section for more details.'
             create_notification(request, admin_account, message_to_admin)
 
-            return redirect('/profile.html')
+            return redirect('/confirmed-booking')
 
 
     return render(request, 'homepage/index.html')
@@ -144,6 +148,8 @@ def login_page(request):
         password = request.POST.get('password')
         loginAccount(request, username, password)
 
+        return redirect('/index')
+    
     return render(request, 'authentication/login.html')
 
 
@@ -414,6 +420,10 @@ def profile(request):
 
 ################ LOGOUT PAGE
 def pending_drivers(request):
+    if not request.user.is_superuser:
+        messages.info(request, 'The page you are trying to access is not available.')
+        return redirect('/index')
+    
     all_pending_drivers = DriverAccount.objects.filter(is_verified = False, auth_token = None).all()
 
     context = {
@@ -434,7 +444,9 @@ def pending_drivers(request):
             host = request.get_host()
             send_registration_email(driver_account.user_id, 'driver', auth_token, host)
 
-            messages.info(request, f'An email verification is sent to {driver_account.user_id.first_name} {driver_account.user_id.first_name} with email {driver_account.user_id.email}. If you want to contact him, use this number ({driver_account.contact_no})')
+            message = f'An email verification is sent to {driver_account.user_id.first_name} {driver_account.user_id.last_name} with email {driver_account.user_id.email}. If you want to contact him, use this number ({driver_account.contact_no})'
+            create_notification(request, request.user, message)
+            messages.info(request, message)
             return redirect('/pending-drivers')
         
         else:
@@ -498,13 +510,177 @@ def rent_booking_list(request):
         messages.info(request, 'The page you are trying to access is not available')
         return redirect('/index')
 
-    all_pending_bookings = RentedVan.objects.filter(is_done=False, is_rejected=False, is_confirmed=False).all()
+    all_pending_bookings = RentedVan.objects.filter(is_done=False, is_rejected=False, is_cancelled = False, is_confirmed=False).all()
 
     context = {
         'all_pending_bookings' : all_pending_bookings,
     }
 
+    if request.method == 'POST':
+        booking_id = request.POST.get('booking_id')
+        driver_id = request.POST.get('driver_id')
+
+        booking_target = RentedVan.objects.filter(id = booking_id).first()
+        driver_target = DriverAccount.objects.filter(id = driver_id).first()
+
+        booking_target.driver_id = driver_target
+        booking_target.is_confirmed = True
+        booking_target.save()
+
+        message_to_admin = f'You confirmed a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+        message_to_driver = f'You have been assigned as a driver in a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+        message_to_passenger = f'Your rent booking with RENT ID : {booking_target.rent_id} has been confirmed, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+        
+        driver_target.is_available = False
+        driver_target.save()
+
+
+        van = Van.objects.filter(id = booking_target.plate_no.id).first()
+        van.is_rented = True
+        van.save()
+
+        create_notification(request, request.user, message_to_admin)
+        create_notification(request, driver_target.user_id, message_to_driver)
+        create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
+
+        messages.info(request, message_to_admin)
+        return redirect('/rent-booking')
+
     return render(request, 'vans/rent-booking.html', context)
+
+
+
+################ CONFIRMED BOOKING PAGE
+def confirmed_bookings(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, f'You must login to continue.')
+        return redirect('/login')
+
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    context = {}
+
+    if not admin_account is None:
+        context['profile'] = admin_account
+        context['account_type'] = 'Admin'
+        context['all_confirmed_bookings'] = RentedVan.objects.filter(is_done=False, is_rejected=False, is_cancelled=False, is_confirmed=True).all()
+    elif not driver_account is None:
+        context['profile'] = driver_account
+        context['account_type'] = 'Driver'
+        context['all_confirmed_bookings']= RentedVan.objects.filter(driver_id = driver_account, is_done=False, is_rejected=False, is_cancelled=False, is_confirmed=True).all()
+    elif not passenger_account is None:
+        context['profile'] = passenger_account
+        context['account_type'] = 'Passenger'
+        context['all_confirmed_bookings']= RentedVan.objects.filter(rented_by = passenger_account, is_done=False, is_rejected=False, is_cancelled=False, is_confirmed=True).all()
+
+
+    if request.method == 'POST':
+        cancel_booking_id = request.POST.get('cancel_booking_id')
+        done_booking_id = request.POST.get('done_booking_id')
+
+        if not cancel_booking_id is None:
+            to_cancel_rent = RentedVan.objects.filter(id = cancel_booking_id).first()
+            to_cancel_rent.is_cancelled = True
+            to_cancel_rent.is_confirmed = False
+            to_cancel_rent.save()
+
+            driver = DriverAccount.objects.filter(id = to_cancel_rent.driver_id.id).first()
+            driver.is_available = True
+            driver.save()
+
+            van = Van.objects.filter(id = to_cancel_rent.plate_no.id).first()
+            van.is_rented = False
+            van.save()
+            
+            message_to_admin = f'CANCELLED || The rent booking with RENT ID : {to_cancel_rent.rent_id}, and destination FROM {to_cancel_rent.from_destination} TO {to_cancel_rent.to_destination} on {str(to_cancel_rent.travel_date)}'
+            message_to_driver = f'CANCELLED || The rent booking with RENT ID : {to_cancel_rent.rent_id} where you have been assigned as a driver, with destination FROM {to_cancel_rent.from_destination} TO {to_cancel_rent.to_destination} on {str(to_cancel_rent.travel_date)}'
+            message_to_passenger = f'CANCELLED || Your rent booking with RENT ID : {to_cancel_rent.rent_id}, with destination FROM {to_cancel_rent.from_destination} TO {to_cancel_rent.to_destination} on {str(to_cancel_rent.travel_date)}'
+            
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, to_cancel_rent.driver_id.user_id, message_to_driver)
+            create_notification(request, to_cancel_rent.rented_by.user_id, message_to_passenger)
+
+            messages.info(request, f'The rent booking with RENT ID : {to_cancel_rent.rent_id} has been cancelled successfully.')
+            return redirect('/confirmed-booking')
+        
+        elif not done_booking_id is None:
+            done_rent = RentedVan.objects.filter(id = done_booking_id).first()
+            done_rent.is_cancelled = False
+            done_rent.is_confirmed = False
+            done_rent.is_done = True
+            done_rent.save()
+
+            driver = DriverAccount.objects.filter(id = done_rent.driver_id.id).first()
+            driver.is_available = True
+            driver.save()
+            
+            van = Van.objects.filter(id = done_rent.plate_no.id).first()
+            van.is_rented = False
+            van.save()
+
+            message_to_admin = f'DONE || Boking with RENT ID : {done_rent.rent_id}, and destination FROM {done_rent.from_destination} TO {done_rent.to_destination} on {str(done_rent.travel_date)}'
+            message_to_driver = f'DONE || Booking with RENT ID : {done_rent.rent_id} where you have been assigned as a driver, with destination FROM {done_rent.from_destination} TO {done_rent.to_destination} on {str(done_rent.travel_date)}'
+            message_to_passenger = f'DONE || Your rent booking with RENT ID : {done_rent.rent_id}, with destination FROM {done_rent.from_destination} TO {done_rent.to_destination} on {str(done_rent.travel_date)}'
+            
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, done_rent.driver_id.user_id, message_to_driver)
+            create_notification(request, done_rent.rented_by.user_id, message_to_passenger)
+
+            messages.info(request, f'The rent booking with RENT ID : {done_rent.rent_id} has been marked as done successfully.')
+            return redirect('/confirmed-booking')
+        
+    return render(request, 'vans/confirmed-booking.html', context)
+
+
+
+################ PAST BOOKING PAGE
+def past_booking(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/login')
+    
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    context = {}
+
+    if not admin_account is None:
+        context['profile'] = admin_account
+        context['account_type'] = 'Admin'
+        context['all_done_bookings'] = RentedVan.objects.filter(is_done=True).all()
+    elif not driver_account is None:
+        context['profile'] = driver_account
+        context['account_type'] = 'Driver'
+        context['all_done_bookings']= RentedVan.objects.filter(driver_id = driver_account, is_done=True).all()
+    elif not passenger_account is None:
+        context['profile'] = passenger_account
+        context['account_type'] = 'Passenger'
+        context['all_done_bookings']= RentedVan.objects.filter(rented_by = passenger_account, is_done=True).all()
+
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        review_or_comment = request.POST.get('review_or_comment')
+        done_rent_id = request.POST.get('done_rent_id')
+
+        create_review = Review.objects.create(rent_id = RentedVan.objects.filter(id=done_rent_id).first(), 
+                                              rating = rating, 
+                                              comment = review_or_comment, 
+                                              date_recorded = datetime.now())
+        create_review.review_id = f'RVW{create_review.id}'
+        create_review.save()
+
+        message = 'You successfully posted a review!'
+        create_notification(request, request.user, message)
+        messages.info(request, message)
+
+    return render(request, 'vans/past-booking.html', context)
+
+    
 
 
 
