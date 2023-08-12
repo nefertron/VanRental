@@ -172,6 +172,20 @@ def get_total_open_bookings():
 
 
 @register.simple_tag
+def get_total_pending_bookings(user):
+    
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if not driver_account is None:
+        total_open_bookings = RentedVan.objects.filter(is_rejected = False, is_confirmed = False, is_done = False, is_cancelled = False).count()
+        return total_open_bookings
+    else:
+        total_open_bookings = RentedVan.objects.filter(rented_by = passenger_account, is_rejected = False, is_confirmed = False, is_done = False, is_cancelled = False).count()
+        return total_open_bookings
+
+
+@register.simple_tag
 def get_total_confirmed_bookings():
     total_confirmed_bookings = RentedVan.objects.filter(is_done = False, is_rejected = False, is_confirmed = True).count()
 

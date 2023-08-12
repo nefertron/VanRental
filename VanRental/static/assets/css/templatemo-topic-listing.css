@@ -1328,7 +1328,7 @@ blockquote {
 
 .side-bar-header{
   position: fixed;
-  margin-top: 100px;
+  margin-top: 120px;
   z-index: 1000;
 }
 
@@ -1353,6 +1353,24 @@ blockquote {
 
 .side-bar.active{
   display: block;
+}
+
+
+.side-bar-row{
+  margin-top:5px;
+  margin-left:10px;
+  width: 180px;
+  display:flex;
+}
+
+.side-bar-circle-alert{
+  background-color:#dc3545; 
+  height:20px; 
+  width:20px; 
+  border-radius:50%; 
+  margin-left: 10px; 
+  text-align:center; 
+  font-size:0.75rem;
 }
 
 
@@ -1411,7 +1429,7 @@ blockquote {
 .van-nav-items ul li:hover{
   transform: scale(1.02);
   background-color: #2ca0a9;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3)
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
 }
 
 
@@ -1431,6 +1449,18 @@ blockquote {
 
 .profile-button img:hover{
   transform: scale(1.05);
+}
+
+.notification-alert{
+  position:absolute; 
+  margin-top:-40px; 
+  margin-left:25px; 
+  background-color:#dc3545; 
+  color:whitesmoke; 
+  height:15px; width:15px; 
+  border-radius:50%; 
+  text-align:center; 
+  font-size:0.6rem;
 }
 
 .font-bold{
@@ -1577,6 +1607,11 @@ blockquote {
   font-weight: bold;
   font-size: 1.2rem;
   margin-left: 30px;
+}
+
+.notification-scroll{
+  overflow-y: auto;
+  height: 100vh;
 }
 
 .custom-button{

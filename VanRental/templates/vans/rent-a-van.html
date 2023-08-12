@@ -1,5 +1,6 @@
 {% load static %}
 {% load tz %}
+{% load vanrental_templatetags %}
 
 <!doctype html>
 <html lang="en">
@@ -10,7 +11,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>My Profile | VAN Rental</title>
+        <title>List of Vans | Van Rental</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,13 +25,12 @@
         <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
 
         <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
-        
+
     </head>
     
-    <body class="topics-listing-page" id="top">
+    <body id="top">
 
         <main>
-
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     {% if user.is_authenticated %}
@@ -226,7 +226,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             {% if user.is_authenticated %}
             <div class="side-bar-header">   
                 <div class="side-bar" id="van-rental-sidebar">
@@ -367,10 +367,10 @@
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-5 col-12">
-                            <nav aria-label="breadcrumb">
+                            <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Rent A Van</li>
                                 </ol>
                             </nav>
                         </div>
@@ -382,146 +382,241 @@
                             </div>
                         {% endfor %}
 
-                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5">
-                            <div class="d-flex">
-                                <div class="profile-bg" style="margin-top: auto; margin-bottom: auto;">
-                                    {% if profile.profile %}
-                                        <img src="{{profile.profile}}" class="" alt="">
-                                    {% else %}
-                                        <img src="{% static 'assets/images/default-profile.png' %}" class="" alt="">
-                                    {% endif %}
+                        <div class="container">
+                            {% if all_vans|length > 0 %}
+                            <div class="row">
+                                {% for van in all_vans %}
+                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class="d-flex">
+                                            <div>
+                                                <div class="mb-2">
+                                                    <h5>{{van.brand_name}}</h5>
+                                                    <p>Plate No : {{van.plate_no}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
 
-                                    <button class="upload-image-button" onclick="openModal('upload-image-modal')">
-                                        <img src="{% static 'assets/images/camera.svg' %}" class="" alt="">
-                                    </button>
+                                        <div id="vanSlider{{van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                            <!-- Indicators/dots -->
+                                            {% all_van_images_indices van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                            <div class="carousel-indicators">
+                                                {% for van_index in van_images_indices %}
+                                                    {% if van_index == 0 %}
+                                                        <button type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                    {% else %}
+                                                        <button type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        
+                                            <!-- The slideshow/carousel -->
+                                            {% get_all_van_images van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                            <div class="carousel-inner">
+                                                {% for van_image in all_van_images %}
+                                                    {% if forloop.counter0 == 0 %}
+                                                        <div class="carousel-item active">
+                                                            <div class='slider-image-container'>
+                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="carousel-item">
+                                                            <div class='slider-image-container'>
+                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        
+                                            <!-- Left and right controls/icons -->
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#vanSlider{{van.id}}" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+                                        </div>
+                                        
+                                        <p class="mb-2">{{van.description}}</p>
+                                        {% get_van_total_rental_and_carpool_service van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                        <p class="mb-0">No. of rental services : {{van_services.0}}</p> <!-- get the total rental services, can be accessed using index 0-->
+                                        <p class="mb-0">No. of rental services : {{van_services.1}}</p> <!-- get the total rental services, can be accessed using index 0-->
 
-                                    <button class="remove-profile" onclick="openModal('remove-profile')">
-                                        Remove Profile
-                                    </button>
-                                </div> <br>
+                                        {% if van.is_rented == True %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3 btn-danger">Status : Rented</button>
+                                        {% elif van.is_carpooled == True %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3 btn-danger">Status : Carpooling</button>
+                                        {% else %}
+                                            <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{van.id}}" onclick="setRent(this, '{{van.plate_no}}', '{{van.package_rent}}')">Status : Available</button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <a href="topics-detail.html">
+                                            <div class="d-flex">
+                                                <div>
+                                                    <div class="mb-2">
+                                                        <h5>Car Name</h5>
+                                                        <p>Plate No : 4569-5656</p>
+                                                    </div>
+        
+                                                </div>
+                                                <span class="badge bg-finance rounded-pill ms-auto">30</span>
+                                            </div>
+                                        </a>
+                                        <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
+                                            <!-- Indicators/dots -->
+                                            <div class="carousel-indicators">
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                                            </div>
+                                        
+                                            <!-- The slideshow/carousel -->
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <img src="{% static 'assets/images/c1.jpg' %}" alt="Los Angeles" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/c2.jpg' %}" alt="Chicago" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/c3.jpg' %}" alt="New York" class="d-block w-100">
+                                                </div>
+                                            </div>
+                                        
+                                            <!-- Left and right controls/icons -->
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+                                        </div>
+                                        
+                                        <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.</p>
+                                        <p class="mb-0">No. of rental service : 12</p>
+                                        <p class="mb-0">No. of carpool service : 12</p>
 
-                                <div class="custom-block-topics-listing-info d-flex">
-                                    <div>
-                                        <h5 class="mb-2">{{profile.user_id.first_name}} {{profile.user_id.last_name}}</h5>
-                                        <p style="font-size: 0.875rem;">{{account_id}} || <b>{{account_type}}</b></p>
-                                        <p class="mb-0">{{profile.user_id.email}}</p>
-                                        <p class="mb-0">{{profile.contact_no}}</p>
-                                        <p class="mb-0">{{profile.bday.date}}</p>
-                                        <p class="mb-0">{{profile.address}}</p>
+                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Available</button>
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('update_modal')">Update</button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </header>
-            
-            <div class="modal-overlay" id="update_modal">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title">Update Profile</h2>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" value="{{profile.user_id.username}}" class="form-control" placeholder="Username" required>
-
-                            <label class="form-label">First Name</label>
-                            <input type="text" name="fname" value="{{profile.user_id.first_name}}" class="form-control" placeholder="First Name" required>
-
-                            <label class="form-label">Last Name</label>
-                            <input type="text" name="lname" value="{{profile.user_id.last_name}}" class="form-control" placeholder="Last Name" required>
-
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" value="{{profile.user_id.email}}" class="form-control" placeholder="Email" required>
-
-                            <label class="form-label">Birth Date</label>
-                            <input type="date" name="bday" value="{{ profile.bday|date:'Y-m-d' }}" max="{% now 'Y-m-d' %}" id="birthdate-input" class="form-control" placeholder="Birth Date" required>
-
-                            <label class="form-label">Contact No.</label>
-                            <input type="text" name="contact_no" value="{{profile.contact_no}}"  class="form-control" placeholder="Contact No." required>
-
-                            <label class="form-label">Address</label>
-                            <input type="text" name="address" value="{{profile.address}}"  class="form-control" placeholder="Complete Address" required>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Update</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('update_modal')">Close</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="modal-overlay" id="upload-image-modal">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title">Upload your image</h2>
-
-                        <div id="uploaded-image-holder" style="display: none;">
-                            <div class="profile-bg" style="margin:auto;">
-                                <img src="{% static 'assets/images/default-profile.png' %}" id="uploaded-image" class="" alt="">
-                            </div><br>
-                            <h2 class="text-center">New Profile</h2>
-                        </div>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <label class="form-label">Attach image</label>
-                            <input type="file" name="profile" class="form-control" placeholder="" required  onchange="displayUploadedPreview(event)">
-                            <input type="hidden" name="new_profile" class="form-control" placeholder="" required  id="new_profile">
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Upload</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('upload-image-modal')">Close</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-overlay" id="remove-profile">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title text-sm">Are you sure you want to remove your profile</h2>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <input type="hidden" name="remove_profile" value="True" class="form-control" placeholder="" required>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Remove now</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('remove-profile')">Cancel</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </main>
+        
 
+        <div class="modal-overlay" id="setRentVan">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Rent a van
+                    </h2>
+
+                    <div id="rent_van" class="carousel slide van-slider" data-bs-ride="carousel">
+                        <!-- Indicators/dots -->
+                        <div class="carousel-indicators" id='fetched-carousel-indicators'>
+                            <!--
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="0" class="active"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="1"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="2"></button>
+                                <button type="button" data-bs-target="#add_van" data-bs-slide-to="3"></button> 
+                            -->
+                        </div>
+                    
+                        <!-- The slideshow/carousel -->
+                        <div class="carousel-inner" id="fetched-carousel-inner">
+                            <!-- images will go here using the format below, wherein the first image will have "active" class to activate the first child -->
+
+                            <!-- <div class="carousel-item active">
+                                <img src="{% static 'assets/images/van-icon.svg' %}" class="d-block w-100">
+                            </div> -->
+                        </div>
+                    
+                        <!-- Left and right controls/icons -->
+                        <button class="carousel-control-prev" type="button" data-bs-target="#rent_van" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon"></span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#rent_van" data-bs-slide="next">
+                            <span class="carousel-control-next-icon"></span>
+                        </button>
+                    </div>
+                    <h2 class="text-center" id='rent-van-brand-name'><!--BRAND NAME WILL BE ASSIGNED HERE--></h2>
+                    <p class="text-center" id='rent-van-plate-no'><!--PLATE NUMBER WILL BE ASSIGNED HERE--></h2>
+
+                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                        {% csrf_token %}
+                        <label class="form-label">Package Rent (in Php) starts at</label>
+                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required>
+                        <input type="hidden" name="van_id" class="form-control" id='van_id' required>
+                        
+                        <label class="form-label">From Destination</label>
+                        <select name="from_destination_municipality" class="form-control" required id="from_destination_municipality" onchange="getDestination('from_destination_municipality', 'from_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="from_destination" class="form-control" required id="from_destination">
+                            <option disabled selected>--- Select From Destination --- </option>
+                        </select>
+
+                        <label class="form-label">To Destination</label>
+                        <select name="to_destination_municipality" class="form-control" required id="to_destination_municipality" onchange="getDestination('to_destination_municipality', 'to_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="to_destination" class="form-control" required id="to_destination">
+                            <option disabled selected>--- Select To Destination --- </option>
+                        </select>
+
+                        <label class="form-label">Travel Date</label>
+                        <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required>
+
+
+                        <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Book Now</button>
+                        <br/>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('setRentVan')">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
+
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
@@ -530,33 +625,71 @@
 
         <script src="{% static 'assets/js/form-validator.js' %}"></script>
         <script src="{% static 'assets/js/open-modal.js' %}"></script>
-        <script src="{% static 'assets/js/birthdate-checker.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/display-fetched-images.js' %}"></script> 
+        
+        <script>
+            function setRent(button, plate_no, package_rent){
+                var rent_data_id = button.getAttribute('rent-data-id');
+                openModal('setRentVan')
 
+                fetch(`rent-a-van/${rent_data_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        displayFetchedImages(data['all_images'])
+                        var brand_name = document.getElementById('rent-van-brand-name');
+                        brand_name.textContent = data['brand_name']
+
+                        var plate_no = document.getElementById('rent-van-plate-no');
+                        plate_no.textContent = `Plate No. : ${data['plate_no']}`
+
+                        var package_rent = document.getElementById('package_rent');
+                        package_rent.value = data['package_rent']
+
+                        var van_id = document.getElementById('van_id');
+                        van_id.value = rent_data_id;
+
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            }
+        </script>
 
         <script>
-            function displayUploadedPreview(event) {
-                const uploadedImageHolder = document.getElementById('uploaded-image-holder');
-                const uploadedImage = document.getElementById('uploaded-image');
-                const file = event.target.files[0];
-                
-                if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    uploadedImage.src = e.target.result;
-                    uploadedImageHolder.style.display = 'block';
+            function getDestination(parent_id, child_id){
 
-                    document.getElementById('new_profile').value = uploadedImage.src
-                }
-                
-                
-                
-                reader.readAsDataURL(file);
-                } else {
-                uploadedImage.src = "{% static 'assets/images/default-profile.png' %}";
-                uploadedImageHolder.style.display = 'none';
-                }
+                var parent_select = document.getElementById(parent_id);
+                municipality_id = parent_select.value;
 
+                fetch(`get-address-destination/${municipality_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        all_places = data['destinations'];
+
+                        var to_destination_select = document.getElementById(child_id);
+                        to_destination_select.innerHTML = ''; 
+
+                        var defaultOption = document.createElement('option');
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        defaultOption.textContent = '--- Select To Destination ---';
+                        to_destination_select.appendChild(defaultOption);
+
+                        all_places.forEach(place => {
+                            var option = document.createElement('option');
+                            option.value = place;
+                            option.textContent = place;
+                            to_destination_select.appendChild(option);
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
 
             }
         </script>

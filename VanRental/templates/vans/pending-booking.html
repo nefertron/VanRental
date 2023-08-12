@@ -1,5 +1,6 @@
 {% load static %}
 {% load tz %}
+{% load vanrental_templatetags %}
 
 <!doctype html>
 <html lang="en">
@@ -10,7 +11,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>My Profile | VAN Rental</title>
+        <title>List of Vans | Van Rental</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,13 +25,12 @@
         <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
 
         <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
-        
+
     </head>
     
-    <body class="topics-listing-page" id="top">
+    <body id="top">
 
         <main>
-
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
                     {% if user.is_authenticated %}
@@ -87,10 +87,11 @@
                             </ul>
                         </div>
 
+                        
                         <div class="message-box mr-20" id="my-notification-mobile">
                             <div class='message-box-header'>
                                 <p>
-                                    Notifications
+                                    Notificationsss
                                 </p>
                             </div>
                             <div class='notification-scroll'>
@@ -226,7 +227,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             {% if user.is_authenticated %}
             <div class="side-bar-header">   
                 <div class="side-bar" id="van-rental-sidebar">
@@ -363,14 +364,15 @@
             </div>
             {% endif %}
 
+
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-5 col-12">
-                            <nav aria-label="breadcrumb">
+                            <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Profile</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Pending Bookings</li>
                                 </ol>
                             </nav>
                         </div>
@@ -382,146 +384,182 @@
                             </div>
                         {% endfor %}
 
-                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5">
-                            <div class="d-flex">
-                                <div class="profile-bg" style="margin-top: auto; margin-bottom: auto;">
-                                    {% if profile.profile %}
-                                        <img src="{{profile.profile}}" class="" alt="">
-                                    {% else %}
-                                        <img src="{% static 'assets/images/default-profile.png' %}" class="" alt="">
-                                    {% endif %}
+                        <div class="container">
+                            {% if all_pending_bookings|length > 0 %}
+                                <div class="row">
+                                    {% for pending_booking in all_pending_bookings %}
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='pending_booking_{{pending_booking.id}}'>
+                                            <div class="custom-block bg-white shadow-lg">
+                                                <div>
+                                                    <div class='display-flex'>
+                                                        <p class="profile-button" style='box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);'> 
+                                                            {% if pending_booking.rented_by.profile %}
+                                                                <img src="{{pending_booking.rented_by.profile}}"/>
+                                                            {% else %}
+                                                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                                            {% endif %}
+                                                        </p>
+                                                        <h5 class='mt-1 ml-10'>{{pending_booking.rented_by.user_id.first_name}} {{pending_booking.rented_by.user_id.last_name}}</h5>
+                                                    </div>
 
-                                    <button class="upload-image-button" onclick="openModal('upload-image-modal')">
-                                        <img src="{% static 'assets/images/camera.svg' %}" class="" alt="">
-                                    </button>
+                                                    <div class='mb-3 line-height-5 mt-3'>
+                                                        <p><b>Personal Information : </b></p>
+                                                        <div class='ml-10'>
+                                                            <p><b>Address :</b> {{pending_booking.rented_by.address}}</p>
+                                                            <p><b>Contact No. :</b> {{pending_booking.rented_by.contact_no}} </p>
+                                                            <p><b>Email :</b> {{pending_booking.rented_by.user_id.email}} </p>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+                                                    <div class='mb-2 line-height-5'>
+                                                        <p><b>Booking Information : </b></p>
+                                                        <div class='ml-10'>
+                                                            <p><b>Budget :</b> {{pending_booking.package_price}} php</p>
+                                                            <p><b>From Destination :</b> {{pending_booking.from_destination}} </p>
+                                                            <p><b>To Destination :</b> {{pending_booking.to_destination}} </p>
+                                                            <p><b>Preferred Schedule :</b> {{pending_booking.travel_date.date}} </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                    <button class="remove-profile" onclick="openModal('remove-profile')">
-                                        Remove Profile
-                                    </button>
-                                </div> <br>
+                                                <h4 class='text-center'>
+                                                    Selected Van
+                                                </h4>
+                                                <div id="vanSlider{{pending_booking.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                    <!-- Indicators/dots -->
 
-                                <div class="custom-block-topics-listing-info d-flex">
-                                    <div>
-                                        <h5 class="mb-2">{{profile.user_id.first_name}} {{profile.user_id.last_name}}</h5>
-                                        <p style="font-size: 0.875rem;">{{account_id}} || <b>{{account_type}}</b></p>
-                                        <p class="mb-0">{{profile.user_id.email}}</p>
-                                        <p class="mb-0">{{profile.contact_no}}</p>
-                                        <p class="mb-0">{{profile.bday.date}}</p>
-                                        <p class="mb-0">{{profile.address}}</p>
+                                                    {% all_van_images_indices pending_booking.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-indicators">
+                                                        {% for van_index in van_images_indices %}
+                                                            {% if van_index == 0 %}
+                                                                <button type="button" data-bs-target="#vanSlider{{pending_booking.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                            {% else %}
+                                                                <button type="button" data-bs-target="#vanSlider{{pending_booking.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- The slideshow/carousel -->
+                                                    {% get_all_van_images pending_booking.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                    <div class="carousel-inner">
+                                                        {% for van_image in all_van_images %}
+                                                            {% if forloop.counter0 == 0 %}
+                                                                <div class="carousel-item active">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="carousel-item">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- Left and right controls/icons -->
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#vanSlider{{pending_booking.id}}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon"></span>
+                                                    </button>
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#vanSlider{{pending_booking.id}}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon"></span>
+                                                    </button>
+
+                                                    <p>
+                                                        <b>Brand Name :</b> {{pending_booking.plate_no.brand_name}} <br>
+                                                        <b>Original Rent Price :</b> {{pending_booking.plate_no.package_rent}} php<br>
+                                                        <b>Plate No :</b> {{pending_booking.plate_no.plate_no}} <br>
+                                                    </p>
+                                                </div>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+
+                                                <p class="mb-2">
+                                                    {{pending_booking.plate_no.description}}
+                                                </p>
+                                                <br>
+                                                <p class="mb-2">
+                                                    Rent ID : {{pending_booking.rent_id}}
+                                                </p>
+                                                
+                                                {% if account_type == 'Passenger' %}
+                                                    <button class="custom-btn mt-2 mt-lg-3 btn-danger" onclick="openCancelBookingModal('{{pending_booking.id}}');">Cancel</button>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <a href="#">
+                                            <div class="d-flex">
+                                                <div>
+                                                    <div class="mb-2">
+                                                        <p><i>Pending Bookings not found</i></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
-                            <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('update_modal')">Update</button>
+                            
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </header>
-            
-            <div class="modal-overlay" id="update_modal">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title">Update Profile</h2>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" value="{{profile.user_id.username}}" class="form-control" placeholder="Username" required>
-
-                            <label class="form-label">First Name</label>
-                            <input type="text" name="fname" value="{{profile.user_id.first_name}}" class="form-control" placeholder="First Name" required>
-
-                            <label class="form-label">Last Name</label>
-                            <input type="text" name="lname" value="{{profile.user_id.last_name}}" class="form-control" placeholder="Last Name" required>
-
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" value="{{profile.user_id.email}}" class="form-control" placeholder="Email" required>
-
-                            <label class="form-label">Birth Date</label>
-                            <input type="date" name="bday" value="{{ profile.bday|date:'Y-m-d' }}" max="{% now 'Y-m-d' %}" id="birthdate-input" class="form-control" placeholder="Birth Date" required>
-
-                            <label class="form-label">Contact No.</label>
-                            <input type="text" name="contact_no" value="{{profile.contact_no}}"  class="form-control" placeholder="Contact No." required>
-
-                            <label class="form-label">Address</label>
-                            <input type="text" name="address" value="{{profile.address}}"  class="form-control" placeholder="Complete Address" required>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Update</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('update_modal')">Close</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="modal-overlay" id="upload-image-modal">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title">Upload your image</h2>
-
-                        <div id="uploaded-image-holder" style="display: none;">
-                            <div class="profile-bg" style="margin:auto;">
-                                <img src="{% static 'assets/images/default-profile.png' %}" id="uploaded-image" class="" alt="">
-                            </div><br>
-                            <h2 class="text-center">New Profile</h2>
-                        </div>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <label class="form-label">Attach image</label>
-                            <input type="file" name="profile" class="form-control" placeholder="" required  onchange="displayUploadedPreview(event)">
-                            <input type="hidden" name="new_profile" class="form-control" placeholder="" required  id="new_profile">
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Upload</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('upload-image-modal')">Close</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="modal-overlay" id="remove-profile">
-                <div class="modal">
-                    <div class="modal-body">
-                        <h2 class="modal-title text-sm">Are you sure you want to remove your profile</h2>
-
-                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                            {% csrf_token %}
-                            <input type="hidden" name="remove_profile" value="True" class="form-control" placeholder="" required>
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <button type="submit" class="form-control">Remove now</button>
-                                </div>
-                                <br/>
-                                <br/>
-                                <br/>
-                                <div class="col-md-6">
-                                    <button type='button' class="form-control" onclick="closeModal('remove-profile')">Cancel</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
         </main>
 
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
+
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        {% if account_type == 'Passenger' %}
+        <div class="modal-overlay" id="cancel_booking">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm">
+                        Cancel a Booking
+                    </h2>
+                    
+                    <div id="approve-booking-body-holder">
+                        Are you sure you want to cancel this booking?
+                    </div>
+                    
+                    <br>
+                    <form method='POST' id='cancelBookingForm'>
+                        {% csrf_token %}
+                        <input type='hidden' name='cancel_booking_id' id='cancel_booking_id'/>
+                        <button type='button' class="btn custom-btn mt-2 mt-lg-3 w-100" onclick="submitCancelBookingForm('cancelBookingForm');">Confirm</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('cancel_booking')">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
         <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
@@ -530,34 +568,28 @@
 
         <script src="{% static 'assets/js/form-validator.js' %}"></script>
         <script src="{% static 'assets/js/open-modal.js' %}"></script>
-        <script src="{% static 'assets/js/birthdate-checker.js' %}"></script>
-
-
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        
         <script>
-            function displayUploadedPreview(event) {
-                const uploadedImageHolder = document.getElementById('uploaded-image-holder');
-                const uploadedImage = document.getElementById('uploaded-image');
-                const file = event.target.files[0];
-                
-                if (file) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    uploadedImage.src = e.target.result;
-                    uploadedImageHolder.style.display = 'block';
 
-                    document.getElementById('new_profile').value = uploadedImage.src
-                }
-                
-                
-                
-                reader.readAsDataURL(file);
-                } else {
-                uploadedImage.src = "{% static 'assets/images/default-profile.png' %}";
-                uploadedImageHolder.style.display = 'none';
-                }
+            function openCancelBookingModal(booking_id){
+                const modalOverlay = document.getElementById('cancel_booking');
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
 
+                var reject_booking_id = document.getElementById('cancel_booking_id');
+                reject_booking_id.value = booking_id;
 
+                console.log(reject_booking_id.value)
+            }
+
+            function submitCancelBookingForm(form_id){
+                var form = document.getElementById(form_id);
+                form.submit();
             }
         </script>
     </body>

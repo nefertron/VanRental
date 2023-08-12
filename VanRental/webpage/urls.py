@@ -14,10 +14,13 @@ urlpatterns = [
     path('profile', profile, name='profile'),
     path('pending-drivers', pending_drivers, name='pending_drivers'),
     path('list-of-vans', list_of_vans, name='list_of_vans'),
+    path('rent-a-van', rent_van, name='rent_van'),
     path('rent-booking', rent_booking_list, name='rent_booking_list'),
     path('confirmed-booking', confirmed_bookings, name='confirmed_bookings'),
     path('past-booking', past_booking, name='past_booking'),
     path('rejected-booking', rejected_booking, name='rejected_booking'),
+    path('pending-booking', pending_booking, name='pending_booking'),
+    path('cancelled-booking', cancelled_booking, name='cancelled_booking'),
 
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),
     path('open/notification/<id>/', open_notification, name='open_notification'),
