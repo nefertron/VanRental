@@ -33,24 +33,35 @@
         <main>
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
-                    <a class="navbar-brand" href="index.html">
-                        <i class="bi-back"></i>
-                        <span>Van Rental</span>
-                    </a>
+                    {% if user.is_authenticated %}
+                        <button class='menu-button' id="menu-btn" onclick="openSideBar();">
+                            <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+
+                        <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
+                            <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% endif %}
 
                     {% if user.is_authenticated %}
-                        <div class="d-none d-lg-block">
-                            <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
-                            <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
-                        </div>
-
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {{unseen_notifications}}
+                            </div>
                         </button>
 
                         <button class="profile-button" onclick="openProfile('mobile');">
-                            <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% get_my_profile user as my_profile %}
+                            {% if my_profile %}
+                                <img src="{{my_profile}}"/>
+                            {% else %}
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% endif %}
                         </button>
 
                         <div class="message-box mr-20" id="my-profile-mobile">
@@ -63,7 +74,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="contact.html">
+                                    <a href="/logout">
                                         <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                         Logout
                                     </a>
@@ -135,10 +146,17 @@
 
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
+
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                    {% get_unseen_notifications user as unseen_notifications %}
+                                    {{unseen_notifications}}
+                                </div>
                             </button>
                             
+
+                                
                             <button class="profile-button" onclick="openProfile('desktop');">
                                 {% get_my_profile user as my_profile %}
                                 {% if my_profile %}
@@ -163,7 +181,7 @@
                                     </li>
     
                                     <li>
-                                        <a href="contact.html">
+                                        <a href="/logout">
                                             <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                             Logout
                                         </a>
@@ -208,9 +226,49 @@
                             <li>
                                 <a href="/index">
                                     <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
-                                    Dashboard
+                                    Homepage
                                 </a>
                             </li>
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    Open Bookings
+                                    {% get_total_open_bookings as total_open_bookings %} 
+                                    {% if total_open_bookings > 0%}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_open_bookings}}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    Confirmed Bookings
+                                    {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                    {% if total_confirmed_bookings > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_confirmed_bookings}}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    Past Bookings
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    Rejected Bookings
+                                </a>
+                            </li>
+
                             <li>
                                 <a href="/profile">
                                     <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
@@ -224,9 +282,15 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/pending-drivers">
+                                <a href="/pending-drivers" class='display-flex'>
                                     <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
                                     Pending Drivers
+                                    {% get_total_pending_drivers as total_pending_drivers %}
+                                    {% if total_pending_drivers > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_pending_drivers}}
+                                        </div>
+                                    {% endif %}
                                 </a>
                             </li>
                         </ul>
@@ -368,7 +432,7 @@
                                                 
                                                 <button class="btn custom-btn mt-2 mt-lg-3" id='submitButton_{{pending_booking.id}}' style='display:none;' onclick="submitApproveBookingForm('approveBookingForm_modal_{{pending_booking.id}}');" >Submit</button>
                                                 <button class="btn custom-btn mt-2 mt-lg-3" id='approveButton_{{pending_booking.id}}' onclick="openBookingModal('{{pending_booking.id}}');">Approve</button>
-                                                <button class="custom-btn mt-2 mt-lg-3 btn-danger" id='rejectButton_{{pending_booking.id}}'>Reject</button>
+                                                <button class="custom-btn mt-2 mt-lg-3 btn-danger" id='rejectButton_{{pending_booking.id}}' onclick="openRejectBookingModal('{{pending_booking.id}}');">Reject</button>
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -397,79 +461,6 @@
             </header>
         </main>
 
-
-
-        <div class="modal-overlay" id="add_van_modal" style="width:40%;">
-            <div class="modal">
-                <div class="modal-body">
-                    <h2 class="modal-title">Add Van Information</h2>
-
-                    <div id="add_van" class="carousel slide van-slider" data-bs-ride="carousel">
-                        <!-- Indicators/dots -->
-                        <div class="carousel-indicators" id='carousel-indicators'>
-                            {% comment %} <button type="button" data-bs-target="#add_van" data-bs-slide-to="0" class="active"></button>
-                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="1"></button>
-                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="2"></button>
-                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="3"></button> {% endcomment %}
-                        </div>
-                    
-                        <!-- The slideshow/carousel -->
-                        <div class="carousel-inner" id="carousel-inner">
-                            <!-- images will go here using the format below, wherein the first image will have "active" class to activate the first child -->
-
-                            <!-- <div class="carousel-item active">
-                                <img src="{% static 'assets/images/van-icon.svg' %}" class="d-block w-100">
-                            </div> -->
-                        </div>
-                    
-                        <!-- Left and right controls/icons -->
-                        <button class="carousel-control-prev" type="button" data-bs-target="#add_van" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon"></span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#add_van" data-bs-slide="next">
-                            <span class="carousel-control-next-icon"></span>
-                        </button>
-                    </div>
-                    <h2 class="text-center" id='carousel_title'>Your Van Images will appear here</h2>
-
-
-                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
-                        {% csrf_token %}
-                        <label class="form-label">Attach Images</label>
-                        <input type="file" multiple name="attached_images" class="form-control"  onchange="displayUploadedPreview(event)" required>
-                        <input type="hidden" multiple name="images" class="form-control" required>
-
-                        <label class="form-label">Plate No.</label>
-                        <input type="text" name="plate_no" class="form-control" placeholder="Plate No." required>
-                        
-                        <label class="form-label">Brand Name</label>
-                        <input type="text" name="brand_name" class="form-control" placeholder="Brand Name" required>
-
-                        <label class="form-label">Color</label>
-                        <input type="text" name="color" class="form-control" placeholder="Color" required>
-
-                        <label class="form-label">No. of seats</label>
-                        <input type="text" name="number_of_seats" class="form-control" placeholder="No. of seats" required>
-                        
-                        <label class="form-label">Van Description</label>
-                        <input type="text" name="description" class="form-control" placeholder="Van Description" required>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="submit" class="form-control">Save</button>
-                            </div>
-                            <br/>
-                            <br/>
-                            <br/>
-                            <div class="col-md-6">
-                                <button type='button' class="form-control" onclick="closeModal('add_van_modal')">Close</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <div class="modal-overlay" id="seen_message">
             <div class="modal">
                 <div class="modal-body">
@@ -485,7 +476,7 @@
                     <p id="modal-footer">
                         <!-- Date Recorded : 0000-00-00 -->
                     </p>
-                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                    <button type='submit' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('seen_message')">Close</button>
                 </div>
             </div>
         </div>
@@ -503,10 +494,34 @@
                     </div>
                     
                     <input type='hidden' name='modal_id' id='modal_id'/>
-                    <button type='submit' class="form-control" onclick="closeBookingModal('approve_booking')">Close</button>
+                    <button type='submit' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeBookingModal('approve_booking')">Close</button>
                 </div>
             </div>
         </div>
+
+
+        <div class="modal-overlay" id="reject_booking">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm">
+                        Reject a Booking
+                    </h2>
+                    
+                    <div id="approve-booking-body-holder">
+                        Are you sure you want to reject this booking?
+                    </div>
+                    
+                    <br>
+                    <form method='POST' id='rejectBookingForm'>
+                        {% csrf_token %}
+                        <input type='hidden' name='rejected_booking_id' id='rejected_booking_id'/>
+                        <button type='button' class="btn custom-btn mt-2 mt-lg-3 w-100" onclick="submitRejectBookingForm('rejectBookingForm');">Confirm</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('reject_booking')">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
         
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
@@ -572,6 +587,24 @@
                 const modal = modalOverlay.querySelector(".modal");
                 modalOverlay.classList.remove("active");
                 modal.classList.remove("active");
+            }
+
+            function openRejectBookingModal(booking_id){
+                const modalOverlay = document.getElementById('reject_booking');
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+
+                var reject_booking_id = document.getElementById('rejected_booking_id');
+                reject_booking_id.value = booking_id;
+
+                console.log(reject_booking_id.value)
+            }
+
+            function submitRejectBookingForm(form_id){
+                console.log(document.getElementById(form_id))
+                var form = document.getElementById(form_id);
+                form.submit();
             }
 
         </script>

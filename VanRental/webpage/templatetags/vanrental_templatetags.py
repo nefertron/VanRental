@@ -1,7 +1,7 @@
 from django import template
 from ..models import *
 from django.db.models import Q
-
+from django.db.models import Sum
 
 register = template.Library()
 
@@ -113,7 +113,7 @@ def get_carpool_vans():
 
 
 @register.simple_tag
-def get_all_rented():
+def get_all_done_rental():
     all_rented_van = RentedVan.objects.filter(is_done = True).all().order_by('date_recorded')
     return all_rented_van
 
@@ -125,9 +125,11 @@ def get_all_carpooled():
     return all_rented_van
 
 @register.simple_tag
-def get_rating():
+def get_overall_rental_rating(id):
+    get_all_rental_ratings = Review.objects.filter(rent_id = id).aggregate(get_all_rental_ratings = Sum('rating'))['get_all_rental_ratings']
+    get_all_rental_reviews_count = Review.objects.filter(rent_id = id).count()
 
-    rating = 10
+    rating = (get_all_rental_ratings/get_all_rental_reviews_count)
     whole_number, decimal_part = divmod(rating, 1)
 
     array = [digit for digit in range(int(whole_number))]
@@ -135,6 +137,20 @@ def get_rating():
     return array, decimal_part
 
 
+@register.simple_tag
+def get_rental_reviews(id):
+    all_reviews = Review.objects.filter(rent_id = id).all()
+    return all_reviews
+
+
+@register.simple_tag
+def convert_rating_to_array(num):
+    array = []
+
+    for i in range(0, num):
+        array.append(i)
+
+    return array
 
 @register.simple_tag
 def get_all_municipality():

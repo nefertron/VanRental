@@ -506,9 +506,9 @@ def list_of_vans(request):
 
 ################ RENT BOOKING LIST PAGE
 def rent_booking_list(request):
-    if not request.user.is_superuser:
-        messages.info(request, 'The page you are trying to access is not available')
-        return redirect('/index')
+    # if not request.user.is_superuser:
+    #     messages.info(request, 'The page you are trying to access is not available')
+    #     return redirect('/index')
 
     all_pending_bookings = RentedVan.objects.filter(is_done=False, is_rejected=False, is_cancelled = False, is_confirmed=False).all()
 
@@ -520,33 +520,86 @@ def rent_booking_list(request):
         booking_id = request.POST.get('booking_id')
         driver_id = request.POST.get('driver_id')
 
-        booking_target = RentedVan.objects.filter(id = booking_id).first()
-        driver_target = DriverAccount.objects.filter(id = driver_id).first()
+        rejected_booking_id = request.POST.get('rejected_booking_id')
 
-        booking_target.driver_id = driver_target
-        booking_target.is_confirmed = True
-        booking_target.save()
+        if not booking_id is None and not driver_id is None:
+            booking_target = RentedVan.objects.filter(id = booking_id).first()
+            driver_target = DriverAccount.objects.filter(id = driver_id).first()
 
-        message_to_admin = f'You confirmed a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
-        message_to_driver = f'You have been assigned as a driver in a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
-        message_to_passenger = f'Your rent booking with RENT ID : {booking_target.rent_id} has been confirmed, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            booking_target.driver_id = driver_target
+            booking_target.is_confirmed = True
+            booking_target.save()
+
+            message_to_admin = f'You confirmed a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            message_to_driver = f'You have been assigned as a driver in a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            message_to_passenger = f'Your rent booking with RENT ID : {booking_target.rent_id} has been confirmed, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            
+            driver_target.is_available = False
+            driver_target.save()
+
+
+            van = Van.objects.filter(id = booking_target.plate_no.id).first()
+            van.is_rented = True
+            van.save()
+
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, driver_target.user_id, message_to_driver)
+            create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
+
+            messages.info(request, message_to_admin)
+            return redirect('/rent-booking')
         
-        driver_target.is_available = False
-        driver_target.save()
 
+        elif not rejected_booking_id is None:
+            booking_target = RentedVan.objects.filter(id = rejected_booking_id).first()
+            booking_target.is_rejected = True
+            booking_target.save()
 
-        van = Van.objects.filter(id = booking_target.plate_no.id).first()
-        van.is_rented = True
-        van.save()
+            message_to_admin = f'REJECTED || A rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            message_to_passenger = f'REJECTED || Your rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            
+            van = Van.objects.filter(id = booking_target.plate_no.id).first()
+            van.is_rented = False
+            van.save()
 
-        create_notification(request, request.user, message_to_admin)
-        create_notification(request, driver_target.user_id, message_to_driver)
-        create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
 
-        messages.info(request, message_to_admin)
-        return redirect('/rent-booking')
-
+            messages.info(request, message_to_admin)
+            return redirect('/rent-booking')
+        
     return render(request, 'vans/rent-booking.html', context)
+
+
+
+################ REJECTED BOOKING PAGE
+def rejected_booking(request):
+    if not request.user.is_authenticated:
+        messages.info(request, f'You must login to continue.')
+        return redirect('/login')
+
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    context = {}
+
+    if not admin_account is None:
+        context['profile'] = admin_account
+        context['account_type'] = 'Admin'
+        context['all_rejected_bookings'] = RentedVan.objects.filter(is_rejected = True).all().order_by('date_recorded')
+    elif not driver_account is None:
+        context['profile'] = driver_account
+        context['account_type'] = 'Driver'
+        context['all_rejected_bookings']= RentedVan.objects.filter(driver_id = driver_account, is_rejected = True).all().order_by('date_recorded')
+    elif not passenger_account is None:
+        context['profile'] = passenger_account
+        context['account_type'] = 'Passenger'
+        context['all_rejected_bookings']= RentedVan.objects.filter(rented_by = passenger_account, is_rejected = True).all().order_by('date_recorded')
+
+
+    return render(request, 'vans/rejected-booking.html', context)
+
 
 
 

@@ -17,6 +17,7 @@ urlpatterns = [
     path('rent-booking', rent_booking_list, name='rent_booking_list'),
     path('confirmed-booking', confirmed_bookings, name='confirmed_bookings'),
     path('past-booking', past_booking, name='past_booking'),
+    path('rejected-booking', rejected_booking, name='rejected_booking'),
 
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),
     path('open/notification/<id>/', open_notification, name='open_notification'),

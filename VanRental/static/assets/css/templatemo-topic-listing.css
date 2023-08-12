@@ -1356,6 +1356,39 @@ blockquote {
 }
 
 
+.menu-button {
+  display: flex;
+  font-weight: bolder;
+  color: black;
+  font-size: 0.875rem;
+  padding: auto;
+  height: 50px;
+  width: 130px;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.menu-button-x{
+  display: none;
+  font-weight: bolder;
+  color: black;
+  font-size: 0.875rem;
+  padding: auto;
+  height: 50px;
+  width: 130px;
+  border-color: transparent;
+  background-color: transparent;
+}
+
+.menu-button:hover, .menu-button-x:hover{
+  transform: scale(1.02);
+}
+
+.menu-button:focus, .menu-button-x:focus{
+  outline: none;
+}
+
+
 .van-nav-items{
   font-weight: 900;
 }
@@ -1447,8 +1480,32 @@ blockquote {
   height: 30px;
 }
 
+.h-40{
+  height: 40px;
+}
+
+.h-45{
+  height: 45px;
+}
+
+.h-50{
+  height: 50px;
+}
+
 .w-30{
   width: 30px;
+}
+
+.w-40{
+  width: 40px;
+}
+
+.w-45{
+  width: 45px;
+}
+
+.w-50{
+  width: 50px;
 }
 
 
@@ -1690,9 +1747,42 @@ blockquote {
   background-image: url('../images/full-star.svg');
 }
 
-.star-rating > input:checked:last-child ~ label:last-child {
-  background-image: url('../images/half-star.svg');
-}
 
  /* #################### FOR STAR RATING ################################# */
 
+
+
+.comment-section{
+  display: flex; 
+  margin-bottom: 20px;
+}
+
+.comment-section:hover{
+  transform: scale(1.02);
+}
+
+.comment-section-profile{
+  width: 30px; 
+  height: 30px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  border-radius: 50%;
+}
+
+.comment-box{
+  margin-left: 10px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  padding:10px; 
+  border-radius: 20px;
+}
+
+
+.red-circle{
+  display:inline-block; 
+  padding:2px; 
+  height:25px; 
+  width:25px; 
+  color:whitesmoke; 
+  background-color:#dc3545; 
+  border-radius:50%; 
+  font-size:0.80rem;
+}

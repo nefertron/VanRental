@@ -33,24 +33,35 @@
         <main>
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
-                    <a class="navbar-brand" href="index.html">
-                        <i class="bi-back"></i>
-                        <span>Van Rental</span>
-                    </a>
+                    {% if user.is_authenticated %}
+                        <button class='menu-button' id="menu-btn" onclick="openSideBar();">
+                            <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+
+                        <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
+                            <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% endif %}
 
                     {% if user.is_authenticated %}
-                        <div class="d-none d-lg-block">
-                            <button class="sidebar-button" id="menu-btn" onclick="openSideBar();"><img src="{% static 'assets/images/menu.svg' %}" /></button>
-                            <button class="sidebar-x-button" id='close-menu-btn' onclick="closeSideBar();"><img src="{% static 'assets/images/close-menu.svg' %}" /></button>
-                        </div>
-
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {{unseen_notifications}}
+                            </div>
                         </button>
 
                         <button class="profile-button" onclick="openProfile('mobile');">
-                            <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% get_my_profile user as my_profile %}
+                            {% if my_profile %}
+                                <img src="{{my_profile}}"/>
+                            {% else %}
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% endif %}
                         </button>
 
                         <div class="message-box mr-20" id="my-profile-mobile">
@@ -63,7 +74,7 @@
                                 </li>
 
                                 <li>
-                                    <a href="contact.html">
+                                    <a href="/logout">
                                         <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                         Logout
                                     </a>
@@ -135,10 +146,17 @@
 
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
+
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                <div style='position:absolute; margin-top:-40px; margin-left:25px; background-color:#dc3545; height:15px; width:15px; border-radius:50%; text-align:center; font-size:0.6rem;'>
+                                    {% get_unseen_notifications user as unseen_notifications %}
+                                    {{unseen_notifications}}
+                                </div>
                             </button>
                             
+
+                                
                             <button class="profile-button" onclick="openProfile('desktop');">
                                 {% get_my_profile user as my_profile %}
                                 {% if my_profile %}
@@ -163,7 +181,7 @@
                                     </li>
     
                                     <li>
-                                        <a href="contact.html">
+                                        <a href="/logout">
                                             <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
                                             Logout
                                         </a>
@@ -208,9 +226,49 @@
                             <li>
                                 <a href="/index">
                                     <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
-                                    Dashboard
+                                    Homepage
                                 </a>
                             </li>
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    Open Bookings
+                                    {% get_total_open_bookings as total_open_bookings %} 
+                                    {% if total_open_bookings > 0%}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_open_bookings}}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    Confirmed Bookings
+                                    {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                    {% if total_confirmed_bookings > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_confirmed_bookings}}
+                                        </div>
+                                    {% endif %}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    Past Bookings
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    Rejected Bookings
+                                </a>
+                            </li>
+
                             <li>
                                 <a href="/profile">
                                     <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
@@ -224,9 +282,15 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="/pending-drivers">
+                                <a href="/pending-drivers" class='display-flex'>
                                     <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
                                     Pending Drivers
+                                    {% get_total_pending_drivers as total_pending_drivers %}
+                                    {% if total_pending_drivers > 0 %}
+                                        <div style='background-color:#dc3545; height:20px; width:20px; border-radius:50%; margin-left: 10px; text-align:center; font-size:0.75rem;'>
+                                            {{total_pending_drivers}}
+                                        </div>
+                                    {% endif %}
                                 </a>
                             </li>
                         </ul>
@@ -367,17 +431,18 @@
                                                         {% csrf_token %}
                                                         Ratings
                                                         <div class="star-rating">
-                                                            <input type="radio" id="star5" name="rating" value="5">
-                                                            <label for="star5"></label>
-                                                            <input type="radio" id="star4" name="rating" value="4">
-                                                            <label for="star4"></label>
-                                                            <input type="radio" id="star3" name="rating" value="3">
-                                                            <label for="star3"></label>
-                                                            <input type="radio" id="star2" name="rating" value="2">
-                                                            <label for="star2"></label>
                                                             <input type="radio" id="star1" name="rating" value="1">
                                                             <label for="star1"></label>
+                                                            <input type="radio" id="star2" name="rating" value="2">
+                                                            <label for="star2"></label>
+                                                            <input type="radio" id="star3" name="rating" value="3">
+                                                            <label for="star3"></label>
+                                                            <input type="radio" id="star4" name="rating" value="4">
+                                                            <label for="star4"></label>
+                                                            <input type="radio" id="star5" name="rating" value="5">
+                                                            <label for="star5"></label>
                                                         </div>
+                                                        
                                                         <br>
                                                         <input type='hidden' name='done_rent_id' value='{{done_booking.id}}'/>
 
