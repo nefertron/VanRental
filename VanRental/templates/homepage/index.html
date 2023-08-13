@@ -246,6 +246,22 @@
                                     </div>
                                 </a>
                             </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
                             {% if user.is_superuser %}
                             <li>
                                 <a href="/rent-booking" class='display-flex'>
@@ -478,7 +494,13 @@
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="carpool-tab" data-bs-toggle="tab" data-bs-target="#carpool-tab-pane" type="button" role="tab" aria-controls="carpool-tab-pane" aria-selected="false">Carpooling</button>
+                                <button class="nav-link" id="carpool-tab" data-bs-toggle="tab" data-bs-target="#carpool-tab-pane" type="button" role="tab" aria-controls="carpool-tab-pane" aria-selected="false">
+                                    Carpooling
+                                    <div class='red-circle'>
+                                        {% get_carpool_vans as to_carpool_vans %}
+                                        {{to_carpool_vans|length}}
+                                    </div>
+                                </button>
                             </li>
 
                             <li class="nav-item" role="presentation">
@@ -569,7 +591,7 @@
                                                 
                                                 <div>
                                                     <p class="mb-0">No. of rental service : {{van_services.0}}</p>
-                                                    <p class="mb-0">No. of carpool service : {{van_services.1}}</p>
+                                                    <p class="mb-0">No. of carpooling service : {{van_services.1}}</p>
                                                 </div>
 
                                                 {% if this_van.is_rented == True %}
@@ -603,7 +625,9 @@
                                                     <div class="d-flex">
                                                         <div>
                                                             <h5 class="mb-2">{{this_carpool_van.brand_name}}</h5>
-                                                            <p class="mb-0">Plate No. : {{this_van.plate_no}}</p>
+                                                            {% get_available_seats_in_carpool this_carpool_van as available_seats %}
+                                                            <h6 style="font-size:1rem;">Available Seats : {{available_seats}}</h6>
+                                                            <p class="mb-0">Plate No. : {{this_carpool_van.plate_no}}</p>
                                                         </div>
                                                         <span class="badge bg-advertising rounded-pill ms-auto">{{this_carpool_van.number_of_seats}}</span>
                                                     </div>
@@ -622,7 +646,7 @@
                                                         </div>
                                                     
                                                         <!-- The slideshow/carousel -->
-                                                        {% get_all_van_images this_van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                        {% get_all_van_images this_carpool_van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
                                                         <div class="carousel-inner">
                                                             {% for van_image in all_van_images %}
                                                                 {% if forloop.counter0 == 0 %}
@@ -650,21 +674,17 @@
                                                     </div>
                                                     
                                                     
-                                                    <p class="mb-0">{{this_van.description}}</p>
+                                                    <p class="mb-0">{{this_carpool_van.description}}</p>
                                                     <br>
 
-                                                    {% get_van_total_rental_and_carpool_service this_van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                                    {% get_van_total_rental_and_carpool_service this_carpool_van as van_services %} <!-- get all the services of the van | located at templatetag -->
                                                     
                                                     <div>
                                                         <p class="mb-0">No. of rental service : {{van_services.0}}</p>
                                                         <p class="mb-0">No. of carpool service : {{van_services.1}}</p>
                                                     </div>
 
-                                                    {% if van.is_rented == True %}
-                                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Unavailable</button>
-                                                    {% else %}
-                                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Available</button>
-                                                    {% endif %}
+                                                    <button class="btn custom-btn mt-2 mt-lg-3">Status : Carpooling</button>
                                                 </div>
                                             </div>
                                             {% endfor %}
@@ -705,12 +725,16 @@
                                                                         <b>Overall Ratings : </b>
                                                                         {% get_overall_rental_rating done_rental.id as rating %}
 
-                                                                        {% for i in rating.0 %}
-                                                                            <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
-                                                                        {% endfor %}
+                                                                        {% if rating.0 != 0 and rating.1 != 0 %}
+                                                                            {% for i in rating.0 %}
+                                                                                <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endfor %}
 
-                                                                        {% if rating.1 != 0 %}
-                                                                            <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% if rating.1 != 0 %}
+                                                                                <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            <p> No ratings found </p>
                                                                         {% endif %}
                                                                     </p>
                                                                 </div>

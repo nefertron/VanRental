@@ -248,6 +248,22 @@
                                     </div>
                                 </a>
                             </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
                             {% if user.is_superuser %}
                             <li>
                                 <a href="/rent-booking" class='display-flex'>
@@ -479,6 +495,7 @@
                                                         <b>Brand Name :</b> {{confirmed_booking.plate_no.brand_name}} <br>
                                                         <b>Original Rent Price :</b> {{confirmed_booking.plate_no.package_rent}} php<br>
                                                         <b>Plate No :</b> {{confirmed_booking.plate_no.plate_no}} <br>
+                                                        <b>Number of seats :</b> {{confirmed_booking.plate_no.number_of_seats}} <br>
                                                     </p>
                                                 </div>
                                                 <br>
@@ -503,6 +520,15 @@
                                                     {% csrf_token %} 
                                                     <input type='hidden' name='done_booking_id' value='{{confirmed_booking.id}}' />
                                                     <input type='hidden' name='enable_carpooling' id='enable_carpooling' value='True' />
+
+                                                    <input type='hidden' name='available_seats' id='carpooling_available_seats'/>
+                                                    
+                                                    <input type='hidden' name='from_destination_city' id='carpooling_from_destination'/>
+                                                    <input type='hidden' name='to_destination_city' id='carpooling_to_destination'/>
+                                                    
+                                                    <input type='hidden' name='from_destination_municipality' id='carpooling_from_destination_municipality'/>
+                                                    <input type='hidden' name='to_destination_municipality' id='carpooling_to_destination_municipality'/>
+
                                                 </form>
 
                                                 {% if account_type == 'Admin' or account_type == 'Passenger' %}
@@ -596,13 +622,49 @@
                         Yes, Do enable Carpooling Mode
                     </div>
                     <br>
+
+                    <form class='custom-form' id='destinationForm' style='display:none;'>
+
+                        <label class="form-label">Available Seats</label>
+                        <input type='number' min='1' id='temp_available_seats' class='form-control' placeholder='Available Seats...' onchange="setAvailableSeats('temp_available_seats');"/>
+
+
+                        <label class="form-label">From Destination</label>
+                        <select name="from_destination_municipality" class="form-control" required id="from_destination_municipality" onchange="getDestination('from_destination_municipality', 'from_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="from_destination" class="form-control" required id="from_destination" onchange="getFromDestination('from_destination');">
+                            <option disabled selected>--- Select From Destination --- </option>
+                        </select>
+
+                        <label class="form-label">To Destination</label>
+                        <select name="to_destination_municipality" class="form-control" required id="to_destination_municipality" onchange="getDestination('to_destination_municipality', 'to_destination')">
+                            {% get_all_municipality as all_municipality %}
+                            <option disabled selected>--- Select City or Municipality --- </option>
+                                {% for municipality in all_municipality %}
+                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
+                                {% endfor %}
+                        </select>
+
+                        <select name="to_destination" class="form-control" required id="to_destination" onchange="getToDestination('to_destination');">
+                            <option disabled selected>--- Select To Destination --- </option>
+                        </select>
+                    </form>
+                    <br>
                     <div>
                         <input type='checkbox' name='no_deactivate' onchange='carpoolDeactivate();' />
                         No, Do not enable Carpooling Mode
                     </div>
 
                     <input type='hidden' id='temp_mark_as_done_booking_id_container' value='' />
-                    <div class='row'>
+
+
+                    <div class='row' id='footerButton' style='display:none;'>
                         <div class='col-md-6'>
                             <button type='button' class="custom-btn mt-2 mt-lg-3" onclick="markAsDoneBooking();">Mark As Done</button> <br/>
                         </div>
@@ -610,6 +672,7 @@
                         <div class='col-md-6'>
                             <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger" onclick="closeModal('markAsDoneBookingModal');">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Close &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -668,27 +731,114 @@
             function carpoolActivate() {
                 var yes = document.getElementsByName('yes_enable')[0];
                 var no = document.getElementsByName('no_deactivate')[0];
-            
+                var destination_form = document.getElementById('destinationForm');
+                var footer_button = document.getElementById('footerButton');
+
                 if (yes.checked) {
                     no.checked = false;
                     var carpooling_enable = document.getElementById('enable_carpooling')
                     carpooling_enable.value = 'True';
-                    console.log(carpooling_enable.value)
+
+                    destination_form.style.display = 'block';
+                    footer_button.style.display = 'flex';
+                }
+                else{
+                    destination_form.style.display = 'none';
+                    footer_button.style.display = 'none';
                 }
             }
-            
+
             function carpoolDeactivate() {
                 var yes = document.getElementsByName('yes_enable')[0];
                 var no = document.getElementsByName('no_deactivate')[0];
+                var destination_form = document.getElementById('destinationForm');
+                var footer_button = document.getElementById('footerButton');
             
                 if (no.checked) {
                     yes.checked = false;
                     var carpooling_enable = document.getElementById('enable_carpooling')
                     carpooling_enable.value = 'False';
-                    console.log(carpooling_enable.value)
+
+                    destination_form.style.display = 'none';
+                    footer_button.style.display = 'flex';
+                }
+                else{
+                    destination_form.style.display = 'none';
+                    footer_button.style.display = 'none';
                 }
             }
+        </script>
+
+        <script>
+            function getDestination(parent_id, child_id){
+
+                var parent_select = document.getElementById(parent_id);
+                municipality_id = parent_select.value;
+
+                fetch(`get-address-destination/${municipality_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        all_places = data['destinations'];
+
+                        var to_destination_select = document.getElementById(child_id);
+                        to_destination_select.innerHTML = ''; 
+
+                        var defaultOption = document.createElement('option');
+                        defaultOption.disabled = true;
+                        defaultOption.selected = true;
+                        defaultOption.textContent = '--- Select To Destination ---';
+                        to_destination_select.appendChild(defaultOption);
+
+                        all_places.forEach(place => {
+                            var option = document.createElement('option');
+                            option.value = place;
+                            option.textContent = place;
+                            to_destination_select.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+
+            }
+        </script>
+
+        <script>
+            function setAvailableSeats(input_id){
+                var temp_available_seats_container = document.getElementById(input_id);
+
+                if (temp_available_seats.value < 0){
+                    temp_available_seats.value = 0
+                }
+                else{
+                    var available_seats = document.getElementById('carpooling_available_seats');
+                    available_seats.value = temp_available_seats_container.value;
+                }
+            }
+            function getFromDestination(select_id){
+                var selected_from_destination_municipality = document.getElementById('from_destination_municipality')
+                var selected_from_destination_city = document.getElementById(select_id);
+
+                var carpooling_from_destination = document.getElementById('carpooling_from_destination')
+                carpooling_from_destination.value = selected_from_destination_city.value;
+
+                var carpooling_from_destination_municipality = document.getElementById('carpooling_from_destination_municipality')
+                carpooling_from_destination_municipality.value = selected_from_destination_municipality.value;
+            }
             
+            function getToDestination(select_id){
+                var selected_to_destination_municipality = document.getElementById('to_destination_municipality')
+                var selected_to_destination_city = document.getElementById(select_id);
+
+                var carpooling_to_destination = document.getElementById('carpooling_to_destination')
+                carpooling_to_destination.value = selected_to_destination_city.value;
+
+                var carpooling_to_destination_municipality = document.getElementById('carpooling_to_destination_municipality')
+                carpooling_to_destination_municipality.value = selected_to_destination_municipality.value;
+
+                console.log(carpooling_to_destination.value)
+                console.log(carpooling_to_destination_municipality.value)
+            }
         </script>
     </body>
 </html>

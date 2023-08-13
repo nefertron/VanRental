@@ -248,6 +248,22 @@
                                     </div>
                                 </a>
                             </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
                             {% if user.is_superuser %}
                             <li>
                                 <a href="/rent-booking" class='display-flex'>
@@ -442,7 +458,7 @@
                                         <p class="mb-2">{{van.description}}</p>
                                         {% get_van_total_rental_and_carpool_service van as van_services %} <!-- get all the services of the van | located at templatetag -->
                                         <p class="mb-0">No. of rental services : {{van_services.0}}</p> <!-- get the total rental services, can be accessed using index 0-->
-                                        <p class="mb-0">No. of rental services : {{van_services.1}}</p> <!-- get the total rental services, can be accessed using index 0-->
+                                        <p class="mb-0">No. of carpooling services : {{van_services.1}}</p> <!-- get the total rental services, can be accessed using index 0-->
 
                                         {% if van.is_rented == True %}
                                             <button class="btn custom-btn mt-2 mt-lg-3 btn-danger">Status : Rented</button>

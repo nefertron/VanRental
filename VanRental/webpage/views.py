@@ -15,6 +15,8 @@ from json import dumps
 import json
 
 from django.db import transaction
+from django.db.models import Sum
+
 # Create your views here.
 
 ################ REUSABLE REMOVE SPACES DEF FUNCTION
@@ -756,7 +758,14 @@ def confirmed_bookings(request):
         cancel_booking_id = request.POST.get('cancel_booking_id')
         done_booking_id = request.POST.get('done_booking_id')
         enable_carpooling = request.POST.get('enable_carpooling')
+        
+        available_seats = request.POST.get('available_seats')
+        from_destination_municipality  = request.POST.get('from_destination_municipality')
+        to_destination_municipality  = request.POST.get('to_destination_municipality')
+        from_destination_city  = request.POST.get('from_destination_city')
+        to_destination_city  = request.POST.get('to_destination_city')
 
+        
         if not cancel_booking_id is None:
             to_cancel_rent = RentedVan.objects.filter(id = cancel_booking_id).first()
             to_cancel_rent.is_cancelled = True
@@ -796,15 +805,70 @@ def confirmed_bookings(request):
             van = Van.objects.filter(id = done_rent.plate_no.id).first()
             van.is_rented = False
 
+
             if enable_carpooling == "True":
                 van.is_carpooled = True
-                messages.info(request, 'True')
+                van.save()
 
+                carpool_available_seats = None
+                carpool_from_destination_city = None
+                carpool_to_destination_city = None
+
+                # get available seats
+                if available_seats is None:
+                    carpool_available_seats = van.number_of_seats
+                else:
+                    carpool_available_seats = int(available_seats)
+                # get available seats
+                
+                # get from destination
+                if from_destination_city is None:
+                    carpool_from_destination_city = done_rent.to_destination
+                else:
+                    municipality = ListOfMunicipalities.objects.filter(id=from_destination_municipality).first()
+                    city = ListOfDestinations.objects.filter(municipality = municipality, destination_name = from_destination_city).first()
+
+                    carpool_from_destination_city = f'{city.destination_name}, {city.municipality.municipality_name}'
+                # get from destination
+                
+                # get to destination
+                if to_destination_city is None:
+                    carpool_to_destination_city = done_rent.from_destination
+                else:
+                    municipality = ListOfMunicipalities.objects.filter(id=to_destination_municipality).first()
+                    city = ListOfDestinations.objects.filter(municipality = municipality, destination_name = to_destination_city).first()
+
+                    carpool_to_destination_city = f'{city.destination_name}, {city.municipality.municipality_name}'
+                # get to destination
+
+
+                create_carpool = CarpoolVan.objects.create(available_seat = carpool_available_seats,
+                                                           from_destination = carpool_from_destination_city,
+                                                           to_destination = carpool_to_destination_city,
+                                                           plate_no = van,
+                                                           driver_id = driver_account,
+                                                           date_recorded = datetime.now())
+                create_carpool.carpool_id = f'CPL{create_carpool.id}'
+                create_carpool.save()
+
+                message_to_admin = f'CARPOOL || Has been created with CARPOOL ID {create_carpool.carpool_id}, and destination FROM {create_carpool.from_destination} TO {create_carpool.to_destination}'
+                message_to_driver = f'CARPOOL || Has been created with CARPOOL ID {create_carpool.carpool_id}, and destination FROM {create_carpool.from_destination} TO {create_carpool.to_destination}'
+
+                create_notification(request, User.objects.filter(is_superuser = True).first(), message_to_admin)
+                create_notification(request, driver_account.user_id, message_to_driver)
+
+                messages.info(request, message_to_driver)
             else:
                 van.is_carpooled = False
-                messages.info(request, 'False')
+                van.save()
 
-            van.save()
+                message_to_admin = f'CARPOOL || Has not been created'
+                message_to_driver = f'CARPOOL || Has not been created'
+
+                create_notification(request, User.objects.filter(is_superuser = True).first(), message_to_admin)
+                create_notification(request, driver_account.user_id, message_to_driver)
+                
+                messages.info(request, message_to_driver)
 
 
             message_to_admin = f'DONE || Boking with RENT ID : {done_rent.rent_id}, and destination FROM {done_rent.from_destination} TO {done_rent.to_destination} on {str(done_rent.travel_date)}'
@@ -820,6 +884,34 @@ def confirmed_bookings(request):
         
     return render(request, 'vans/confirmed-booking.html', context)
 
+
+def available_carpooling(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/login')
+    
+    if request.user.is_superuser:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/index')
+    
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    context = {}
+
+    if not driver_account is None:
+        context['profile'] = driver_account
+        context['account_type'] = 'Driver'
+        context['all_available_carpooling'] = CarpoolVan.objects.filter(driver_id = driver_account, is_done = False).all()
+
+    elif not passenger_account is None:
+        context['profile'] = passenger_account
+        context['account_type'] = 'Passenger'
+        context['all_available_carpooling'] = CarpoolVan.objects.filter(is_done = False).all()
+
+
+    return render(request, 'vans/available-carpooling.html', context)
 
 
 ################ PAST BOOKING PAGE
@@ -974,7 +1066,20 @@ def get_destination_address(request, id):
     return JsonResponse(response)
 
 
+def get_carpooling_information(request, id):
+    carpooling = CarpoolVan.objects.filter(id=id).first()
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpooling).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
     
+    response = {}
+    
+    if not all_booked_passengers is None:
+        remaining_available_seats = carpooling.available_seat - all_booked_passengers
+        response['available_seats'] = remaining_available_seats
+    else:
+        response['available_seats'] = carpooling.available_seat
+
+    return JsonResponse(response)
+
 ############################ THESE ARE USED FOR FETCHING USING JS ####################################################
 
 
@@ -986,40 +1091,40 @@ def get_destination_address(request, id):
 
 
 
-def add_municipality(request):
-    add_destinations(request)
-    return render(request, 'authentication/blank.html')
+# def add_municipality(request):
+#     add_destinations(request)
+#     return render(request, 'authentication/blank.html')
 
 
 
-@transaction.atomic
-def add_destinations(request):
+# @transaction.atomic
+# def add_destinations(request):
 
-    # with transaction.atomic():
-    #     municipality = ['Quezon', 'Laguna', 'Rizal', 'Metro Manila', 'Cavite', 'Batangas', 'Benguet', 'Mountain Province', 'Isabela', 'Cagayan', 'Nueva Vizcaya', 'Nueva Ecija', 'Pangasinan', 'La Union']
+#     # with transaction.atomic():
+#     #     municipality = ['Quezon', 'Laguna', 'Rizal', 'Metro Manila', 'Cavite', 'Batangas', 'Benguet', 'Mountain Province', 'Isabela', 'Cagayan', 'Nueva Vizcaya', 'Nueva Ecija', 'Pangasinan', 'La Union']
 
-    #     x = 0
-    #     for i in municipality:
-    #         create_municipality = ListOfMunicipalities.objects.create(municipality_name = i)
-    #         create_municipality.save()
-    #         x = x + 1
+#     #     x = 0
+#     #     for i in municipality:
+#     #         create_municipality = ListOfMunicipalities.objects.create(municipality_name = i)
+#     #         create_municipality.save()
+#     #         x = x + 1
         
-    #     return messages.info(request, f'{x} municipality saved')
+#     #     return messages.info(request, f'{x} municipality saved')
 
-    # with transaction.atomic():
-    #     list_of_destinations = ["Lucban|| Quezon", "Lucena City|| Quezon", "Sta. Rosa|| Laguna", "Calamba|| Laguna", "Los Baños|| Laguna", "Binangonan|| Rizal", "Antipolo|| Rizal", "Angono|| Rizal", "Taytay|| Rizal", "Cainta|| Rizal", "Marikina City|| Metro Manila", "San Juan City|| Metro Manila", "Mandaluyong City|| Metro Manila", "Pasig City|| Metro Manila", "Quezon City|| Metro Manila", "Caloocan City|| Metro Manila", "Valenzuela City|| Metro Manila", "Malabon City|| Metro Manila", "Navotas City|| Metro Manila", "Manila City|| Metro Manila", "Makati City|| Metro Manila", "Taguig City|| Metro Manila", "Pasay City|| Metro Manila", "Parañaque City|| Metro Manila", "Las Piñas City|| Metro Manila", "Muntinlupa City|| Metro Manila", "Pateros|| Metro Manila", "San Pedro|| Laguna", "Biñan|| Laguna", "Cabuyao|| Laguna", "San Pablo City|| Laguna", "Calauan|| Laguna", "Santa Cruz|| Laguna", "Victoria|| Laguna", "Lumban|| Laguna", "Pila|| Laguna", "Bay|| Laguna", "Paete|| Laguna", "Pagsanjan|| Laguna", "Magdalena|| Laguna", "Mabitac|| Laguna", "Siniloan|| Laguna", "Famy|| Laguna", "Luisiana|| Laguna", "Pakil|| Laguna", "Nagcarlan|| Laguna", "Rizal|| Laguna", "Santa Maria|| Laguna", "Liliw|| Laguna", "Sta. Cruz|| Laguna", "Carmona|| Cavite", "Cavite City|| Cavite", "Tagaytay City|| Cavite", "Dasmariñas City|| Cavite", "Trece Martires City|| Cavite", "Imus City|| Cavite", "Bacoor City|| Cavite", "General Trias City|| Cavite", "Noveleta|| Cavite", "Kawit|| Cavite", "Rosario|| Cavite", "Tanza|| Cavite", "Naic|| Cavite", "Amadeo|| Cavite", "Gen. Mariano Alvarez|| Cavite", "Indang|| Cavite", "Silang|| Cavite", "Maragondon|| Cavite", "Ternate|| Cavite", "Alfonso|| Cavite", "Magallanes|| Cavite", "Cuenca|| Batangas", "San Juan|| Batangas", "Balayan|| Batangas", "Tuy|| Batangas", "Nasugbu|| Batangas", "Calatagan|| Batangas", "Lian|| Batangas", "Laurel|| Batangas", "Talisay|| Batangas", "San Jose|| Batangas", "Lipa City|| Batangas", "Tanauan City|| Batangas", "Sto. Tomas City|| Batangas", "Malvar|| Batangas", "Ibaan|| Batangas", "Batangas City|| Batangas", "Lobo|| Batangas", "Tingloy|| Batangas", "San Pascual|| Batangas", "Bauan|| Batangas", "Mabini|| Batangas", "Padre Garcia|| Batangas", "San Luis|| Batangas", "Agoncillo|| Batangas", "San Nicolas|| Batangas", "Taal|| Batangas", "Santa Teresita|| Batangas", "Rosario|| Batangas", "Balete|| Batangas", "Sto. Tomas|| Batangas", "Lemery|| Batangas", "Calaca|| Batangas", "Baguio City|| Benguet", "La Trinidad|| Benguet", "Itogon|| Benguet", "Tuba|| Benguet", "Tublay|| Benguet", "Bokod|| Benguet", "Kabayan|| Benguet", "Atok|| Benguet", "Kapangan|| Benguet", "Bauko|| Mountain Province", "Bontoc|| Mountain Province", "Sadanga|| Mountain Province", "Sabangan|| Mountain Province", "Sagada|| Mountain Province", "Besao|| Mountain Province", "Tadian|| Mountain Province", "Barlig|| Mountain Province", "Paracelis|| Mountain Province", "Cauayan City|| Isabela", "Ilagan City|| Isabela", "Santiago City|| Isabela", "Aurora|| Isabela", "Cabagan|| Isabela", "Tuguegarao City|| Cagayan", "Aparri|| Cagayan", "Lal-lo|| Cagayan", "Gattaran|| Cagayan", "Santa Ana|| Cagayan", "Enrile|| Cagayan", "Peñablanca|| Cagayan", "Solana|| Cagayan", "Rizal|| Cagayan", "Baggao|| Cagayan", "Alcala|| Cagayan", "Iguig|| Cagayan", "Calayan|| Cagayan", "Bambang|| Nueva Vizcaya", "Bayombong|| Nueva Vizcaya", "Solano|| Nueva Vizcaya", "Bagabag|| Nueva Vizcaya", "Diadi|| Nueva Vizcaya", "Kayapa|| Nueva Vizcaya", "Quezon|| Nueva Vizcaya", "Santa Fe|| Nueva Vizcaya", "Villaverde|| Nueva Vizcaya", "Dupax del Norte|| Nueva Vizcaya", "Dupax del Sur|| Nueva Vizcaya", "Santo Domingo|| Nueva Ecija", "Cabiao|| Nueva Ecija", "San Isidro|| Nueva Ecija", "Aliaga|| Nueva Ecija", "Licab|| Nueva Ecija", "Zaragoza|| Nueva Ecija", "Talavera|| Nueva Ecija", "Guimba|| Nueva Ecija", "Quezon|| Nueva Ecija", "Cabanatuan City|| Nueva Ecija", "Palayan City|| Nueva Ecija", "Gapan City|| Nueva Ecija", "Muñoz City|| Nueva Ecija", "San Jose City|| Nueva Ecija", "Santa Rosa|| Nueva Ecija", "San Leonardo|| Nueva Ecija", "Peñaranda|| Nueva Ecija", "Talugtug|| Nueva Ecija", "Roxas|| Isabela", "San Manuel|| Isabela", "Benito Soliven|| Isabela", "Naguilian|| Isabela", "Reina Mercedes|| Isabela", "Alicia|| Isabela", "Angadanan|| Isabela", "San Guillermo|| Isabela", "San Mateo|| Isabela", "Jones|| Isabela", "San Agustin|| Isabela", "San Isidro|| Isabela", "Echague|| Isabela", "San Mariano|| Isabela", "Ramón|| Isabela", "Cordon|| Isabela", "Luna|| Isabela", "Cabatuan|| Isabela", "Maconacon|| Isabela", "Delfin Albano|| Isabela", "Tumauini|| Isabela", "Santa Maria|| Isabela", "San Pablo|| Isabela", "Tayug|| Pangasinan", "Umingan|| Pangasinan", "Balungao|| Pangasinan", "Binalonan|| Pangasinan", "San Manuel|| Pangasinan", "Asingan|| Pangasinan", "Urdaneta City|| Pangasinan", "Sison|| Pangasinan", "Pozorrubio|| Pangasinan", "Lingayen|| Pangasinan", "Dagupan City|| Pangasinan", "San Carlos City|| Pangasinan", "Alaminos City|| Pangasinan", "Bayambang|| Pangasinan", "Basista|| Pangasinan", "Bautista|| Pangasinan", "Malasiqui|| Pangasinan", "Villasis|| Pangasinan", "Sual|| Pangasinan", "Pozzorubio|| Pangasinan", "Mangaldan|| Pangasinan", "San Fabian|| Pangasinan", "Rosales|| Pangasinan", "Sta. Maria|| Pangasinan", "Manaoag|| Pangasinan", "Calasiao|| Pangasinan", "Binmaley|| Pangasinan", "Laoac|| Pangasinan", "San Quintin|| Pangasinan", "Mangatarem|| Pangasinan", "Aguilar|| Pangasinan", "Bugallon|| Pangasinan", "Infanta|| Pangasinan", "Dasol|| Pangasinan", "Mabini|| Pangasinan", "Burgos|| Pangasinan", "Alcala|| Pangasinan", "San Jacinto|| Pangasinan", "Bani|| Pangasinan", "Santo Tomas|| Pangasinan", "Santa Barbara|| Pangasinan", "Agoo|| La Union", "Aringay|| La Union", "Bacnotan|| La Union", "Bagulin|| La Union", "Balaoan|| La Union", "Bangar|| La Union", "Bauang|| La Union", "Burgos|| La Union", "Caba|| La Union", "Luna|| La Union", "Naguilian|| La Union", "Pugo|| La Union", "Rosario|| La Union", "San Fernando City|| La Union", "San Gabriel|| La Union", "San Juan|| La Union", "Santo Tomas|| La Union", "Santol|| La Union", "Sudipen|| La Union", "Tubao|| La Union", "Santa Maria|| Pangasinan", "San Nicolas|| Pangasinan"]
+#     # with transaction.atomic():
+#     #     list_of_destinations = ["Lucban|| Quezon", "Lucena City|| Quezon", "Sta. Rosa|| Laguna", "Calamba|| Laguna", "Los Baños|| Laguna", "Binangonan|| Rizal", "Antipolo|| Rizal", "Angono|| Rizal", "Taytay|| Rizal", "Cainta|| Rizal", "Marikina City|| Metro Manila", "San Juan City|| Metro Manila", "Mandaluyong City|| Metro Manila", "Pasig City|| Metro Manila", "Quezon City|| Metro Manila", "Caloocan City|| Metro Manila", "Valenzuela City|| Metro Manila", "Malabon City|| Metro Manila", "Navotas City|| Metro Manila", "Manila City|| Metro Manila", "Makati City|| Metro Manila", "Taguig City|| Metro Manila", "Pasay City|| Metro Manila", "Parañaque City|| Metro Manila", "Las Piñas City|| Metro Manila", "Muntinlupa City|| Metro Manila", "Pateros|| Metro Manila", "San Pedro|| Laguna", "Biñan|| Laguna", "Cabuyao|| Laguna", "San Pablo City|| Laguna", "Calauan|| Laguna", "Santa Cruz|| Laguna", "Victoria|| Laguna", "Lumban|| Laguna", "Pila|| Laguna", "Bay|| Laguna", "Paete|| Laguna", "Pagsanjan|| Laguna", "Magdalena|| Laguna", "Mabitac|| Laguna", "Siniloan|| Laguna", "Famy|| Laguna", "Luisiana|| Laguna", "Pakil|| Laguna", "Nagcarlan|| Laguna", "Rizal|| Laguna", "Santa Maria|| Laguna", "Liliw|| Laguna", "Sta. Cruz|| Laguna", "Carmona|| Cavite", "Cavite City|| Cavite", "Tagaytay City|| Cavite", "Dasmariñas City|| Cavite", "Trece Martires City|| Cavite", "Imus City|| Cavite", "Bacoor City|| Cavite", "General Trias City|| Cavite", "Noveleta|| Cavite", "Kawit|| Cavite", "Rosario|| Cavite", "Tanza|| Cavite", "Naic|| Cavite", "Amadeo|| Cavite", "Gen. Mariano Alvarez|| Cavite", "Indang|| Cavite", "Silang|| Cavite", "Maragondon|| Cavite", "Ternate|| Cavite", "Alfonso|| Cavite", "Magallanes|| Cavite", "Cuenca|| Batangas", "San Juan|| Batangas", "Balayan|| Batangas", "Tuy|| Batangas", "Nasugbu|| Batangas", "Calatagan|| Batangas", "Lian|| Batangas", "Laurel|| Batangas", "Talisay|| Batangas", "San Jose|| Batangas", "Lipa City|| Batangas", "Tanauan City|| Batangas", "Sto. Tomas City|| Batangas", "Malvar|| Batangas", "Ibaan|| Batangas", "Batangas City|| Batangas", "Lobo|| Batangas", "Tingloy|| Batangas", "San Pascual|| Batangas", "Bauan|| Batangas", "Mabini|| Batangas", "Padre Garcia|| Batangas", "San Luis|| Batangas", "Agoncillo|| Batangas", "San Nicolas|| Batangas", "Taal|| Batangas", "Santa Teresita|| Batangas", "Rosario|| Batangas", "Balete|| Batangas", "Sto. Tomas|| Batangas", "Lemery|| Batangas", "Calaca|| Batangas", "Baguio City|| Benguet", "La Trinidad|| Benguet", "Itogon|| Benguet", "Tuba|| Benguet", "Tublay|| Benguet", "Bokod|| Benguet", "Kabayan|| Benguet", "Atok|| Benguet", "Kapangan|| Benguet", "Bauko|| Mountain Province", "Bontoc|| Mountain Province", "Sadanga|| Mountain Province", "Sabangan|| Mountain Province", "Sagada|| Mountain Province", "Besao|| Mountain Province", "Tadian|| Mountain Province", "Barlig|| Mountain Province", "Paracelis|| Mountain Province", "Cauayan City|| Isabela", "Ilagan City|| Isabela", "Santiago City|| Isabela", "Aurora|| Isabela", "Cabagan|| Isabela", "Tuguegarao City|| Cagayan", "Aparri|| Cagayan", "Lal-lo|| Cagayan", "Gattaran|| Cagayan", "Santa Ana|| Cagayan", "Enrile|| Cagayan", "Peñablanca|| Cagayan", "Solana|| Cagayan", "Rizal|| Cagayan", "Baggao|| Cagayan", "Alcala|| Cagayan", "Iguig|| Cagayan", "Calayan|| Cagayan", "Bambang|| Nueva Vizcaya", "Bayombong|| Nueva Vizcaya", "Solano|| Nueva Vizcaya", "Bagabag|| Nueva Vizcaya", "Diadi|| Nueva Vizcaya", "Kayapa|| Nueva Vizcaya", "Quezon|| Nueva Vizcaya", "Santa Fe|| Nueva Vizcaya", "Villaverde|| Nueva Vizcaya", "Dupax del Norte|| Nueva Vizcaya", "Dupax del Sur|| Nueva Vizcaya", "Santo Domingo|| Nueva Ecija", "Cabiao|| Nueva Ecija", "San Isidro|| Nueva Ecija", "Aliaga|| Nueva Ecija", "Licab|| Nueva Ecija", "Zaragoza|| Nueva Ecija", "Talavera|| Nueva Ecija", "Guimba|| Nueva Ecija", "Quezon|| Nueva Ecija", "Cabanatuan City|| Nueva Ecija", "Palayan City|| Nueva Ecija", "Gapan City|| Nueva Ecija", "Muñoz City|| Nueva Ecija", "San Jose City|| Nueva Ecija", "Santa Rosa|| Nueva Ecija", "San Leonardo|| Nueva Ecija", "Peñaranda|| Nueva Ecija", "Talugtug|| Nueva Ecija", "Roxas|| Isabela", "San Manuel|| Isabela", "Benito Soliven|| Isabela", "Naguilian|| Isabela", "Reina Mercedes|| Isabela", "Alicia|| Isabela", "Angadanan|| Isabela", "San Guillermo|| Isabela", "San Mateo|| Isabela", "Jones|| Isabela", "San Agustin|| Isabela", "San Isidro|| Isabela", "Echague|| Isabela", "San Mariano|| Isabela", "Ramón|| Isabela", "Cordon|| Isabela", "Luna|| Isabela", "Cabatuan|| Isabela", "Maconacon|| Isabela", "Delfin Albano|| Isabela", "Tumauini|| Isabela", "Santa Maria|| Isabela", "San Pablo|| Isabela", "Tayug|| Pangasinan", "Umingan|| Pangasinan", "Balungao|| Pangasinan", "Binalonan|| Pangasinan", "San Manuel|| Pangasinan", "Asingan|| Pangasinan", "Urdaneta City|| Pangasinan", "Sison|| Pangasinan", "Pozorrubio|| Pangasinan", "Lingayen|| Pangasinan", "Dagupan City|| Pangasinan", "San Carlos City|| Pangasinan", "Alaminos City|| Pangasinan", "Bayambang|| Pangasinan", "Basista|| Pangasinan", "Bautista|| Pangasinan", "Malasiqui|| Pangasinan", "Villasis|| Pangasinan", "Sual|| Pangasinan", "Pozzorubio|| Pangasinan", "Mangaldan|| Pangasinan", "San Fabian|| Pangasinan", "Rosales|| Pangasinan", "Sta. Maria|| Pangasinan", "Manaoag|| Pangasinan", "Calasiao|| Pangasinan", "Binmaley|| Pangasinan", "Laoac|| Pangasinan", "San Quintin|| Pangasinan", "Mangatarem|| Pangasinan", "Aguilar|| Pangasinan", "Bugallon|| Pangasinan", "Infanta|| Pangasinan", "Dasol|| Pangasinan", "Mabini|| Pangasinan", "Burgos|| Pangasinan", "Alcala|| Pangasinan", "San Jacinto|| Pangasinan", "Bani|| Pangasinan", "Santo Tomas|| Pangasinan", "Santa Barbara|| Pangasinan", "Agoo|| La Union", "Aringay|| La Union", "Bacnotan|| La Union", "Bagulin|| La Union", "Balaoan|| La Union", "Bangar|| La Union", "Bauang|| La Union", "Burgos|| La Union", "Caba|| La Union", "Luna|| La Union", "Naguilian|| La Union", "Pugo|| La Union", "Rosario|| La Union", "San Fernando City|| La Union", "San Gabriel|| La Union", "San Juan|| La Union", "Santo Tomas|| La Union", "Santol|| La Union", "Sudipen|| La Union", "Tubao|| La Union", "Santa Maria|| Pangasinan", "San Nicolas|| Pangasinan"]
 
-    #     x = 0
-    #     for destination in list_of_destinations:
-    #         sliced = destination.split('|| ')
+#     #     x = 0
+#     #     for destination in list_of_destinations:
+#     #         sliced = destination.split('|| ')
 
-    #         municipality = ListOfMunicipalities.objects.filter(municipality_name = sliced[1]).first()
+#     #         municipality = ListOfMunicipalities.objects.filter(municipality_name = sliced[1]).first()
 
-    #         create_destination = ListOfDestinations.objects.create(municipality = municipality, destination_name = sliced[0])
-    #         create_destination.save()
+#     #         create_destination = ListOfDestinations.objects.create(municipality = municipality, destination_name = sliced[0])
+#     #         create_destination.save()
 
-    #         x = x + 1
+#     #         x = x + 1
 
-        # return messages.info(request, f'{x} destination saved')
+#         # return messages.info(request, f'{x} destination saved')
     
-    return messages.info(request, f'something went wrong')
+#     return messages.info(request, f'something went wrong')

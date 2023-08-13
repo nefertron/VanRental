@@ -106,6 +106,18 @@ def get_rent_vans():
 
 @register.simple_tag
 def get_carpool_vans():
+    all_to_carpool_vans = Van.objects.filter(is_rented = False).all()
+
+    return all_to_carpool_vans
+
+
+@register.simple_tag
+def get_available_seats_in_carpool(van):
+    return 0
+
+
+@register.simple_tag
+def get_carpool_vans():
     all_to_carpool_vans = Van.objects.filter(is_carpooled = True).all()
 
     return all_to_carpool_vans
@@ -129,12 +141,15 @@ def get_overall_rental_rating(id):
     get_all_rental_ratings = Review.objects.filter(rent_id = id).aggregate(get_all_rental_ratings = Sum('rating'))['get_all_rental_ratings']
     get_all_rental_reviews_count = Review.objects.filter(rent_id = id).count()
 
-    rating = (get_all_rental_ratings/get_all_rental_reviews_count)
-    whole_number, decimal_part = divmod(rating, 1)
+    if get_all_rental_reviews_count > 0:
+        rating = (get_all_rental_ratings/get_all_rental_reviews_count)
+        whole_number, decimal_part = divmod(rating, 1)
 
-    array = [digit for digit in range(int(whole_number))]
-    
-    return array, decimal_part
+        array = [digit for digit in range(int(whole_number))]
+        
+        return array, decimal_part
+    else:
+        return 0,0
 
 
 @register.simple_tag
@@ -170,6 +185,20 @@ def get_total_open_bookings():
 
     return total_open_bookings
 
+@register.simple_tag
+def get_total_open_carpool():
+    total_open_carpool = CarpoolVan.objects.filter(is_done = False).count()
+    return total_open_carpool
+
+@register.simple_tag
+def get_available_number_of_seats_in_carpooling(carpool):
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
+    
+    if not all_booked_passengers is None:
+        remaining_available_seats = carpool.available_seat - all_booked_passengers
+        return remaining_available_seats
+    else:
+        return carpool.available_seat
 
 @register.simple_tag
 def get_total_pending_bookings(user):
