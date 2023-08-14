@@ -106,35 +106,52 @@ def get_rent_vans():
 
 @register.simple_tag
 def get_carpool_vans():
-    all_to_carpool_vans = Van.objects.filter(is_rented = False).all()
+    all_to_carpool_vans = CarpoolVan.objects.filter(is_done = False).all()
 
     return all_to_carpool_vans
+
 
 
 @register.simple_tag
 def get_available_seats_in_carpool(van):
     return 0
 
-
 @register.simple_tag
-def get_carpool_vans():
-    all_to_carpool_vans = Van.objects.filter(is_carpooled = True).all()
+def get_all_passengers_in_carpool(carpool):
+    get_total_of_bookings = BookedPassenger.objects.filter(carpool_id = carpool).count()
+    get_all_seats_occupied_by_passengers = BookedPassenger.objects.filter(carpool_id = carpool).aggregate(get_all_seats_occupied_by_passengers = Sum('seats_occupied'))['get_all_seats_occupied_by_passengers']
+    
+    if not get_total_of_bookings is None:
+        return get_total_of_bookings, get_all_seats_occupied_by_passengers
+    else:
+        return 0, 0
 
-    return all_to_carpool_vans
+
+# @register.simple_tag
+# def get_carpool_vans():
+#     all_to_carpool_vans = Van.objects.filter(is_carpooled = True).all()
+
+#     return all_to_carpool_vans
 
 
 
 @register.simple_tag
 def get_all_done_rental():
-    all_rented_van = RentedVan.objects.filter(is_done = True).all().order_by('date_recorded')
+    all_rented_van = RentedVan.objects.filter(is_done = True).all().order_by('-date_recorded')
     return all_rented_van
+
+@register.simple_tag
+def get_all_done_carpool():
+    all_carpooled_van = CarpoolVan.objects.filter(is_done = True).all().order_by('-date_recorded')
+    return all_carpooled_van
 
 
 @register.simple_tag
 def get_all_carpooled():
-    all_rented_van = CarpoolVan.objects.filter(is_done = True).all().order_by('date_recorded')
+    all_rented_van = CarpoolVan.objects.filter(is_done = True).all().order_by('-date_recorded')
 
     return all_rented_van
+
 
 @register.simple_tag
 def get_overall_rental_rating(id):
@@ -150,13 +167,45 @@ def get_overall_rental_rating(id):
         return array, decimal_part
     else:
         return 0,0
+    
+
+@register.simple_tag
+def get_overall_carpool_rating(carpool_id):
+    carpool = CarpoolVan.objects.filter(id=carpool_id).first()
+
+    get_all_rental_ratings = Review.objects.filter(carpool_id__carpool_id = carpool).aggregate(get_all_rental_ratings = Sum('rating'))['get_all_rental_ratings']
+    get_all_rental_reviews_count = Review.objects.filter(carpool_id__carpool_id = carpool).count()
+
+    if get_all_rental_reviews_count > 0:
+        rating = (get_all_rental_ratings/get_all_rental_reviews_count)
+        whole_number, decimal_part = divmod(rating, 1)
+
+        array = [digit for digit in range(int(whole_number))]
+        
+        return array, decimal_part
+    else:
+        return 0,0
 
 
 @register.simple_tag
 def get_rental_reviews(id):
-    all_reviews = Review.objects.filter(rent_id = id).all()
+    all_reviews = Review.objects.filter(rent_id = id).all().order_by('-date_recorded')
     return all_reviews
 
+@register.simple_tag
+def get_carpool_reviews(carpool_id):
+    all_reviews = Review.objects.filter(carpool_id__carpool_id = carpool_id).all().order_by('-date_recorded')
+    return all_reviews
+
+@register.simple_tag
+def check_if_part_of_carpooling(carpool, passenger_account):
+    booking = BookedPassenger.objects.filter(carpool_id = carpool, passenger_id = passenger_account).first()
+
+    if booking:
+        return True
+    else:
+        return False
+    
 
 @register.simple_tag
 def convert_rating_to_array(num):
@@ -194,8 +243,7 @@ def get_total_open_carpool():
 def get_available_number_of_seats_in_carpooling(carpool):
     all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
                                                            is_confirmed = True,
-                                                           is_rejected = False,
-                                                           is_cancelled = False,).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
+                                                           is_dropped = False).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
     
     if not all_booked_passengers is None:
         remaining_available_seats = carpool.available_seat - all_booked_passengers
@@ -244,30 +292,36 @@ def get_all_dropped_booked_passengers_in_carpooling(carpool):
 
 @register.simple_tag
 def get_my_carpool_booking_information(carpool, passenger_account):
-    my_carpool_booking_information = {}
+    my_carpool_booking_information = []
 
-    my_carpool = BookedPassenger.objects.filter(carpool_id = carpool,
-                                                passenger_id = passenger_account).first()
+    my_carpools = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                passenger_id = passenger_account).all()
+    if my_carpools:
+        for carpool in my_carpools:
+            dictionary = {}
+            if carpool.is_confirmed:
+                dictionary['Status'] = 'Confirmed'
+            elif carpool.is_rejected:
+                dictionary['Status'] = 'Rejected'
+            elif carpool.is_cancelled:
+                dictionary['Status'] = 'Cancelled'
+            elif carpool.is_dropped:
+                dictionary['Status'] = 'Dropped'
+            else:
+                dictionary['Status'] = 'Pending'
 
-    if my_carpool.is_confirmed:
-        my_carpool_booking_information['Status'] = 'Confirmed'
-    elif my_carpool.is_rejected:
-        my_carpool_booking_information['Status'] = 'Rejected'
-    elif my_carpool.is_cancelled:
-        my_carpool_booking_information['Status'] = 'Cancelled'
-    elif my_carpool.is_dropped:
-        my_carpool_booking_information['Status'] = 'Dropped'
+            dictionary['BookID'] = carpool.booked_id
+            dictionary['SeatsOccupied'] = carpool.seats_occupied
+            dictionary['PickUpLocation'] = carpool.pick_up_location
+            dictionary['Destination'] = carpool.destination
+            dictionary['Fare'] = carpool.fare
+            dictionary['MyBookedID'] = carpool.id
+
+            my_carpool_booking_information.append(dictionary)
+
+        return my_carpool_booking_information
     else:
-        my_carpool_booking_information['Status'] = 'None'
-
-    my_carpool_booking_information['BookID'] = my_carpool.booked_id
-    my_carpool_booking_information['SeatsOccupied'] = my_carpool.seats_occupied
-    my_carpool_booking_information['PickUpLocation'] = my_carpool.pick_up_location
-    my_carpool_booking_information['Destination'] = my_carpool.destination
-    my_carpool_booking_information['Fare'] = my_carpool.fare
-    
-
-    return my_carpool_booking_information
+        return None
 
 @register.simple_tag
 def get_total_pending_bookings(user):

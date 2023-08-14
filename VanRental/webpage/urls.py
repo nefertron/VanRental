@@ -19,6 +19,7 @@ urlpatterns = [
     path('confirmed-booking', confirmed_bookings, name='confirmed_bookings'),
     path('available-carpooling', available_carpooling, name='available_carpooling'),
     path('past-booking', past_booking, name='past_booking'),
+    path('past-carpooling', past_carpooling, name='past_carpooling'),
     path('rejected-booking', rejected_booking, name='rejected_booking'),
     path('pending-booking', pending_booking, name='pending_booking'),
     path('cancelled-booking', cancelled_booking, name='cancelled_booking'),

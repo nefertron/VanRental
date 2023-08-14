@@ -1,5 +1,6 @@
 {% load static %}
 {% load tz %}
+{% load vanrental_templatetags %}
 
 <!doctype html>
 <html lang="en">
@@ -226,7 +227,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             {% if user.is_authenticated %}
             <div class="side-bar-header">   
                 <div class="side-bar" id="van-rental-sidebar">
@@ -317,7 +318,16 @@
                                 <a href="/past-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
-                                        Past Bookings
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
                                     </div>
                                 </a>
                             </li>
@@ -548,6 +558,8 @@
         <script src="{% static 'assets/js/open-modal.js' %}"></script>
         <script src="{% static 'assets/js/birthdate-checker.js' %}"></script>
 
+        <script src="{% static 'assets/js/open-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
 
         <script>
             function displayUploadedPreview(event) {

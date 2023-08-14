@@ -321,6 +321,15 @@
                                     </div>
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
+                                    </div>
+                                </a>
+                            </li>
                             
                             <li>
                                 <a href="/cancelled-booking" class='display-flex'>
@@ -502,10 +511,19 @@
 
 
                                                 {% if account_type == 'Driver'%}
-                                                    <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="openMarkAsDoneModal('{{available_carpooling.id}}');" id='markAsDoneBooking{{available_carpooling.id}}'>Mark as Done</button>
-                                                    <button class="custom-btn mt-2 mt-lg-3 btn-danger" type='button' onclick="openCancelBookingModal('{{available_carpooling.id}}');" id='cancelBooking{{available_carpooling.id}}'>Cancel</button>
+                                                    <form method='POST' id='markAsDoneForm_{{available_carpooling.id}}' class='display-flex w-100'>
+                                                        {% csrf_token %}
+                                                        <input type='hidden' name='mark_as_done_carpooling_id' value='{{available_carpooling.id}}' />
+                                                        <button class="custom-btn mt-2 mt-lg-3 w-100" type='button' onclick="openCarpoolingModal('markAsDoneCarpooling', {{available_carpooling.id}});">Mark as Done</button>
+                                                    </form>
+
+                                                    <form method='POST' id='cancelCarpoolingForm_{{available_carpooling.id}}' class='display-flex w-100'>
+                                                        {% csrf_token %}
+                                                        <input type='hidden' name='delete_or_remove_carpooling_id' value='{{available_carpooling.id}}' />
+                                                        <button class="custom-btn mt-2 mt-lg-3 btn-danger w-100" type='button' onclick="openCarpoolingModal('cancelCarpoolingModal', {{available_carpooling.id}});" id='cancelBooking{{available_carpooling.id}}'>Delete this carpooling</button>
+                                                    </form>
                                                 {% else %}
-                                                    <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="bookCarpoolNow('{{available_carpooling.id}}');">Book Now</button>
+                                                    <button class="custom-btn mt-2 mt-lg-3 w-100" type='button' onclick="bookCarpoolNow('{{available_carpooling.id}}');">Book Now</button>
                                                 {% endif %}
                                             </div>
                                         </div>
@@ -747,20 +765,40 @@
                                                                             <th scope="col">Pick Up Location</th>
                                                                             <th scope="col">Destination</th>
                                                                             <th scope="col">Fare</th>
+                                                                            <th scope="col">Action</th>
                                                                         </tr>
                                                                     </thead>
                             
                                                                     <tbody>
-                                                                        {% get_my_carpool_booking_information available_carpooling user.passengeraccount as my_carpool_booking_information %}
-                                                                        {% if my_carpool_booking_information %}
+                                                                        {% get_my_carpool_booking_information available_carpooling user.passengeraccount as my_carpool_booking_informations %}
+                                                                        {% if my_carpool_booking_informations %}
+                                                                            {% for my_carpool_booking_information in my_carpool_booking_informations%}
                                                                                 <tr>
+                                                                                    <td class="font-bold">{{forloop.counter}}</td>
                                                                                     <td class="font-bold">{{my_carpool_booking_information.BookID}}</td>
                                                                                     <td>{{my_carpool_booking_information.Status}}</td>
-                                                                                    <td>{{my_carpool_booking_information.SeatsOccupied}}</td>
+                                                                                    <td class='text-center'>{{my_carpool_booking_information.SeatsOccupied}}</td>
                                                                                     <td>{{my_carpool_booking_information.PickUpLocation}}</td>
                                                                                     <td>{{my_carpool_booking_information.Destination}}</td>
-                                                                                    <td>{{my_carpool_booking_information.Fare}}</td>
+                                                                                    <td>
+                                                                                        {% if my_carpool_booking_information.Fare %}
+                                                                                            {{my_carpool_booking_information.Fare}}
+                                                                                        {% else %}
+                                                                                            Not Set
+                                                                                        {% endif %}
+                                                                                    </td>
+                                                                                    <td>
+                                                                                        {% if my_carpool_booking_information.Status != 'Cancelled' and my_carpool_booking_information.Status != 'Dropped' %}
+                                                                                        <form method='POST' id='cancelMyBookingForm'>
+                                                                                            {% csrf_token %}
+                                                                                            <input type='hidden' name='cancel_my_booking' value='True' />
+                                                                                            <input type='hidden' name='cancel_booking_id' value='{{my_carpool_booking_information.MyBookedID}}' />
+                                                                                            <button class="approve-button btn-danger ml-10" type="button" onclick="openModal('cancelMyBookingModal')">Delete / Cancel</button>
+                                                                                        </form>
+                                                                                        {% endif %}
+                                                                                    </td>
                                                                                 </tr>
+                                                                            {% endfor %}
                                                                         {% else %}
                                                                             <p>The system couldn`t find any booking in this carpool.</p>
                                                                         {% endif %}
@@ -888,7 +926,8 @@
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     </div>
-
+                    <br>
+                    <br>
                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                         {% csrf_token %}
                         <label class="form-label">Number of Seats</label>
@@ -906,6 +945,20 @@
                         <br/>
                         <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('bookCarpoolingModal')">Close</button>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="cancelMyBookingModal">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Are you sure you want to cancel or delete your booking?
+                    </h2>
+                    
+                    <button type="button" onclick="submitDropNowForm('cancelMyBookingForm');" class="custom-btn mt-2 mt-lg-3 w-100">Yes Please</button>
+                    <br/>
+                    <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('addPassengerModal')">Close</button>
                 </div>
             </div>
         </div>
@@ -946,6 +999,46 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="modal-overlay" id="markAsDoneCarpooling">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Mark As Done
+                    </h2>
+
+                    <div>  
+                        <p>Are you sure you want to mark this carpooling as done?</p>
+                    </div>
+                    <input type='hidden' id='to_mark_as_done_carpool_id' />
+                    <button type="button" onclick="endCarpoolNow('markAsDoneForm');" class="custom-btn mt-2 mt-lg-3 w-100">Mark As Done</button>
+                    <br/>
+                    <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeCarpoolingModal('markAsDoneCarpooling')">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="cancelCarpoolingModal">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Cancel or Delete this Carpool
+                    </h2>
+
+                    <div>  
+                        <p>Are you sure you want to cancel or delete this carpooling?</p>
+                    </div>
+                    <input type='hidden' id='to_cancel_carpool_id' />
+                    <button type="button" onclick="endCarpoolNow('cancelCarpoolingForm');" class="custom-btn mt-2 mt-lg-3 w-100">Yes, Cancel this carpooling</button>
+                    <br/>
+                    <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeCarpoolingModal('cancelCarpoolingModal')">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+
+        
         {% endif %}
 
         <!-- JAVASCRIPT FILES -->
@@ -1105,6 +1198,40 @@
                     .catch(error => {
                         console.error("Error:", error);
                     });
+            }
+        </script>
+
+
+        <script>
+            function openCarpoolingModal(modal_id, carpool_id){
+                var to_mark_as_done_carpool_id = document.getElementById('to_mark_as_done_carpool_id')
+                to_mark_as_done_carpool_id.value = carpool_id
+                console.log('1')
+
+                var to_cancel_carpool_id  = document.getElementById('to_cancel_carpool_id')
+                to_cancel_carpool_id.value = carpool_id
+
+                console.log('2')
+
+                const modalOverlay = document.getElementById(modal_id);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+            }
+
+            function closeCarpoolingModal(modal_id){
+                const modalOverlay = document.getElementById(modal_id);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+
+
+            function endCarpoolNow(form_id){    
+                var carpool_id = document.getElementById('to_cancel_carpool_id').value;
+
+                var form = document.getElementById(`${form_id}_${carpool_id}`)
+                form.submit();
             }
         </script>
 

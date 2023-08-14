@@ -315,7 +315,16 @@
                                 <a href="/past-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
-                                        Past Bookings
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
                                     </div>
                                 </a>
                             </li>
@@ -514,7 +523,13 @@
                             </li>
 
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="carpool-review-tab" data-bs-toggle="tab" data-bs-target="#carpool-review-tab-pane" type="button" role="tab" aria-controls="carpool-review-tab-pane" aria-selected="false">Carpool Reviews</button>
+                                <button class="nav-link" id="carpool-review-tab" data-bs-toggle="tab" data-bs-target="#carpool-review-tab-pane" type="button" role="tab" aria-controls="carpool-review-tab-pane" aria-selected="false">
+                                    Carpool Reviews
+                                    <div class='red-circle'>
+                                        {% get_all_done_carpool as all_done_carpool %}
+                                        {{all_done_carpool|length}}
+                                    </div>
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -619,34 +634,34 @@
                                     <div class="row">
                                         {% get_carpool_vans as to_carpool_vans %}
                                         {% if to_carpool_vans %}
-                                            {% for this_carpool_van in to_carpool_vans %}
+                                            {% for this_carpool in to_carpool_vans %}
                                             <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
                                                 <div class="custom-block bg-white shadow-lg">
                                                     <div class="d-flex">
                                                         <div>
-                                                            <h5 class="mb-2">{{this_carpool_van.brand_name}}</h5>
-                                                            {% get_available_seats_in_carpool this_carpool_van as available_seats %}
-                                                            <h6 style="font-size:1rem;">Available Seats : {{available_seats}}</h6>
-                                                            <p class="mb-0">Plate No. : {{this_carpool_van.plate_no}}</p>
+                                                            <h5 class="mb-2">{{this_carpool.plate_no.brand_name}}</h5>
+                                                            {% get_available_number_of_seats_in_carpooling this_carpool as available_number_of_seats %}
+                                                            <h6 style="font-size:1rem;">Available Seats : {{available_number_of_seats}}</h6>
+                                                            <p class="mb-0">Plate No. : {{this_carpool.plate_no.plate_no}}</p>
                                                         </div>
-                                                        <span class="badge bg-advertising rounded-pill ms-auto">{{this_carpool_van.number_of_seats}}</span>
+                                                        <span class="badge bg-advertising rounded-pill ms-auto">{{this_carpool.plate_no.number_of_seats}}</span>
                                                     </div>
 
-                                                    <div id="vanCarpoolSlider{{this_carpool_van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                    <div id="vanCarpoolSlider{{this_carpool.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
                                                         <!-- Indicators/dots -->
-                                                        {% all_van_images_indices this_carpool_van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                        {% all_van_images_indices this_carpool.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
                                                         <div class="carousel-indicators">
                                                             {% for van_index in van_images_indices %}
                                                                 {% if van_index == 0 %}
-                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
                                                                 {% else %}
-                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                    <button type="button" data-bs-target="#vanCarpoolSlider{{this_carpool.id}}" data-bs-slide-to="{{van_index}}"></button>
                                                                 {% endif %}
                                                             {% endfor %}
                                                         </div>
                                                     
                                                         <!-- The slideshow/carousel -->
-                                                        {% get_all_van_images this_carpool_van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                        {% get_all_van_images this_carpool.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
                                                         <div class="carousel-inner">
                                                             {% for van_image in all_van_images %}
                                                                 {% if forloop.counter0 == 0 %}
@@ -665,19 +680,19 @@
                                                             {% endfor %}
                                                         </div>
                                                         <!-- Left and right controls/icons -->
-                                                        <button class="carousel-control-prev" type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide="prev">
+                                                        <button class="carousel-control-prev" type="button" data-bs-target="#vanCarpoolSlider{{this_carpool.id}}" data-bs-slide="prev">
                                                             <span class="carousel-control-prev-icon"></span>
                                                         </button>
-                                                        <button class="carousel-control-next" type="button" data-bs-target="#vanCarpoolSlider{{this_carpool_van.id}}" data-bs-slide="next">
+                                                        <button class="carousel-control-next" type="button" data-bs-target="#vanCarpoolSlider{{this_carpool.id}}" data-bs-slide="next">
                                                             <span class="carousel-control-next-icon"></span>
                                                         </button>
                                                     </div>
                                                     
                                                     
-                                                    <p class="mb-0">{{this_carpool_van.description}}</p>
+                                                    <p class="mb-0">{{this_carpool.plate_no.description}}</p>
                                                     <br>
 
-                                                    {% get_van_total_rental_and_carpool_service this_carpool_van as van_services %} <!-- get all the services of the van | located at templatetag -->
+                                                    {% get_van_total_rental_and_carpool_service this_carpool.plate_no as van_services %} <!-- get all the services of the van | located at templatetag -->
                                                     
                                                     <div>
                                                         <p class="mb-0">No. of rental service : {{van_services.0}}</p>
@@ -685,7 +700,7 @@
                                                     </div>
 
                                                     {% if user.is_authenticated %}
-                                                        <button class="btn custom-btn mt-2 mt-lg-3">Status : Carpooling</button>
+                                                        <button class="btn custom-btn mt-2 mt-lg-3" onclick="location.href='/available-carpooling';">Status : Carpooling</button>
                                                     {% else %}
                                                         <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('loginFirst')">Status : Carpooling</button>
                                                     {% endif %}
@@ -730,7 +745,7 @@
                                                                         <b>Overall Ratings : </b>
                                                                         {% get_overall_rental_rating done_rental.id as rating %}
 
-                                                                        {% if rating.0 != 0 and rating.1 != 0 %}
+                                                                        {% if rating.0 != 0 %}
                                                                             {% for i in rating.0 %}
                                                                                 <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                             {% endfor %}
@@ -750,15 +765,15 @@
                                                         </div>
                                                         <br>
                                                         
-                                                        <div id="doneRental{{done_rental.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                        <div id="doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
                                                             <!-- Indicators/dots -->
                                                             {% all_van_images_indices done_rental.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
                                                             <div class="carousel-indicators">
                                                                 {% for van_index in van_images_indices %}
                                                                     {% if van_index == 0 %}
-                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
                                                                     {% else %}
-                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             </div>
@@ -783,10 +798,10 @@
                                                                 {% endfor %}
                                                             </div>
                                                             <!-- Left and right controls/icons -->
-                                                            <button class="carousel-control-prev" type="button" data-bs-target="#doneRental{{done_rental.plate_no.id}}" data-bs-slide="prev">
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="prev">
                                                                 <span class="carousel-control-prev-icon"></span>
                                                             </button>
-                                                            <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_rental.plate_no.id}}" data-bs-slide="next">
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="next">
                                                                 <span class="carousel-control-next-icon"></span>
                                                             </button>
                                                         </div>
@@ -871,8 +886,142 @@
 
 
                                 <!-- FOR CARPOOL REVIEWS PANEL -->
+                                
                                 <div class="tab-pane fade" id="carpool-review-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">   
                                     <div class="row">
+                                        {% get_all_done_carpool as all_carpool %}
+                                        {% if all_carpool|length > 0 %}
+                                            {% for done_carpool in all_carpool %}
+                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
+                                                    <div class="custom-block bg-white shadow-lg">
+                                                        <div class="d-flex">
+                                                            <div>
+                                                                <h5 class="mb-2">{{done_carpool.plate_no.brand_name}}</h5>
+                                                                <div>
+                                                                    <p class="mb-0">
+                                                                        <b>Overall Ratings : </b>
+                                                                        {% get_overall_carpool_rating done_carpool.id as rating %}
+
+                                                                        {% if rating.0 != 0 %}
+                                                                            {% for i in rating.0 %}
+                                                                                <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endfor %}
+
+                                                                            {% if rating.1 != 0 %}
+                                                                                <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            <p> No ratings found </p>
+                                                                        {% endif %}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <span class="badge bg-finance rounded-pill ms-auto">
+                                                                {{done_carpool.plate_no.number_of_seats}}
+                                                            </span>
+                                                        </div>
+                                                        <br>
+                                                        
+                                                        <div id="doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                            <!-- Indicators/dots -->
+                                                            {% all_van_images_indices done_carpool.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                            <div class="carousel-indicators">
+                                                                {% for van_index in van_images_indices %}
+                                                                    {% if van_index == 0 %}
+                                                                        <button type="button" data-bs-target="#doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                    {% else %}
+                                                                        <button type="button" data-bs-target="#doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                        
+                                                            <!-- The slideshow/carousel -->
+                                                            {% get_all_van_images done_carpool.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                            <div class="carousel-inner">
+                                                                {% for van_image in all_van_images %}
+                                                                    {% if forloop.counter0 == 0 %}
+                                                                        <div class="carousel-item active">
+                                                                            <div class='slider-image-container'>
+                                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                            </div>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="carousel-item">
+                                                                            <div class='slider-image-container'>
+                                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                            <!-- Left and right controls/icons -->
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" data-bs-slide="prev">
+                                                                <span class="carousel-control-prev-icon"></span>
+                                                            </button>
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" data-bs-slide="next">
+                                                                <span class="carousel-control-next-icon"></span>
+                                                            </button>
+                                                        </div>
+                                                        
+                                                        <br>
+                                                        <p class="mb-0">
+                                                            {{done_carpool.plate_no.description}}
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            <b>CARPOOL ID :</b> {{done_carpool.carpool_id}}
+                                                        </p>
+                                                        <hr/>
+
+
+                                                        <!-- ALL COMMENTS -->
+                                                        {% get_carpool_reviews done_carpool.id as all_rental_reviews %}
+                                                        {% if all_rental_reviews|length > 0 %}
+                                                            {% for review in all_rental_reviews %}
+                                                                {% if forloop.counter0 < 3 %}
+                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:block;">
+                                                                {% else %}
+                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:none;">
+                                                                {% endif %}
+                                                                    <div class='comment-section'>
+                                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        <div class='comment-box'>
+                                                                            <h6 style="font-size: 0.875rem;">
+                                                                                {{review.carpool_id.passenger_id.user_id.first_name}} 
+                                                                                {{review.carpool_id.passenger_id.user_id.last_name}}
+                                                                            </h6>
+                                                                            
+                                                                            <p style="font-size: 0.75rem;">
+                                                                                {{review.comment}}
+                                                                            </p>
+                                                                            <p class="mb-0">
+                                                                                Ratings : 
+
+                                                                                {% convert_rating_to_array review.rating as my_rating%}
+                                                                                {% for i in my_rating %}
+                                                                                    <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                                {% endfor %}
+                
+                                                                                {% comment %} {% if rating.1 != 0 %}
+                                                                                    <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                                {% endif %} {% endcomment %}
+                                                                            </p>
+                                                                            <p style="font-size: 0.75rem;">
+                                                                                Date Recorded : {{review.date_recorded}}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                            <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                            <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                        {% else %}
+                                                            <p style="font-size: 0.75rem;">No comments found</p>
+                                                        {% endif %}
+                                                        <!-- ALL COMMENTS -->
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
                                         <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
                                             <div class="custom-block bg-white shadow-lg">
                                                 <div class="d-flex">
@@ -887,7 +1036,9 @@
                                                 <img src="images/topics/undraw_Finance_re_gnv2.png" class="custom-block-image img-fluid" alt="">
                                             </div>
                                         </div>
+                                        {% endif %}
                                     </div>
+
                                 </div>
                                 <!-- FOR CARPOOL REVIEWS PANEL -->
                             </div>

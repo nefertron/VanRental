@@ -226,7 +226,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             {% if user.is_authenticated %}
             <div class="side-bar-header">   
                 <div class="side-bar" id="van-rental-sidebar">
@@ -396,7 +396,7 @@
                             <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Confirmed Bookings</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Past Bookings</li>
                                 </ol>
                             </nav>
                         </div>
@@ -409,48 +409,31 @@
                         {% endfor %}
 
                         <div class="container">
-                            {% if all_confirmed_bookings|length > 0 %}
+                            {% if all_done_carpoolings|length > 0 %}
                                 <div class="row">
-                                    {% for confirmed_booking in all_confirmed_bookings %}
-                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='confirmed_booking_{{confirmed_booking.id}}'>
+                                    {% for done_carpooling in all_done_carpoolings %}
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='done_carpooling_{{done_carpooling.id}}'>
                                             <div class="custom-block bg-white shadow-lg">
                                                 <div>
-                                                    <div class='display-flex'>
-                                                        <p class="profile-button" style='box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);'> 
-                                                            {% if confirmed_booking.rented_by.profile %}
-                                                                <img src="{{confirmed_booking.rented_by.profile}}"/>
-                                                            {% else %}
-                                                                <img src="{% static 'assets/images/default-profile.png' %}"/>
-                                                            {% endif %}
-                                                        </p>
-                                                        <h5 class='mt-1 ml-10'>{{confirmed_booking.rented_by.user_id.first_name}} {{confirmed_booking.rented_by.user_id.last_name}}</h5>
-                                                    </div>
-
-                                                    <div class='mb-3 line-height-5 mt-3'>
-                                                        <p><b>Personal Information : </b></p>
-                                                        <div class='ml-10'>
-                                                            <p><b>Address :</b> {{confirmed_booking.rented_by.address}}</p>
-                                                            <p><b>Contact No. :</b> {{confirmed_booking.rented_by.contact_no}} </p>
-                                                            <p><b>Email :</b> {{confirmed_booking.rented_by.user_id.email}} </p>
-                                                        </div>
-                                                    </div>
                                                     <br>
                                                     <div class='mb-2 line-height-5'>
-                                                        <p><b>Booking Information : </b></p>
+                                                        <p><b>Carpool Information : </b></p>
                                                         <div class='ml-10'>
-                                                            <p><b>Budget :</b> {{confirmed_booking.package_price}} php</p>
-                                                            <p><b>From Destination :</b> {{confirmed_booking.from_destination}} </p>
-                                                            <p><b>To Destination :</b> {{confirmed_booking.to_destination}} </p>
-                                                            <p><b>Preferred Schedule :</b> {{confirmed_booking.travel_date.date}} </p>
+                                                            <p><b>From Destination :</b> {{done_carpooling.from_destination}}</p>
+                                                            <p><b>To Destination :</b>  {{done_carpooling.to_destination}}  </p>
+                                                            {% get_all_passengers_in_carpool done_carpooling as all_passengers_in_carpool%}
+                                                            <p><b>Total Passengers :</b> {{all_passengers_in_carpool.0}} </p>
+                                                            <p><b>Total Seats Occupied by Passengers :</b> {{all_passengers_in_carpool.1}} </p>
                                                         </div>
                                                     </div>
+                                                    
                                                     <br>
                                                     <div class='mb-2 line-height-5'>
                                                         <p><b>Assigned Driver : </b></p>
                                                         <div class='ml-10'>
-                                                            <p><b>Fullname :</b> {{confirmed_booking.driver_id.user_id.first_name}}  {{confirmed_booking.driver_id.user_id.last_name}}</p>
-                                                            <p><b>Contact No :</b>  {{confirmed_booking.driver_id.contact_no}}  </p>
-                                                            <p><b>Email :</b> {{confirmed_booking.driver_id.user_id.email}} </p>
+                                                            <p><b>Fullname :</b> {{done_carpooling.driver_id.user_id.first_name}}  {{done_carpooling.driver_id.user_id.last_name}}</p>
+                                                            <p><b>Contact No :</b>  {{done_carpooling.driver_id.contact_no}}  </p>
+                                                            <p><b>Email :</b> {{done_carpooling.driver_id.user_id.email}} </p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -458,22 +441,22 @@
                                                 <h4 class='text-center'>
                                                     Selected Van
                                                 </h4>
-                                                <div id="vanSlider{{confirmed_booking.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                <div id="vanSlider{{done_carpooling.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
                                                     <!-- Indicators/dots -->
 
-                                                    {% all_van_images_indices confirmed_booking.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                    {% all_van_images_indices done_carpooling.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
                                                     <div class="carousel-indicators">
                                                         {% for van_index in van_images_indices %}
                                                             {% if van_index == 0 %}
-                                                                <button type="button" data-bs-target="#vanSlider{{confirmed_booking.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                <button type="button" data-bs-target="#vanSlider{{done_carpooling.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
                                                             {% else %}
-                                                                <button type="button" data-bs-target="#vanSlider{{confirmed_booking.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                <button type="button" data-bs-target="#vanSlider{{done_carpooling.id}}" data-bs-slide-to="{{van_index}}"></button>
                                                             {% endif %}
                                                         {% endfor %}
                                                     </div>
                                                 
                                                     <!-- The slideshow/carousel -->
-                                                    {% get_all_van_images confirmed_booking.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                    {% get_all_van_images done_carpooling.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
                                                     <div class="carousel-inner">
                                                         {% for van_image in all_van_images %}
                                                             {% if forloop.counter0 == 0 %}
@@ -493,67 +476,111 @@
                                                     </div>
                                                 
                                                     <!-- Left and right controls/icons -->
-                                                    <button class="carousel-control-prev" type="button" data-bs-target="#vanSlider{{confirmed_booking.id}}" data-bs-slide="prev">
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#vanSlider{{done_carpooling.id}}" data-bs-slide="prev">
                                                         <span class="carousel-control-prev-icon"></span>
                                                     </button>
-                                                    <button class="carousel-control-next" type="button" data-bs-target="#vanSlider{{confirmed_booking.id}}" data-bs-slide="next">
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#vanSlider{{done_carpooling.id}}" data-bs-slide="next">
                                                         <span class="carousel-control-next-icon"></span>
                                                     </button>
 
                                                     <p>
-                                                        <b>Brand Name :</b> {{confirmed_booking.plate_no.brand_name}} <br>
-                                                        <b>Original Rent Price :</b> {{confirmed_booking.plate_no.package_rent}} php<br>
-                                                        <b>Plate No :</b> {{confirmed_booking.plate_no.plate_no}} <br>
-                                                        <b>Number of seats :</b> {{confirmed_booking.plate_no.number_of_seats}} <br>
+                                                        <b>Brand Name :</b> {{done_carpooling.plate_no.brand_name}} <br>
+                                                        <b>Original Rent Price :</b> {{done_carpooling.plate_no.package_rent}} php<br>
+                                                        <b>Plate No :</b> {{done_carpooling.plate_no.plate_no}} <br>
                                                     </p>
                                                 </div>
                                                 <br>
                                                 <br>
                                                 <br>
                                                 <br>
-
                                                 <p class="mb-2">
-                                                    {{confirmed_booking.plate_no.description}}
+                                                    {{done_carpooling.plate_no.description}}
                                                 </p>
                                                 <br>
                                                 <p class="mb-2">
-                                                    Rent ID : {{confirmed_booking.rent_id}}
+                                                    Rent ID : {{done_carpooling.carpool_id}}
                                                 </p>
+                                                <br>
 
-                                                <form method='POST' id='cancelMyBookingForm_{{confirmed_booking.id}}'>
-                                                    {% csrf_token %} 
-                                                    <input type='hidden' name='cancel_booking_id' value='{{confirmed_booking.id}}' />
-                                                </form>
+                                                {% get_carpool_reviews done_carpooling.id as all_rental_reviews %}
+                                                {% if all_rental_reviews|length > 0 %}
+                                                    {% for review in all_rental_reviews %}
+                                                        {% if forloop.counter0 < 3 %}
+                                                            <div id="1_user_comment{{forloop.counter0}}" style="display:block;">
+                                                        {% else %}
+                                                            <div id="1_user_comment{{forloop.counter0}}" style="display:none;">
+                                                        {% endif %}
+                                                            <div class='comment-section'>
+                                                                <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                <div class='comment-box'>
+                                                                    <h6 style="font-size: 0.875rem;">
+                                                                        {{review.carpool_id.passenger_id.user_id.first_name}} 
+                                                                        {{review.carpool_id.passenger_id.user_id.last_name}}
+                                                                    </h6>
+                                                                    
+                                                                    <p style="font-size: 0.75rem;">
+                                                                        {{review.comment}}
+                                                                    </p>
+                                                                    <p class="mb-0">
+                                                                        Ratings : 
 
-                                                <form method='POST' id='markAsDoneBookingForm_{{confirmed_booking.id}}'>
-                                                    {% csrf_token %} 
-                                                    <input type='hidden' name='done_booking_id' value='{{confirmed_booking.id}}' />
-                                                    <input type='hidden' name='enable_carpooling' id='enable_carpooling' value='True' />
+                                                                        {% convert_rating_to_array review.rating as my_rating%}
+                                                                        {% for i in my_rating %}
+                                                                            <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                        {% endfor %}
+        
+                                                                    </p>
+                                                                    <p style="font-size: 0.75rem;">
+                                                                        Date Recorded : {{review.date_recorded}}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                    <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                    <br>
+                                                    <br>
+                                                    <br>
+                                                {% endif %}
+                                                
+                                                {% if account_type == 'Passenger' %}
+                                                    {% check_if_part_of_carpooling done_carpooling profile as i_am_a_passenger %}
+                                                    {% if i_am_a_passenger == True %}
+                                                        <form method='POST' id='reviewForm'>
+                                                            {% csrf_token %}
+                                                            Ratings
+                                                            <div class="star-rating">
+                                                                <input type="radio" id="{{done_carpooling.id}}_star5" name="rating" value="5">
+                                                                <label for="{{done_carpooling.id}}_star5"></label>
+                                                                <input type="radio" id="{{done_carpooling.id}}_star4" name="rating" value="4">
+                                                                <label for="{{done_carpooling.id}}_star4"></label>
+                                                                <input type="radio" id="{{done_carpooling.id}}_star3" name="rating" value="3">
+                                                                <label for="{{done_carpooling.id}}_star3"></label>
+                                                                <input type="radio" id="{{done_carpooling.id}}_star2" name="rating" value="2">
+                                                                <label for="{{done_carpooling.id}}_star2"></label>
+                                                                <input type="radio" id="{{done_carpooling.id}}_star1" name="rating" value="1">
+                                                                <label for="{{done_carpooling.id}}_star1"></label>
+                                                            </div>
+                                                            <br>
+                                                            <input type='hidden' name='done_carpooling_id' value='{{done_carpooling.id}}'/>
 
-                                                    <input type='hidden' name='available_seats' id='carpooling_available_seats'/>
-                                                    
-                                                    <input type='hidden' name='from_destination_city' id='carpooling_from_destination'/>
-                                                    <input type='hidden' name='to_destination_city' id='carpooling_to_destination'/>
-                                                    
-                                                    <input type='hidden' name='from_destination_municipality' id='carpooling_from_destination_municipality'/>
-                                                    <input type='hidden' name='to_destination_municipality' id='carpooling_to_destination_municipality'/>
-
-                                                </form>
-
-                                                {% if account_type == 'Admin' or account_type == 'Passenger' %}
-                                                    <button class="custom-btn mt-2 mt-lg-3 btn-danger" type='button' onclick="openCancelBookingModal('{{confirmed_booking.id}}');" id='cancelBooking{{confirmed_booking.id}}'>Cancel This Booking</button>
-                                                {% else %}
-                                                    <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="openMarkAsDoneModal('{{confirmed_booking.id}}');" id='markAsDoneBooking{{confirmed_booking.id}}'>Mark as Done</button>
+                                                            <label>Comment / Suggestion / Review</label>
+                                                            <textarea type="text" name="review_or_comment" class="form-control" placeholder="Enter your comment here" required></textarea>
+                                                            <button class="btn custom-btn mt-2 mt-lg-3" type='submit'>Post Review</button>
+                                                        </form>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </div>
+                                        
                                     {% endfor %}
                                 </div>
                             {% else %}
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
                                         <div class="custom-block bg-white shadow-lg">
-                                            <a href="">
+                                            <a href="topics-detail.html">
                                                 <div class="d-flex">
                                                     <div>
                                                         <div class="mb-2">
@@ -594,97 +621,7 @@
         </div>
 
 
-        <div class="modal-overlay" id="cancelMyBookingModal">
-            <div class="modal">
-                <div class="modal-body">
-                    <h2 class="modal-title text-sm">
-                        Cancel Booking
-                    </h2>
-                    
-                    <div id="approve-booking-body-holder">
-                        Are you sure you want to cancel this booking?
-                    </div>
-
-                    <input type='hidden' id='temp_booking_id_container' value='' />
-                    
-                    <div class='row'>
-                        <div class='col-md-6'>
-                            <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger" onclick="cancelMyBooking();">Cancel Booking</button> <br/>
-                        </div>
-                        
-                        <div class='col-md-6'>
-                            <button type='button' class="custom-btn mt-2 mt-lg-3" onclick="closeModal('cancelMyBookingModal');">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Close &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
-                        </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="modal-overlay" id="markAsDoneBookingModal">
-            <div class="modal">
-                <div class="modal-body">
-                    <h2 class="modal-title text-sm">
-                        Do you want to enable Carpooling Mode?
-                    </h2>
-                    
-                    <div class='mb-2'>
-                        <input type='checkbox' name='yes_enable' onchange='carpoolActivate();' />
-                        Yes, Do enable Carpooling Mode
-                    </div>
-                    <br>
-
-                    <form class='custom-form' id='destinationForm' style='display:none;'>
-
-                        <label class="form-label">Available Seats</label>
-                        <input type='number' min='1' id='temp_available_seats' class='form-control' placeholder='Available Seats...' onchange="setAvailableSeats('temp_available_seats');"/>
-
-
-                        <label class="form-label">From Destination</label>
-                        <select name="from_destination_municipality" class="form-control" required id="from_destination_municipality" onchange="getDestination('from_destination_municipality', 'from_destination')">
-                            {% get_all_municipality as all_municipality %}
-                            <option disabled selected>--- Select City or Municipality --- </option>
-                                {% for municipality in all_municipality %}
-                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
-                                {% endfor %}
-                        </select>
-
-                        <select name="from_destination" class="form-control" required id="from_destination" onchange="getFromDestination('from_destination');">
-                            <option disabled selected>--- Select From Destination --- </option>
-                        </select>
-
-                        <label class="form-label">To Destination</label>
-                        <select name="to_destination_municipality" class="form-control" required id="to_destination_municipality" onchange="getDestination('to_destination_municipality', 'to_destination')">
-                            {% get_all_municipality as all_municipality %}
-                            <option disabled selected>--- Select City or Municipality --- </option>
-                                {% for municipality in all_municipality %}
-                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
-                                {% endfor %}
-                        </select>
-
-                        <select name="to_destination" class="form-control" required id="to_destination" onchange="getToDestination('to_destination');">
-                            <option disabled selected>--- Select To Destination --- </option>
-                        </select>
-                    </form>
-                    <br>
-                    <div>
-                        <input type='checkbox' name='no_deactivate' onchange='carpoolDeactivate();' />
-                        No, Do not enable Carpooling Mode
-                    </div>
-
-                    <input type='hidden' id='temp_mark_as_done_booking_id_container' value='' />
-
-
-                    <div class='row' id='footerButton' style='display:none;'>
-                        <div class='col-md-6'>
-                            <button type='button' class="custom-btn mt-2 mt-lg-3" onclick="markAsDoneBooking();">Mark As Done</button> <br/>
-                        </div>
-                        
-                        <div class='col-md-6'>
-                            <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger" onclick="closeModal('markAsDoneBookingModal');">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Close &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
         
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
@@ -698,156 +635,5 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
-        
-        <script>
-            
-            function openCancelBookingModal(booking_id){
-                const modalOverlay = document.getElementById('cancelMyBookingModal');
-                const modal = modalOverlay.querySelector(".modal");
-                modalOverlay.classList.add("active");
-                modal.classList.add("active");
-
-                console.log(booking_id)
-                var temp_booking_id = document.getElementById('temp_booking_id_container').value = booking_id;
-                console.log(temp_booking_id.value)
-
-            }
-
-            function cancelMyBooking(){
-                var booking_id = document.getElementById('temp_booking_id_container').value;
-                var form = document.getElementById(`cancelMyBookingForm_${booking_id}`);
-                form.submit();
-            }
-
-            function openMarkAsDoneModal(booking_id){
-                const modalOverlay = document.getElementById('markAsDoneBookingModal');
-                const modal = modalOverlay.querySelector(".modal");
-                modalOverlay.classList.add("active");
-                modal.classList.add("active");
-
-                var temp_booking_id = document.getElementById('temp_mark_as_done_booking_id_container').value = booking_id;
-                console.log(temp_booking_id.value)
-            }
-
-            function markAsDoneBooking(){
-                var booking_id = document.getElementById('temp_mark_as_done_booking_id_container').value;
-                var form = document.getElementById(`markAsDoneBookingForm_${booking_id}`);
-                form.submit();
-            }
-        </script>
-
-        <script>
-            function carpoolActivate() {
-                var yes = document.getElementsByName('yes_enable')[0];
-                var no = document.getElementsByName('no_deactivate')[0];
-                var destination_form = document.getElementById('destinationForm');
-                var footer_button = document.getElementById('footerButton');
-
-                if (yes.checked) {
-                    no.checked = false;
-                    var carpooling_enable = document.getElementById('enable_carpooling')
-                    carpooling_enable.value = 'True';
-
-                    destination_form.style.display = 'block';
-                    footer_button.style.display = 'flex';
-                }
-                else{
-                    destination_form.style.display = 'none';
-                    footer_button.style.display = 'none';
-                }
-            }
-
-            function carpoolDeactivate() {
-                var yes = document.getElementsByName('yes_enable')[0];
-                var no = document.getElementsByName('no_deactivate')[0];
-                var destination_form = document.getElementById('destinationForm');
-                var footer_button = document.getElementById('footerButton');
-            
-                if (no.checked) {
-                    yes.checked = false;
-                    var carpooling_enable = document.getElementById('enable_carpooling')
-                    carpooling_enable.value = 'False';
-
-                    destination_form.style.display = 'none';
-                    footer_button.style.display = 'flex';
-                }
-                else{
-                    destination_form.style.display = 'none';
-                    footer_button.style.display = 'none';
-                }
-            }
-        </script>
-
-        <script>
-            function getDestination(parent_id, child_id){
-
-                var parent_select = document.getElementById(parent_id);
-                municipality_id = parent_select.value;
-
-                fetch(`get-address-destination/${municipality_id}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        all_places = data['destinations'];
-
-                        var to_destination_select = document.getElementById(child_id);
-                        to_destination_select.innerHTML = ''; 
-
-                        var defaultOption = document.createElement('option');
-                        defaultOption.disabled = true;
-                        defaultOption.selected = true;
-                        defaultOption.textContent = '--- Select To Destination ---';
-                        to_destination_select.appendChild(defaultOption);
-
-                        all_places.forEach(place => {
-                            var option = document.createElement('option');
-                            option.value = place;
-                            option.textContent = place;
-                            to_destination_select.appendChild(option);
-                        });
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                    });
-
-            }
-        </script>
-
-        <script>
-            function setAvailableSeats(input_id){
-                var temp_available_seats_container = document.getElementById(input_id);
-
-                if (temp_available_seats.value < 0){
-                    temp_available_seats.value = 0
-                }
-                else{
-                    var available_seats = document.getElementById('carpooling_available_seats');
-                    available_seats.value = temp_available_seats_container.value;
-                }
-            }
-            function getFromDestination(select_id){
-                var selected_from_destination_municipality = document.getElementById('from_destination_municipality')
-                var selected_from_destination_city = document.getElementById(select_id);
-
-                var carpooling_from_destination = document.getElementById('carpooling_from_destination')
-                carpooling_from_destination.value = selected_from_destination_city.value;
-
-                var carpooling_from_destination_municipality = document.getElementById('carpooling_from_destination_municipality')
-                carpooling_from_destination_municipality.value = selected_from_destination_municipality.value;
-            }
-            
-            function getToDestination(select_id){
-                var selected_to_destination_municipality = document.getElementById('to_destination_municipality')
-                var selected_to_destination_city = document.getElementById(select_id);
-
-                var carpooling_to_destination = document.getElementById('carpooling_to_destination')
-                carpooling_to_destination.value = selected_to_destination_city.value;
-
-                var carpooling_to_destination_municipality = document.getElementById('carpooling_to_destination_municipality')
-                carpooling_to_destination_municipality.value = selected_to_destination_municipality.value;
-
-                console.log(carpooling_to_destination.value)
-                console.log(carpooling_to_destination_municipality.value)
-            }
-        </script>
     </body>
 </html>
