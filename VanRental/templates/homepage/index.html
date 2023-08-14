@@ -9,7 +9,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>Homepage</title>
+        <title>Homepage | Passenger Connect</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -70,7 +70,7 @@
                         <div class="message-box mr-20" id="my-profile-mobile">
                             <ul>
                                 <li>
-                                    <a href="topics-listing.html">
+                                    <a href="/profile">
                                         <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
                                         My Profile
                                     </a>
@@ -120,11 +120,11 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-lg-5 me-lg-auto">
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_1">Home</a>
+                                <a class="nav-link click-scroll" href="/index">Home</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_2">Browse Topics</a>
+                                <a class="nav-link click-scroll" href="#section_2">Browse</a>
                             </li>
     
                             <li class="nav-item">
@@ -179,7 +179,7 @@
                                 </div>
                                 <ul>
                                     <li>
-                                        <a href="topics-listing.html">
+                                        <a href="/profile">
                                             <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
                                             My Profile
                                         </a>
@@ -235,6 +235,14 @@
                                     <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
                                         Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
                                     </div>
                                 </a>
                             </li>
@@ -735,13 +743,13 @@
                                         {% get_all_done_rental as all_rental %}
                                         {% if all_rental|length > 0 %}
                                             {% for done_rental in all_rental %}
-                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
+                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-2">
                                                     <div class="custom-block bg-white shadow-lg">
                                                         <div class="d-flex">
                                                             <div>
                                                                 <h5 class="mb-2">{{done_rental.plate_no.brand_name}}</h5>
                                                                 <div>
-                                                                    <p class="mb-0">
+                                                                    <p class="mb-2">
                                                                         <b>Overall Ratings : </b>
                                                                         {% get_overall_rental_rating done_rental.id as rating %}
 
@@ -754,8 +762,12 @@
                                                                                 <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                             {% endif %}
                                                                         {% else %}
-                                                                            <p> No ratings found </p>
+                                                                            No ratings found
                                                                         {% endif %}
+                                                                    </p>
+                                                                    <p class='mb-2'>
+                                                                        <b>From Destination : </b> {{done_rental.from_destination}} <br>
+                                                                        <b>To Destination : </b> {{done_rental.to_destination}}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -804,14 +816,25 @@
                                                             <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="next">
                                                                 <span class="carousel-control-next-icon"></span>
                                                             </button>
+
+                                                            <p class='mb-2'>
+                                                                <b>Brand Name : </b> {{done_rental.plate_no.brand_name}} <br>
+                                                                <b>Driver Name : </b> {{done_rental.driver_id.user_id.first_name}} {{done_rental.driver_id.user_id.last_name}}<br>
+                                                                <b>Driver Contact No : </b> {{done_rental.driver_id.contact_no}}<br>
+                                                                <b>Driver Email : </b> {{done_rental.driver_id.user_id.email}}<br>
+                                                                <b>Plate No : </b> {{done_rental.plate_no.plate_no}} <br>
+                                                                <b>Rental ID : </b> {{done_rental.rent_id}}
+                                                            </p>
                                                         </div>
                                                         
                                                         <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
                                                         <p class="mb-0">
                                                             {{done_rental.plate_no.description}}
-                                                        </p>
-                                                        <p class="mb-0">
-                                                            <b>Rental ID :</b> {{done_rental.rent_id}}
                                                         </p>
                                                         <hr/>
 
@@ -820,13 +843,17 @@
                                                         {% get_rental_reviews done_rental.id as all_rental_reviews %}
                                                         {% if all_rental_reviews|length > 0 %}
                                                             {% for review in all_rental_reviews %}
-                                                                {% if forloop.counter0 < 3 %}
-                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:block;">
+                                                                {% if forloop.counter0 < 1 %}
+                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter0}}">
                                                                 {% else %}
-                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:none;">
+                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter}}" style="display:none;">
                                                                 {% endif %}
                                                                     <div class='comment-section'>
-                                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        {% if review.rent_id.rented_by.profile %}
+                                                                            <img src="{{review.rent_id.rented_by.profile}}" class='comment-section-profile'/>
+                                                                        {% else %}
+                                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        {% endif %}
                                                                         <div class='comment-box'>
                                                                             <h6 style="font-size: 0.875rem;">
                                                                                 {{review.rent_id.rented_by.user_id.first_name}} 
@@ -844,9 +871,9 @@
                                                                                     <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                                 {% endfor %}
                 
-                                                                                {% comment %} {% if rating.1 != 0 %}
+                                                                                {% if rating.1 != 0 %}
                                                                                     <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
-                                                                                {% endif %} {% endcomment %}
+                                                                                {% endif %}
                                                                             </p>
                                                                             <p style="font-size: 0.75rem;">
                                                                                 Date Recorded : {{review.date_recorded}}
@@ -855,8 +882,8 @@
                                                                     </div>
                                                                 </div>
                                                             {% endfor %}
-                                                            <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                            <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                            <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
                                                         {% endif %}
@@ -892,13 +919,13 @@
                                         {% get_all_done_carpool as all_carpool %}
                                         {% if all_carpool|length > 0 %}
                                             {% for done_carpool in all_carpool %}
-                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-0">
+                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-2">
                                                     <div class="custom-block bg-white shadow-lg">
                                                         <div class="d-flex">
                                                             <div>
                                                                 <h5 class="mb-2">{{done_carpool.plate_no.brand_name}}</h5>
                                                                 <div>
-                                                                    <p class="mb-0">
+                                                                    <p class="mb-2">
                                                                         <b>Overall Ratings : </b>
                                                                         {% get_overall_carpool_rating done_carpool.id as rating %}
 
@@ -911,8 +938,12 @@
                                                                                 <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                             {% endif %}
                                                                         {% else %}
-                                                                            <p> No ratings found </p>
+                                                                            No ratings found
                                                                         {% endif %}
+                                                                    </p>
+                                                                    <p class='mb-2'>
+                                                                        <b>From Destination : </b> {{done_carpool.from_destination}} <br>
+                                                                        <b>To Destination : </b> {{done_carpool.to_destination}}
                                                                     </p>
                                                                 </div>
                                                             </div>
@@ -961,29 +992,41 @@
                                                             <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_carpool.id}}_{{done_carpool.plate_no.id}}" data-bs-slide="next">
                                                                 <span class="carousel-control-next-icon"></span>
                                                             </button>
+                                                            <p class='mb-2'>
+                                                                <b>Brand Name : </b> {{done_carpool.plate_no.brand_name}} <br>
+                                                                <b>Driver Name : </b> {{done_carpool.driver_id.user_id.first_name}} {{done_carpool.driver_id.user_id.last_name}}<br>
+                                                                <b>Driver Contact No : </b> {{done_carpool.driver_id.contact_no}}<br>
+                                                                <b>Driver Email : </b> {{done_carpool.driver_id.user_id.email}}<br>
+                                                                <b>Plate No : </b> {{done_carpool.plate_no.plate_no}} <br>
+                                                                <b>CARPOOL ID : </b> {{done_carpool.carpool_id}}
+                                                            </p>
                                                         </div>
-                                                        
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
                                                         <br>
                                                         <p class="mb-0">
                                                             {{done_carpool.plate_no.description}}
                                                         </p>
-                                                        <p class="mb-0">
-                                                            <b>CARPOOL ID :</b> {{done_carpool.carpool_id}}
-                                                        </p>
                                                         <hr/>
-
 
                                                         <!-- ALL COMMENTS -->
                                                         {% get_carpool_reviews done_carpool.id as all_rental_reviews %}
                                                         {% if all_rental_reviews|length > 0 %}
                                                             {% for review in all_rental_reviews %}
-                                                                {% if forloop.counter0 < 3 %}
-                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:block;">
+                                                                {% if forloop.counter0 < 1 %}
+                                                                <div id="{{done_carpool.id}}_carpool_user_comments{{forloop.counter0}}" style="display:block;">
                                                                 {% else %}
-                                                                <div id="1_user_comment{{forloop.counter0}}" style="display:none;">
+                                                                <div id="{{done_carpool.id}}_carpool_user_comments{{forloop.counter}}" style="display:none;">
                                                                 {% endif %}
                                                                     <div class='comment-section'>
-                                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        {% if review.carpool_id.passenger_id.profile %}
+                                                                            <img src="{{review.carpool_id.passenger_id.profile}}" class='comment-section-profile'/>
+                                                                        {% else %}
+                                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        {% endif %}
                                                                         <div class='comment-box'>
                                                                             <h6 style="font-size: 0.875rem;">
                                                                                 {{review.carpool_id.passenger_id.user_id.first_name}} 
@@ -1001,9 +1044,9 @@
                                                                                     <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                                 {% endfor %}
                 
-                                                                                {% comment %} {% if rating.1 != 0 %}
+                                                                                {% if rating.1 != 0 %}
                                                                                     <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
-                                                                                {% endif %} {% endcomment %}
+                                                                                {% endif %}
                                                                             </p>
                                                                             <p style="font-size: 0.75rem;">
                                                                                 Date Recorded : {{review.date_recorded}}
@@ -1012,8 +1055,8 @@
                                                                     </div>
                                                                 </div>
                                                             {% endfor %}
-                                                            <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                            <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            <button id="open-comments_{{done_carpool.id}}_carpool_user_comments" onclick="openAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                            <button id="hide-comments_{{done_carpool.id}}_carpool_user_comments"  onclick="hideAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
                                                         {% endif %}
@@ -1180,11 +1223,9 @@
                             <h2 class="mb-5">Get in touch</h2>
                         </div>
 
-                        <div class="col-lg-5 col-12 mb-4 mb-lg-0">
-                            <iframe class="google-map" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2595.065641062665!2d-122.4230416990949!3d37.80335401520422!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858127459fabad%3A0x808ba520e5e9edb7!2sFrancisco%20Park!5e1!3m2!1sen!2sth!4v1684340239744!5m2!1sen!2sth" width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                        </div>
+                        
 
-                        <div class="col-lg-6 col-md-6 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
+                        <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
                             <h4 class="mb-3">Head office</h4>
 
                             <p>Barangay Isabang, Lucena City, Quezon, Philippines 4301</p>
@@ -1203,7 +1244,7 @@
                                 <span class="me-2">Email</span>
 
                                 <a href="mailto:vanrental@gmail.com" class="site-footer-link">
-                                    vanrental@gmail.com
+                                    passengerconnect@gmail.com
                                 </a>
                             </p>
                         </div>

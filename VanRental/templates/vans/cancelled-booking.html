@@ -11,7 +11,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
-        <title>List of Vans | Van Rental</title>
+        <title>Cancelled Rental | Passenger Connect</title>
 
         <!-- CSS FILES -->        
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,7 +72,7 @@
                         <div class="message-box mr-20" id="my-profile-mobile">
                             <ul>
                                 <li>
-                                    <a href="topics-listing.html">
+                                    <a href="/profile">
                                         <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
                                         My Profile
                                     </a>
@@ -122,11 +122,11 @@
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav ms-lg-5 me-lg-auto">
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_1">Home</a>
+                                <a class="nav-link click-scroll" href="/index">Home</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_2">Browse Topics</a>
+                                <a class="nav-link click-scroll" href="#section_2">Browse</a>
                             </li>
     
                             <li class="nav-item">
@@ -181,7 +181,7 @@
                                 </div>
                                 <ul>
                                     <li>
-                                        <a href="topics-listing.html">
+                                        <a href="/profile">
                                             <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
                                             My Profile
                                         </a>
@@ -226,7 +226,7 @@
                     </div>
                 </div>
             </nav>
-            
+
             {% if user.is_authenticated %}
             <div class="side-bar-header">   
                 <div class="side-bar" id="van-rental-sidebar">
@@ -237,6 +237,14 @@
                                     <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
                                         Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
                                     </div>
                                 </a>
                             </li>
@@ -317,7 +325,7 @@
                                 <a href="/past-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
-                                        Past Bookings
+                                        Past Bookingss
                                     </div>
                                 </a>
                             </li>
@@ -387,7 +395,6 @@
                 </div>
             </div>
             {% endif %}
-
 
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">

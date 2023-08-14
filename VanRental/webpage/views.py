@@ -140,6 +140,16 @@ def index(request):
 
     return render(request, 'homepage/index.html')
 
+################ DASHBOARD PAGE
+def dashboard(request):
+    if not request.user.is_authenticated:
+        messages.info(request, 'The page you are trying to access is not available because you are already logged in!')
+        return redirect('/login')
+
+    return render(request, 'homepage/dashboard.html')
+    
+
+
 ################ LOGIN PAGE
 def login_page(request):
     if request.user.is_authenticated:
@@ -589,9 +599,9 @@ def rent_booking_list(request):
             booking_target.is_confirmed = True
             booking_target.save()
 
-            message_to_admin = f'You confirmed a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
-            message_to_driver = f'You have been assigned as a driver in a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
-            message_to_passenger = f'Your rent booking with RENT ID : {booking_target.rent_id} has been confirmed, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            message_to_admin = f'You confirmed a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
+            message_to_driver = f'You have been assigned as a driver in a rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
+            message_to_passenger = f'Your rent booking with RENT ID : {booking_target.rent_id} has been confirmed, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
             
             driver_target.is_available = False
             driver_target.save()
@@ -614,8 +624,8 @@ def rent_booking_list(request):
             booking_target.is_rejected = True
             booking_target.save()
 
-            message_to_admin = f'REJECTED || A rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
-            message_to_passenger = f'REJECTED || Your rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date.date}'
+            message_to_admin = f'REJECTED || A rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
+            message_to_passenger = f'REJECTED || Your rent booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
             
             van = Van.objects.filter(id = booking_target.plate_no.id).first()
             van.is_rented = False

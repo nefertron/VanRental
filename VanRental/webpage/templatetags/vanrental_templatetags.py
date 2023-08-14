@@ -21,6 +21,74 @@ def user_type_checker(user):
     else:
         return None
 
+
+
+
+@register.simple_tag
+def get_income_last_month():
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+
+    target_month = 0
+    target_year = 0
+    
+
+    if month == 1:
+        target_year = year - 1
+        target_month = 12
+    else:
+        target_year = year
+        target_month = month - 1
+
+        if target_month < 10:
+            target_month = f'0{target_month}'
+        else:
+            target_month = target_month
+    
+    overall_income = 0
+
+    for rent in RentedVan.objects.filter(is_done = True, travel_date__year = target_year, travel_date__month = target_month).all():
+        overall_income = overall_income + rent.package_price
+
+    for booked_carpool in BookedPassenger.objects.filter(is_dropped = True, date_dropped__year = target_year, date_dropped__month = target_month ).all():
+        overall_income = overall_income + booked_carpool.fare
+    
+    return overall_income
+
+@register.simple_tag
+def get_income_this_month():
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+
+    target_month = 0
+    if month < 10:
+        target_month = f'0{month}'
+    else:
+        target_month = month
+
+    overall_income = 0
+
+    for rent in RentedVan.objects.filter(is_done = True, travel_date__year = year, travel_date__month = target_month).all():
+        overall_income = overall_income + rent.package_price
+
+    for booked_carpool in BookedPassenger.objects.filter(is_dropped = True, date_dropped__year = year, date_dropped__month = target_month).all():
+        overall_income = overall_income + booked_carpool.fare
+
+    return overall_income
+
+@register.simple_tag
+def get_all_rental_services():
+    all_rental_services = RentedVan.objects.filter(is_done = True).all()
+    return all_rental_services
+
+@register.simple_tag
+def get_all_carpool_services():
+    all_booked_carpool = BookedPassenger.objects.filter(is_dropped = True).all()
+    return all_booked_carpool
+
+
 @register.simple_tag
 def get_my_notifications(user):
     if user:
@@ -125,15 +193,6 @@ def get_all_passengers_in_carpool(carpool):
         return get_total_of_bookings, get_all_seats_occupied_by_passengers
     else:
         return 0, 0
-
-
-# @register.simple_tag
-# def get_carpool_vans():
-#     all_to_carpool_vans = Van.objects.filter(is_carpooled = True).all()
-
-#     return all_to_carpool_vans
-
-
 
 @register.simple_tag
 def get_all_done_rental():
