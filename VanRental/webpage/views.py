@@ -911,6 +911,147 @@ def available_carpooling(request):
         context['all_available_carpooling'] = CarpoolVan.objects.filter(is_done = False).all()
 
 
+    if request.method == 'POST':
+        carpool_van_id  = request.POST.get('carpool_van_id')
+        seats_occupied  = request.POST.get('seats_occupied')
+        pick_up_location  = request.POST.get('pick_up_location')
+        my_destination = request.POST.get('my_destination')
+
+        booking_id  = request.POST.get('booking_id')
+        is_rejected  = request.POST.get('is_rejected')
+        is_approved  = request.POST.get('is_approved')
+
+        is_dropped  = request.POST.get('is_dropped')
+        passenger_fare = request.POST.get('passenger_fare')
+
+        is_removed  = request.POST.get('is_removed')
+
+        is_walkin = request.POST.get('is_walkin')
+        walkin_van_id = request.POST.get('walkin_van_id')
+        walkin_seats_occupied = request.POST.get('walkin_seats_occupied')
+        walkin_pick_up_location = request.POST.get('walkin_pick_up_location')
+        walkin_destination = request.POST.get('walkin_destination')
+
+
+        if context['account_type'] == 'Passenger':
+            carpool_van = CarpoolVan.objects.filter(id = carpool_van_id).first()
+            seats_occupied = int(seats_occupied)
+
+            if seats_occupied > int(carpool_van.available_seat):
+                messages.info(request, f'It seems like the seats that you will occupy exceeded the number of available seats in this carpooling!')
+                return redirect('/available-carpooling')
+            
+            else:
+                create_carpool_booking = BookedPassenger.objects.create(passenger_id = passenger_account,
+                                                                        carpool_id = carpool_van,
+                                                                        pick_up_location = pick_up_location,
+                                                                        seats_occupied = seats_occupied,
+                                                                        destination = my_destination)
+                create_carpool_booking.booked_id = f'BKDCPL{create_carpool_booking.id}'
+                create_carpool_booking.save()
+
+                message_to_driver = f'PLACED BOOKING || {passenger_account.user_id.first_name} {passenger_account.user_id.last_name} booked in your carpool, with PICK UP LOCATION {pick_up_location} and BOOKING ID : {create_carpool_booking.booked_id}'
+                message_to_passenger = f'PLACED BOOKING || You successfully booked in carpooling with CARPOOL ID : {carpool_van.carpool_id} and BOOKING ID : {create_carpool_booking.booked_id}. Please wait for the driver`s approval.'
+            
+                create_notification(request, carpool_van.driver_id.user_id, message_to_driver)
+                create_notification(request, passenger_account.user_id, message_to_passenger)
+
+                messages.info(request, message_to_passenger)
+                return redirect('/available-carpooling')
+            
+        elif context['account_type'] == 'Driver':
+            if not is_approved is None:
+                approve_carpool_booking = BookedPassenger.objects.filter(id=booking_id).first()
+                approve_carpool_booking.is_confirmed = True
+                approve_carpool_booking.date_confirmed = datetime.now()
+                approve_carpool_booking.save()
+                
+                message_to_driver = f'APPROVED || You approved a carpool booking with BOOKING ID : {approve_carpool_booking.booked_id}'
+                message_to_passenger = f'APPROVED || Your carpool booking has been approved with BOOKING ID : {approve_carpool_booking.booked_id}'
+                
+                create_notification(request, request.user, message_to_driver)
+                create_notification(request, approve_carpool_booking.passenger_id.user_id, message_to_passenger)
+
+                messages.info(request, message_to_driver)
+                return redirect('/available-carpooling')
+
+
+            elif not is_rejected is None:
+                reject_carpool_booking = BookedPassenger.objects.filter(id=booking_id).first()
+                reject_carpool_booking.is_rejected = True
+                reject_carpool_booking.date_rejected = datetime.now()
+                reject_carpool_booking.save()
+
+                message_to_driver = f'REJECTED || You rejected a carpool booking with BOOKING ID : {reject_carpool_booking.booked_id}'
+                message_to_passenger = f'REJECTED || Your carpool booking has been rejected with BOOKING ID : {reject_carpool_booking.booked_id}'
+                
+                create_notification(request, request.user, message_to_driver)
+                create_notification(request, approve_carpool_booking.passenger_id.user_id, message_to_passenger)
+
+                messages.info(request, message_to_driver)
+                return redirect('/available-carpooling')
+            
+            elif not is_dropped is None:
+                dropped_passenger = BookedPassenger.objects.filter(id=booking_id).first()
+                dropped_passenger.is_dropped = True
+                dropped_passenger.date_dropped = datetime.now()
+                dropped_passenger.fare = passenger_fare
+                dropped_passenger.save()
+
+
+                message_to_driver = f'DROPPED || You dropped a passenger with BOOKING ID : {dropped_passenger.booked_id} and DESTINATION : {dropped_passenger.destination}'
+                create_notification(request, request.user, message_to_driver)
+                
+                if not dropped_passenger.passenger_id is None:
+                    message_to_passenger = f'DROPPED || The driver has been dropped you successfully in your DESTINATION : {dropped_passenger.destination}'
+                    create_notification(request, dropped_passenger.passenger_id.user_id, message_to_passenger)
+
+                messages.info(request, message_to_driver)
+                return redirect('/available-carpooling')
+
+            elif not is_removed is None:
+                removed_passenger = BookedPassenger.objects.filter(id=booking_id).first()
+                removed_passenger.is_confirmed = False
+                removed_passenger.is_rejected = False
+                removed_passenger.is_cancelled = False
+                removed_passenger.is_dropped = False
+    
+                removed_passenger.date_confirmed = None
+                removed_passenger.date_rejected = None
+                removed_passenger.date_cancelled = None
+                removed_passenger.date_dropped = None
+                removed_passenger.save()
+
+                message_to_driver = f'REMOVED || You removed a passenger from the confirmed booking with BOOKING ID : {removed_passenger.booked_id} and DESTINATION : {removed_passenger.destination}'
+                message_to_passenger = f'REMOVED || The driver has been removed you from the list of Confirmed Bookings with your BOOKING ID : {removed_passenger.booked_id} and DESTINATION : {removed_passenger.destination}'
+                
+                create_notification(request, request.user, message_to_driver)
+                create_notification(request, approve_carpool_booking.passenger_id.user_id, message_to_passenger)
+
+                messages.info(request, message_to_driver)
+                return redirect('/available-carpooling')
+            
+            elif not is_walkin is None:
+                walkin_van = CarpoolVan.objects.filter(id = walkin_van_id).first()
+        
+                create_walkin_booking = BookedPassenger.objects.create(carpool_id = walkin_van,
+                                                                        pick_up_location = walkin_pick_up_location,
+                                                                        seats_occupied = walkin_seats_occupied,
+                                                                        destination = walkin_destination,
+                                                                        is_confirmed = True,
+                                                                        date_confirmed = datetime.now())
+                create_walkin_booking.booked_id = f'BKDCPL{create_walkin_booking.id}'
+                create_walkin_booking.save()
+
+                message_to_driver = f'PLACED BOOKING || A passenger has been picked up along the way, with PICK UP LOCATION {walkin_pick_up_location}, DESTINATION {walkin_destination}, and BOOKING ID : {create_walkin_booking.booked_id}'
+            
+                create_notification(request, walkin_van.driver_id.user_id, message_to_driver)
+
+                messages.info(request, message_to_driver)
+                return redirect('/available-carpooling')
+            
+
+
     return render(request, 'vans/available-carpooling.html', context)
 
 
@@ -1068,8 +1209,10 @@ def get_destination_address(request, id):
 
 def get_carpooling_information(request, id):
     carpooling = CarpoolVan.objects.filter(id=id).first()
-    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpooling).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
-    
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpooling,
+                                                           is_confirmed = True,
+                                                           is_rejected = False,
+                                                           is_cancelled = False).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
     response = {}
     
     if not all_booked_passengers is None:
@@ -1077,6 +1220,16 @@ def get_carpooling_information(request, id):
         response['available_seats'] = remaining_available_seats
     else:
         response['available_seats'] = carpooling.available_seat
+
+    all_images_container = []
+
+    for van_image in VanImages.objects.filter(van_image_id = carpooling.plate_no).all():
+        all_images_container.append(van_image.vehicle_image)
+
+    response['all_images'] = all_images_container
+    response['carpooling_id'] = carpooling.id
+    response['from_destination'] = carpooling.from_destination
+    response['to_destination'] = carpooling.to_destination
 
     return JsonResponse(response)
 

@@ -192,13 +192,82 @@ def get_total_open_carpool():
 
 @register.simple_tag
 def get_available_number_of_seats_in_carpooling(carpool):
-    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                           is_confirmed = True,
+                                                           is_rejected = False,
+                                                           is_cancelled = False,).aggregate(all_booked_passengers = Sum('seats_occupied'))['all_booked_passengers']
     
     if not all_booked_passengers is None:
         remaining_available_seats = carpool.available_seat - all_booked_passengers
         return remaining_available_seats
     else:
         return carpool.available_seat
+    
+@register.simple_tag
+def get_pending_number_of_seats_in_carpooling(carpool):
+    all_pending_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                           is_confirmed = False,
+                                                           is_rejected = False,
+                                                           is_cancelled = False,).aggregate(all_pending_booked_passengers = Sum('seats_occupied'))['all_pending_booked_passengers']
+    if not all_pending_booked_passengers is None:
+        return all_pending_booked_passengers
+    else:
+        return 0
+    
+
+@register.simple_tag
+def get_all_pending_booked_passengers_in_carpooling(carpool):
+
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                           is_confirmed = False,
+                                                           is_rejected = False,
+                                                           is_cancelled = False,
+                                                           is_dropped = False).all()
+    return all_booked_passengers
+
+
+@register.simple_tag
+def get_all_confirmed_booked_passengers_in_carpooling(carpool):
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                           is_confirmed = True,
+                                                           is_rejected = False,
+                                                           is_cancelled = False,
+                                                           is_dropped = False).all()
+    return all_booked_passengers
+
+@register.simple_tag
+def get_all_dropped_booked_passengers_in_carpooling(carpool):
+    all_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                           is_dropped = True).all()
+    return all_booked_passengers
+
+
+@register.simple_tag
+def get_my_carpool_booking_information(carpool, passenger_account):
+    my_carpool_booking_information = {}
+
+    my_carpool = BookedPassenger.objects.filter(carpool_id = carpool,
+                                                passenger_id = passenger_account).first()
+
+    if my_carpool.is_confirmed:
+        my_carpool_booking_information['Status'] = 'Confirmed'
+    elif my_carpool.is_rejected:
+        my_carpool_booking_information['Status'] = 'Rejected'
+    elif my_carpool.is_cancelled:
+        my_carpool_booking_information['Status'] = 'Cancelled'
+    elif my_carpool.is_dropped:
+        my_carpool_booking_information['Status'] = 'Dropped'
+    else:
+        my_carpool_booking_information['Status'] = 'None'
+
+    my_carpool_booking_information['BookID'] = my_carpool.booked_id
+    my_carpool_booking_information['SeatsOccupied'] = my_carpool.seats_occupied
+    my_carpool_booking_information['PickUpLocation'] = my_carpool.pick_up_location
+    my_carpool_booking_information['Destination'] = my_carpool.destination
+    my_carpool_booking_information['Fare'] = my_carpool.fare
+    
+
+    return my_carpool_booking_information
 
 @register.simple_tag
 def get_total_pending_bookings(user):

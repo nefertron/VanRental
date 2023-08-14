@@ -101,7 +101,7 @@ class RentedVan(models.Model):
 
 class CarpoolVan(models.Model):
     carpool_id = models.CharField(max_length=30)
-    available_seat = models.TextField(default=0)
+    available_seat = models.IntegerField(default=0)
     from_destination = models.TextField()
     to_destination = models.TextField()
     plate_no = models.ForeignKey(Van, on_delete=models.CASCADE)
@@ -115,7 +115,7 @@ class CarpoolVan(models.Model):
 
 class BookedPassenger(models.Model):
     booked_id = models.CharField(max_length=30)
-    passenger_id = models.ForeignKey(PassengerAccount, on_delete=models.CASCADE)
+    passenger_id = models.ForeignKey(PassengerAccount, on_delete=models.CASCADE, null=True, blank=True)
     carpool_id = models.ForeignKey(CarpoolVan, on_delete=models.CASCADE)
     fare = models.IntegerField(default=0)
     pick_up_location = models.TextField()
@@ -127,15 +127,19 @@ class BookedPassenger(models.Model):
     is_cancelled = models.BooleanField(default=False)
     is_dropped = models.BooleanField(default=False)
 
-    date_confirmed = models.DateTimeField(default=datetime.now(), null=True, blank=True)
-    date_rejected = models.DateTimeField(default=datetime.now(), null=True, blank=True)
-    date_cancelled = models.DateTimeField(default=datetime.now(), null=True, blank=True)
-    date_dropped = models.DateTimeField(default=datetime.now(), null=True, blank=True)
+    date_confirmed = models.DateTimeField(default=None, null=True, blank=True)
+    date_rejected = models.DateTimeField(default=None, null=True, blank=True)
+    date_cancelled = models.DateTimeField(default=None, null=True, blank=True)
+    date_dropped = models.DateTimeField(default=None, null=True, blank=True)
 
     destination = models.TextField()
 
     def __str__(self):
-        return f'PASSENGER : {self.passenger_id.user_id.first_name} {self.passenger_id.user_id.last_name} || DESTINATION : {self.destination} || IS DROPPED : {self.is_dropped} || IS REJECTED : {self.is_rejected} || IS CANCELLED : {self.is_cancelled}'
+        if not self.passenger_id is None:
+            return f'PASSENGER : {self.passenger_id.user_id.first_name} {self.passenger_id.user_id.last_name} || DESTINATION : {self.destination} || IS DROPPED : {self.is_dropped} || IS REJECTED : {self.is_rejected} || IS CANCELLED : {self.is_cancelled}'
+        else:
+            return f'DESTINATION : {self.destination} || IS DROPPED : {self.is_dropped} || IS REJECTED : {self.is_rejected} || IS CANCELLED : {self.is_cancelled}'
+
     
 
 class Review(models.Model):

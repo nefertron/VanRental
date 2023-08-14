@@ -473,11 +473,17 @@
                                                     <p>
                                                         <b>Brand Name :</b> {{available_carpooling.plate_no.brand_name}} <br>
                                                         <b>Plate No :</b> {{available_carpooling.plate_no.plate_no}} <br>
+                                                        
                                                         <b>Available Number of Seats :
-
                                                         </b> 
                                                         {% get_available_number_of_seats_in_carpooling available_carpooling as available_number_of_seats %}
                                                         {{available_number_of_seats}}
+                                                        <br>
+
+                                                        <b>Number of Seats in Placed Bookings:
+                                                        </b> 
+                                                        {% get_pending_number_of_seats_in_carpooling available_carpooling as pending_booking_seats %}
+                                                        {{pending_booking_seats}}
                                                         <br>
                                                     </p>
                                                 </div>
@@ -499,10 +505,273 @@
                                                     <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="openMarkAsDoneModal('{{available_carpooling.id}}');" id='markAsDoneBooking{{available_carpooling.id}}'>Mark as Done</button>
                                                     <button class="custom-btn mt-2 mt-lg-3 btn-danger" type='button' onclick="openCancelBookingModal('{{available_carpooling.id}}');" id='cancelBooking{{available_carpooling.id}}'>Cancel</button>
                                                 {% else %}
-                                                    <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="bookCarpooling('{{available_carpooling.id}}')">Book Now</button>
+                                                    <button class="custom-btn mt-2 mt-lg-3" type='button' onclick="bookCarpoolNow('{{available_carpooling.id}}');">Book Now</button>
                                                 {% endif %}
                                             </div>
                                         </div>
+
+
+                                        {% if account_type == 'Driver' %}
+                                            <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='available_carpooling_{{available_carpooling.id}}'>
+                                                <div class="custom-block bg-white shadow-lg">
+                                                    <div>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>List of Bookings</h5>
+                                                            <button class="add-btn mt-1" onclick="addWalkInPassenger('{{available_carpooling.id}}');">Add Passenger</button>
+                                                        </div>
+
+                                                        <div class='mb-2 line-height-5'>
+                                                            <p><b>Carpooling Information : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><b>From Destination :</b> {{available_carpooling.from_destination}} </p>
+                                                                <p><b>To Destination :</b> {{available_carpooling.to_destination}} </p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class='mb-2 line-height-5'>
+                                                            <p><b>Assigned Driver : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><b>Fullname :</b> {{available_carpooling.driver_id.user_id.first_name}}  {{available_carpooling.driver_id.user_id.last_name}}</p>
+                                                                <p><b>Contact No :</b>  {{available_carpooling.driver_id.contact_no}}  </p>
+                                                                <p><b>Email :</b> {{available_carpooling.driver_id.user_id.email}} </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+
+                                                    <div style='overflow-y:auto; height:100vh'>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>Confirmed Bookings</h5>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="table-responsive table-x-overflow">
+                                                                <table class="table table-striped table-full">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">#</th>
+                                                                            <th scope="col">Full Name</th>
+                                                                            <th scope="col">Contact No.</th>
+                                                                            <th scope="col">Number of Seats</th>
+                                                                            <th scope="col">Pick Up Location</th>
+                                                                            <th scope="col">Drop Area</th>
+                                                                            <th scope="col">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                            
+                                                                    <tbody>
+                                                                        {% get_all_confirmed_booked_passengers_in_carpooling available_carpooling as all_confirmed_booked_passengers %}
+                                                                        {% if all_confirmed_booked_passengers|length > 0 %}
+                                                                            {% for confirmed_passenger in all_confirmed_booked_passengers %}
+                                                                                <tr>
+                                                                                    <td class="font-bold">{{confirmed_passenger.booked_id}}</td>
+                                                                                    <td>{{confirmed_passenger.passenger_id.user_id.first_name}} {{confirmed_passenger.passenger_id.user_id.last_name}}</td>
+                                                                                    <td>{{confirmed_passenger.passenger_id.contact_no}}</td>
+                                                                                    <td class='text-center'>{{confirmed_passenger.seats_occupied}}</td>
+                                                                                    <td>{{confirmed_passenger.pick_up_location}}</td>
+                                                                                    <td>{{confirmed_passenger.destination}}</td>
+                                                                                    <td class='display-flex'>
+                                                                                        <form method='POST' id='dropNowForm'>
+                                                                                            {% csrf_token %}
+                                                                                            <input type='hidden' name='is_dropped' value='True' />
+                                                                                            <input type='hidden' name='booking_id' value='{{confirmed_passenger.id}}' />
+                                                                                            <input type='hidden' name='booking_id' value='{{confirmed_passenger.id}}' />
+                                                                                            <input type='hidden' name='passenger_fare' id='passenger_fare' />
+                                                                                            <button class="approve-button" type="button" onclick="openDropNowModal('dropNowModal',
+                                                                                                                                                                    '{{confirmed_passenger.passenger_id.user_id.first_name}} {{confirmed_passenger.passenger_id.user_id.last_name}}',
+                                                                                                                                                                    '{{confirmed_passenger.pick_up_location}}',
+                                                                                                                                                                    '{{confirmed_passenger.destination}}')">Drop Now</button>
+                                                                                        </form>
+                                                                                        
+                                                                                        <form method='POST'>
+                                                                                            {% csrf_token %}
+                                                                                            <input type='hidden' name='is_removed' value='True'/>
+                                                                                            <input type='hidden' name='booking_id' value='{{confirmed_passenger.id}}' />
+                                                                                            <button class="approve-button btn-danger ml-10" type="submit">Cancel Booking</button>
+                                                                                        </form>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endfor %}
+                                                                        {% else %}
+                                                                            <p>The system couldn`t find any confirmed booking.</p>
+                                                                        {% endif %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <br>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>Pending Bookings</h5>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="table-responsive table-x-overflow">
+                                                                <table class="table table-striped table-full">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">#</th>
+                                                                            <th scope="col">Full Name</th>
+                                                                            <th scope="col">Contact No.</th>
+                                                                            <th scope="col">Number of Seats</th>
+                                                                            <th scope="col">Pick Up Location</th>
+                                                                            <th scope="col">Drop Area</th>
+                                                                            <th scope="col">Action</th>
+                                                                        </tr>
+                                                                    </thead>
+                            
+                                                                    <tbody>
+                                                                        {% get_all_pending_booked_passengers_in_carpooling available_carpooling as all_booked_passengers %}
+                                                                        {% if all_booked_passengers|length > 0 %}
+                                                                            {% for passenger in all_booked_passengers %}
+                                                                                <tr>
+                                                                                    <td class="font-bold">{{passenger.booked_id}}</td>
+                                                                                    <td>{{passenger.passenger_id.user_id.first_name}} {{passenger.passenger_id.user_id.last_name}}</td>
+                                                                                    <td>{{passenger.passenger_id.contact_no}}</td>
+                                                                                    <td class='text-center'>{{passenger.seats_occupied}}</td>
+                                                                                    <td>{{passenger.pick_up_location}}</td>
+                                                                                    <td>{{passenger.destination}}</td>
+                                                                                    <td class='display-flex'>
+                                                                                        <form method='POST'>
+                                                                                            {% csrf_token %}
+                                                                                            <input type='hidden' name='is_approved' value='True' />
+                                                                                            <input type='hidden' name='booking_id' value='{{passenger.id}}' />
+                                                                                            <button class="approve-button" type="submit">Approve</button>
+                                                                                        </form>
+                                                                                        
+                                                                                        <form method='POST'>
+                                                                                            {% csrf_token %}
+                                                                                            <input type='hidden' name='is_rejected' value='True'  />
+                                                                                            <input type='hidden' name='booking_id' value='{{passenger.id}}' />
+                                                                                            <button class="approve-button btn-danger ml-10" type="submit">Reject</button>
+                                                                                        </form>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endfor %}
+
+                                                                        {% else %}
+                                                                            <p>The system couldn`t find any pending booking.</p>
+                                                                        {% endif %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <br>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>Dropped Passengers</h5>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="table-responsive table-x-overflow">
+                                                                <table class="table table-striped table-full">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">#</th>
+                                                                            <th scope="col">Full Name</th>
+                                                                            <th scope="col">Contact No.</th>
+                                                                            <th scope="col">Number of Seats</th>
+                                                                            <th scope="col">Pick Up Location</th>
+                                                                            <th scope="col">Drop Area</th>
+                                                                            <th scope="col">Fare</th>
+                                                                            <th scope="col">Status</th>
+                                                                        </tr>
+                                                                    </thead>
+                            
+                                                                    <tbody>
+                                                                        {% get_all_dropped_booked_passengers_in_carpooling available_carpooling as all_dropped_booked_passengers %}
+                                                                        {% if all_dropped_booked_passengers|length > 0 %}
+                                                                            {% for dropped_passenger in all_dropped_booked_passengers %}
+                                                                                <tr>
+                                                                                    <td class="font-bold">{{dropped_passenger.booked_id}}</td>
+                                                                                    <td>{{dropped_passenger.passenger_id.user_id.first_name}} {{dropped_passenger.passenger_id.user_id.last_name}}</td>
+                                                                                    <td>{{dropped_passenger.passenger_id.contact_no}}</td>
+                                                                                    <td class='text-center'>{{dropped_passenger.seats_occupied}}</td>
+                                                                                    <td>{{dropped_passenger.pick_up_location}}</td>
+                                                                                    <td>{{dropped_passenger.destination}}</td>
+                                                                                    <td>Php {{dropped_passenger.fare}}</td>
+                                                                                    <td class='display-flex'>
+                                                                                        <button class="approve-button">Dropped</button>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            {% endfor %}
+                                                                        {% else %}
+                                                                            <p>The system couldn`t find any dropped passengers.</p>
+                                                                        {% endif %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if account_type == 'Passenger' %}
+                                            <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='available_carpooling_{{available_carpooling.id}}'>
+                                                <div class="custom-block bg-white shadow-lg">
+                                                    <div>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>My Booking</h5>
+                                                        </div>
+
+                                                        <div class='mb-2 line-height-5'>
+                                                            <p><b>Carpooling Information : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><b>From Destination :</b> {{available_carpooling.from_destination}} </p>
+                                                                <p><b>To Destination :</b> {{available_carpooling.to_destination}} </p>
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class='mb-2 line-height-5'>
+                                                            <p><b>Assigned Driver : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><b>Fullname :</b> {{available_carpooling.driver_id.user_id.first_name}}  {{available_carpooling.driver_id.user_id.last_name}}</p>
+                                                                <p><b>Contact No :</b>  {{available_carpooling.driver_id.contact_no}}  </p>
+                                                                <p><b>Email :</b> {{available_carpooling.driver_id.user_id.email}} </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <br>
+
+                                                    <div style='overflow-y:auto; height:100vh'>
+                                                        <div class='display-flex'>
+                                                            <h5 class='mt-1'>Status of My Booking</h5>
+                                                        </div>
+                                                        <div class="d-flex">
+                                                            <div class="table-responsive table-x-overflow">
+                                                                <table class="table table-striped table-full">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th scope="col">#</th>
+                                                                            <th scope="col">Book ID</th>
+                                                                            <th scope="col">Status</th>
+                                                                            <th scope="col">Seats Occupied</th>
+                                                                            <th scope="col">Pick Up Location</th>
+                                                                            <th scope="col">Destination</th>
+                                                                            <th scope="col">Fare</th>
+                                                                        </tr>
+                                                                    </thead>
+                            
+                                                                    <tbody>
+                                                                        {% get_my_carpool_booking_information available_carpooling user.passengeraccount as my_carpool_booking_information %}
+                                                                        {% if my_carpool_booking_information %}
+                                                                                <tr>
+                                                                                    <td class="font-bold">{{my_carpool_booking_information.BookID}}</td>
+                                                                                    <td>{{my_carpool_booking_information.Status}}</td>
+                                                                                    <td>{{my_carpool_booking_information.SeatsOccupied}}</td>
+                                                                                    <td>{{my_carpool_booking_information.PickUpLocation}}</td>
+                                                                                    <td>{{my_carpool_booking_information.Destination}}</td>
+                                                                                    <td>{{my_carpool_booking_information.Fare}}</td>
+                                                                                </tr>
+                                                                        {% else %}
+                                                                            <p>The system couldn`t find any booking in this carpool.</p>
+                                                                        {% endif %}
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             {% else %}
@@ -542,18 +811,54 @@
                     <p id="modal-footer">
                         <!-- Date Recorded : 0000-00-00 -->
                     </p>
-                    <button type='submit' class="form-control" onclick="closeModal('seen_message')">Close</button>
+                    <button type='submit' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="dropNowModal">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        Please Enter the Fare for this Passenger
+                    </h2>
+
+                    <p>
+                        Full Name : <b id='fullname-modal-title'><!-- PICK UP LOCATION WILL GO HERE --></b> <br>
+                        Pick Up Location : <b id='pick-up-location-modal-title'><!-- PICK UP LOCATION WILL GO HERE --></b> <br>
+                        Destination : <b id='destination-modal-title'><!-- PICK UP LOCATION WILL GO HERE --></b> <br>
+                    </p>
+
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate>
+                        <label class="form-label">Fare for this passenger</label>
+                        <input type='number' name="temp_fare_container" onchange="setFareForPassenger('temp_fare_container');" class="form-control" id='temp_fare_container' placeholder='Enter the fare for this passenger' required />
+
+                   
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 w-100" style='display:none;' id='set-fare-submit-button' onclick="submitDropNowForm('dropNowForm')">Drop Now</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('dropNowModal')">Close</button>
+                    </form>
                 </div>
             </div>
         </div>
 
 
+        {% if account_type == 'Passenger' %}
         <div class="modal-overlay" id="bookCarpoolingModal">
             <div class="modal">
                 <div class="modal-body">
                     <h2 class="modal-title text-sm" id="modal-setRentVan-header">
                         Book Carpooling
                     </h2>
+                    
+                    
+                    <p>
+                        <b id='carpool-available-seats'><!-- AVAILABLE SEATS --></b><br/>
+                        <b id='carpool-from-destination'><!-- FROM DESTINATION --></b><br/>
+                        <b id='carpool-to-destination'><!-- TO DESTINATION --></b><br/>
+                    </p>
 
                     <div id="rent_van" class="carousel slide van-slider" data-bs-ride="carousel">
                         <!-- Indicators/dots -->
@@ -583,52 +888,65 @@
                             <span class="carousel-control-next-icon"></span>
                         </button>
                     </div>
-                    <h2 class="text-center" id='rent-van-brand-name'><!--BRAND NAME WILL BE ASSIGNED HERE--></h2>
-                    <p class="text-center" id='rent-van-plate-no'><!--PLATE NUMBER WILL BE ASSIGNED HERE--></h2>
 
                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                         {% csrf_token %}
-                        <label class="form-label">Package Rent (in Php) starts at</label>
-                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required>
-                        <input type="hidden" name="van_id" class="form-control" id='van_id' required>
+                        <label class="form-label">Number of Seats</label>
+                        <input type='hidden' name="carpool_van_id" class="form-control" id='carpool_van_id' required />
+                        <input type='hidden' name="temp_available_seats_holder" class="form-control" id='temp_available_seats_holder' required />
+                        <input type="number" onchange="checkSelectedNumberOfSeats('seats_occupied', 'temp_available_seats_holder')"; name="seats_occupied" class="form-control" id='seats_occupied' placeholder="Enter your number of seats..." required>
                         
-                        <label class="form-label">From Destination</label>
-                        <select name="from_destination_municipality" class="form-control" required id="from_destination_municipality" onchange="getDestination('from_destination_municipality', 'from_destination')">
-                            {% get_all_municipality as all_municipality %}
-                            <option disabled selected>--- Select City or Municipality --- </option>
-                                {% for municipality in all_municipality %}
-                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
-                                {% endfor %}
-                        </select>
+                        <label class="form-label">Pick Up Location</label>
+                        <input type='text' name="pick_up_location" class="form-control" id='pick_up_location' placeholder='Enter your pick up location' required />
 
-                        <select name="from_destination" class="form-control" required id="from_destination">
-                            <option disabled selected>--- Select From Destination --- </option>
-                        </select>
-
-                        <label class="form-label">To Destination</label>
-                        <select name="to_destination_municipality" class="form-control" required id="to_destination_municipality" onchange="getDestination('to_destination_municipality', 'to_destination')">
-                            {% get_all_municipality as all_municipality %}
-                            <option disabled selected>--- Select City or Municipality --- </option>
-                                {% for municipality in all_municipality %}
-                                    <option value="{{municipality.id}}">--- {{municipality.municipality_name}} --- </option>
-                                {% endfor %}
-                        </select>
-
-                        <select name="to_destination" class="form-control" required id="to_destination">
-                            <option disabled selected>--- Select To Destination --- </option>
-                        </select>
-
-                        <label class="form-label">Travel Date</label>
-                        <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required>
-
+                        <label class="form-label">My Destination</label>
+                        <input type='text' name="my_destination" class="form-control" id='my_destination' placeholder='Enter your destination' required />
 
                         <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Book Now</button>
                         <br/>
-                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('setRentVan')">Close</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('bookCarpoolingModal')">Close</button>
                     </form>
                 </div>
             </div>
         </div>
+        {% endif %}
+
+        {% if account_type == 'Driver' %}
+        <div class="modal-overlay" id="addPassengerModal">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-setRentVan-header">
+                        Add Passenger
+                    </h2>
+                    
+                    <p>
+                        <b id='walkin-available-seats'><!-- AVAILABLE SEATS --></b><br/>
+                        <b id='walkin-from-destination'><!-- FROM DESTINATION --></b><br/>
+                        <b id='walkin-to-destination'><!-- TO DESTINATION --></b><br/>
+                    </p>
+
+                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                        {% csrf_token %}
+                        <label class="form-label">Number of Seats</label>
+                        <input type='hidden' name="walkin_van_id" class="form-control" id='walkin_van_id' required />
+                        <input type='hidden' name="is_walkin" class="form-control" value='True' required />
+                        <input type='hidden' name="walkin_temp_available_seats_holder" class="form-control" id='walkin_temp_available_seats_holder' required />
+                        <input type="number" onchange="checkSelectedNumberOfSeats('walkin_seats_occupied', 'walkin_temp_available_seats_holder')"; name="walkin_seats_occupied" class="form-control" id='walkin_seats_occupied' placeholder="Enter the number of seats..." required>
+                        
+                        <label class="form-label">Pick Up Location</label>
+                        <input type='text' name="walkin_pick_up_location" class="form-control" id='walkin_pick_up_location' placeholder='Enter the pick up location' required />
+
+                        <label class="form-label">Destination</label>
+                        <input type='text' name="walkin_destination" class="form-control" id='walkin_destination' placeholder='Enter the destination' required />
+
+                        <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Add Now</button>
+                        <br/>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('addPassengerModal')">Close</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- JAVASCRIPT FILES -->
         <script src="{% static 'assets/js/jquery.min.js' %}"></script>
@@ -642,26 +960,154 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/display-fetched-images.js' %}"></script> 
         
         <script>
-            function bookCarpooling(carpooling_id){
-
+            function bookCarpoolNow(carpooling_id){
                 fetch(`get-carpooling-information/${carpooling_id}/`)
                     .then(response => response.json())
                     .then(data => {
-                        var available_seats = data['available_seats'];
-                        
-                        const modalOverlay = document.getElementById('bookCarpoolingModal');
-                        const modal = modalOverlay.querySelector(".modal");
-                        modalOverlay.classList.add("active");
-                        modal.classList.add("active");
-                        
+                        if (data['available_seats'] > 0){
+                            displayFetchedImages(data['all_images'])
 
+                            var carpooling_id = data['carpooling_id']
+                            var carpool_van_id = document.getElementById('carpool_van_id');
+                            carpool_van_id.value = carpooling_id
+                        
+                            var available_seats = data['available_seats'];
+                            var available_seats_in_modal = document.getElementById('carpool-available-seats')
+                            available_seats_in_modal.textContent = `Available Seats : ${available_seats}`;
+                            
+                            var temp_available_seats_holder = document.getElementById('temp_available_seats_holder')
+                            temp_available_seats_holder.value = data['available_seats'];
+
+                            var from_destination = data['from_destination'];
+                            var from_destination_in_modal = document.getElementById('carpool-from-destination')
+                            from_destination_in_modal.textContent = `From Destination : ${from_destination}`
+    
+                            var to_destination = data['to_destination'];
+                            var to_destination_in_modal = document.getElementById('carpool-to-destination')
+                            to_destination_in_modal.textContent = `To Destination : ${to_destination}`
+    
+                            const modalOverlay = document.getElementById('bookCarpoolingModal');
+                            const modal = modalOverlay.querySelector(".modal");
+                            modalOverlay.classList.add("active");
+                            modal.classList.add("active");
+                        }
+                        else{
+                            alert('Sorry, it seems like there is no available seats in this carpool.')
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            };
+        </script>
+
+        <script>
+            function checkSelectedNumberOfSeats(input_id, temp_available_seats_container_id){
+                var input_field = document.getElementById(input_id);
+                var temp_available_seats_holder = document.getElementById(temp_available_seats_container_id)
+                
+                if (parseInt(temp_available_seats_holder.value) > 0){
+                    if (parseInt(input_field.value) > 0){
+                        if (parseInt(temp_available_seats_holder.value) < parseInt(input_field.value)){
+                            alert('Sorry, it seems like the number of seats you entered is greater than the available seats!')
+                            input_field.value = ''
+                        }
+                    }
+                    else{
+                        alert('Sorry, it seems like the number of seats you entered is invalid. Please try again!')
+                        input_field.value = ''
+                    }
+                }
+                else{
+                    alert('Sorry, it seems like there is no available seats for you!')
+                    closeModal('bookCarpoolingModal')
+                }
+            }
+        </script>
+
+        <script>
+            function openDropNowModal(modal_id, passenger_name, passenger_pick_up_location, passenger_destination){
+                openModal(modal_id)
+                var full_name_modal_title = document.getElementById('fullname-modal-title')
+                full_name_modal_title.textContent = passenger_name
+
+                var pick_up_location_modal_title = document.getElementById('pick-up-location-modal-title')
+                pick_up_location_modal_title.textContent = passenger_pick_up_location
+
+                var destination_modal_title = document.getElementById('destination-modal-title')
+                destination_modal_title.textContent = passenger_destination
+            }
+
+            function setFareForPassenger(input_id){
+                var temp_fare_container = document.getElementById(input_id);
+
+                if (parseInt(temp_fare_container.value) <= 0){
+                    alert('It seems like the Fare you entered for this passenger is less than 0, resulting to an invalid input. Please enter a number more than 0')
+                    temp_fare_container.value = ''
+
+                    var set_fare_submit_button = document.getElementById('set-fare-submit-button');
+                    set_fare_submit_button.style.display = 'none';
+                }
+                else{
+                    var passenger_fare_holder = document.getElementById('passenger_fare');
+                    passenger_fare_holder.value = parseInt(temp_fare_container.value)
+
+                    var set_fare_submit_button = document.getElementById('set-fare-submit-button');
+                    set_fare_submit_button.style.display = 'block';
+                }
+            }
+        </script>
+
+        <script>
+            function submitDropNowForm(dropNowFormID){
+                var drop_now_form = document.getElementById(dropNowFormID);
+                drop_now_form.submit();
+            }
+        </script>
+
+        <script>
+            function addWalkInPassenger(carpool_id){
+
+                fetch(`get-carpooling-information/${carpool_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        if (data['available_seats'] > 0){
+
+                            var carpooling_id = data['carpooling_id']
+                            var carpool_van_id = document.getElementById('walkin_van_id');
+                            carpool_van_id.value = carpooling_id
+                        
+                            var available_seats = data['available_seats'];
+                            var available_seats_in_modal = document.getElementById('walkin-available-seats')
+                            available_seats_in_modal.textContent = `Available Seats : ${available_seats}`;
+                            
+                            var temp_available_seats_holder = document.getElementById('walkin_temp_available_seats_holder')
+                            temp_available_seats_holder.value = data['available_seats'];
+
+                            var from_destination = data['from_destination'];
+                            var from_destination_in_modal = document.getElementById('walkin-from-destination')
+                            from_destination_in_modal.textContent = `From Destination : ${from_destination}`
+
+                            var to_destination = data['to_destination'];
+                            var to_destination_in_modal = document.getElementById('walkin-to-destination')
+                            to_destination_in_modal.textContent = `To Destination : ${to_destination}`
+
+                            openModal('addPassengerModal')
+                        }
+                        else{
+                            alert('Sorry, it seems like there is no available seats in this carpool.')
+                        }
                     })
                     .catch(error => {
                         console.error("Error:", error);
                     });
             }
         </script>
+
+        
     </body>
 </html>
