@@ -468,9 +468,7 @@
 
                         <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                             {% csrf_token %}
-                            <label class="form-label">Username</label>
-                            <input type="text" name="username" value="{{profile.user_id.username}}" class="form-control" placeholder="Username" required>
-
+                            
                             <label class="form-label">First Name</label>
                             <input type="text" name="fname" value="{{profile.user_id.first_name}}" class="form-control" placeholder="First Name" required>
 

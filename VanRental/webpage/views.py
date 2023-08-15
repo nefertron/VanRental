@@ -335,7 +335,6 @@ def profile(request):
 
 
     if request.method == 'POST':
-        username = request.POST.get('username')
         fname = request.POST.get('fname')
         lname = request.POST.get('lname')
         email = request.POST.get('email')
@@ -364,18 +363,11 @@ def profile(request):
             messages.info(request, f'Sorry, the email you entered is not available. Please try another!')
             return redirect('/profile')
         
-        elif User.objects.filter(username = username).first():
-            messages.info(request, f'Sorry, the username you entered is not available. Please try another!')
-            return redirect('/profile')
 
         else:
-            username = RemoveSpaces(username.lower())
             email = RemoveSpaces(email.lower())
 
             all_changes = []
-
-            if username != context["profile"].user_id.username:
-                all_changes.append('username')
             
             if fname != context["profile"].user_id.first_name:
                 all_changes.append('first name')
@@ -397,8 +389,7 @@ def profile(request):
 
             User.objects.filter(id = request.user.id).update(first_name = fname,
                                         last_name = lname,
-                                        email = email,
-                                        username = username)
+                                        email = email)
 
             context['profile'].bday = bday
             context['profile'].contact_no = contact_no
