@@ -14,6 +14,8 @@
         <title>My Profile | Passenger Connect</title>
 
         <!-- CSS FILES -->        
+        <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,10 +57,12 @@
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
-                            <div class='notification-alert'>
-                                {% get_unseen_notifications user as unseen_notifications %}
-                                {{unseen_notifications}}
-                            </div>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
                         </button>
 
                         <button class="profile-button" onclick="openProfile('mobile');">
@@ -157,10 +161,12 @@
 
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
-                                <div class='notification-alert'>
-                                    {% get_unseen_notifications user as unseen_notifications %}
-                                    {{unseen_notifications}}
-                                </div>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
                             </button>
                             
 
@@ -249,6 +255,7 @@
                                     </div>
                                 </a>
                             </li>
+                            {% if not user.is_superuser %}
                             <li>
                                 <a href="/rent-a-van" class='display-flex'>
                                     <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
@@ -257,6 +264,7 @@
                                     </div>
                                 </a>
                             </li>
+                            {% endif %}
                             {% if not user.is_superuser %}
                             <li>
                                 <a href="/available-carpooling" class='display-flex'>
@@ -350,7 +358,7 @@
                             </li>
                             
                             <li>
-                                <a href="/past-booking" class='display-flex'>
+                                <a href="/rejected-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
                                         Rejected Bookings

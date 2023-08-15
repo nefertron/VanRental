@@ -364,7 +364,7 @@ def profile(request):
             messages.info(request, f'Sorry, the email you entered is not available. Please try another!')
             return redirect('/profile')
         
-        elif User.objects.filter(username = username).count() > 1:
+        elif User.objects.filter(username = username).first():
             messages.info(request, f'Sorry, the username you entered is not available. Please try another!')
             return redirect('/profile')
 
@@ -395,7 +395,7 @@ def profile(request):
             if address != context["profile"].address:
                 all_changes.append('address')
 
-            User.objects.filter().update(first_name = fname,
+            User.objects.filter(id = request.user.id).update(first_name = fname,
                                         last_name = lname,
                                         email = email,
                                         username = username)
@@ -1369,6 +1369,159 @@ def get_carpooling_information(request, id):
 
     return JsonResponse(response)
 
+
+
+def get_chart_values(request, rentalOrCarpooling):
+
+
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    response = {}
+
+    list_of_months = ['Jan', 'Feb', 'Mar', 'Aprl', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+    date_today = datetime.now()
+    year_today = date_today.year
+
+
+    ########## FOR ADMIN ##########
+    if not admin_account is None:
+        if rentalOrCarpooling == 'rental':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_rental = RentedVan.objects.filter(is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+                temp_x_axis.append(all_rental)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+
+
+        elif rentalOrCarpooling == 'carpooling':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool = CarpoolVan.objects.filter(is_done = True, date_recorded__year = year_today, date_recorded__month = i + 1).count()
+                temp_x_axis.append(all_carpool)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+        
+        else:
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool = CarpoolVan.objects.filter(is_done = True, date_recorded__year = year_today, date_recorded__month = i + 1).count()
+                all_rental = RentedVan.objects.filter(is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+                total = all_carpool + all_rental
+
+                temp_x_axis.append(total)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+    ########## FOR ADMIN ##########
+
+    
+    ########## FOR DRIVER ##########
+    elif not driver_account is None:
+        if rentalOrCarpooling == 'rental':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_rental = RentedVan.objects.filter(driver_id = driver_account, is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+
+                temp_x_axis.append(all_rental)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+
+        elif rentalOrCarpooling == 'carpooling':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool = CarpoolVan.objects.filter(driver_id = driver_account, is_done = True, date_recorded__year = year_today, date_recorded__month = i + 1).count()
+
+                temp_x_axis.append(all_carpool)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+        
+        else:
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool = CarpoolVan.objects.filter(driver_id = driver_account, is_done = True, date_recorded__year = year_today, date_recorded__month = i + 1).count()
+                all_rental = RentedVan.objects.filter(driver_id = driver_account, is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+                total = all_carpool + all_rental
+
+                temp_x_axis.append(total)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+    ########## FOR DRIVER ##########
+    
+
+
+    ########## FOR PASSENGER ##########
+    elif not passenger_account is None:
+        if rentalOrCarpooling == 'rental':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_rental = RentedVan.objects.filter(rented_by = passenger_account, is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+
+                temp_x_axis.append(all_rental)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+
+        elif rentalOrCarpooling == 'carpooling':
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool_booking = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True, date_dropped__year = year_today, date_dropped__month = i + 1).count()
+
+                temp_x_axis.append(all_carpool_booking)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+        
+        else:
+            temp_x_axis = []
+            temp_y_axis = []
+
+            for i in range(0, len(list_of_months)):
+                all_carpool_booking = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True, date_dropped__year = year_today, date_dropped__month = i + 1).count()
+                all_rental = RentedVan.objects.filter(rented_by = passenger_account, is_done = True, travel_date__year = year_today, travel_date__month = i + 1).count()
+                total = all_carpool_booking + all_rental
+
+                temp_x_axis.append(total)
+                temp_y_axis.append(list_of_months[i])
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+    ########## FOR PASSENGER ##########
+        
+    
+
+    return JsonResponse(response)
 ############################ THESE ARE USED FOR FETCHING USING JS ####################################################
 
 

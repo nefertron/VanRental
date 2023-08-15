@@ -14,6 +14,8 @@
         <title>Dashboard | Passenger Connect</title>
 
         <!-- CSS FILES -->        
+        <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,10 +56,12 @@
                     <div class="d-lg-none ms-auto me-4">
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
-                            <div class='notification-alert'>
-                                {% get_unseen_notifications user as unseen_notifications %}
-                                {{unseen_notifications}}
-                            </div>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
                         </button>
 
                         <button class="profile-button" onclick="openProfile('mobile');">
@@ -156,10 +160,12 @@
 
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
-                                <div class='notification-alert'>
-                                    {% get_unseen_notifications user as unseen_notifications %}
-                                    {{unseen_notifications}}
-                                </div>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
                             </button>
                             
 
@@ -248,6 +254,7 @@
                                     </div>
                                 </a>
                             </li>
+                            {% if not user.is_superuser %}
                             <li>
                                 <a href="/rent-a-van" class='display-flex'>
                                     <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
@@ -256,6 +263,7 @@
                                     </div>
                                 </a>
                             </li>
+                            {% endif %}
                             {% if not user.is_superuser %}
                             <li>
                                 <a href="/available-carpooling" class='display-flex'>
@@ -349,7 +357,7 @@
                             </li>
                             
                             <li>
-                                <a href="/past-booking" class='display-flex'>
+                                <a href="/rejected-booking" class='display-flex'>
                                     <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
                                     <div class='side-bar-row'>
                                         Rejected Bookings
@@ -418,7 +426,7 @@
 
                         <div class="container">
                             <div class="row">
-                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-4 mb-lg-0">
+                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class="d-flex">
                                             <div>
@@ -434,7 +442,7 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-4 mb-lg-0">
+                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class="d-flex">
                                             <div>
@@ -450,33 +458,71 @@
                                     </div>
                                 </div>
 
-                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-4 mb-lg-0">
+                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class="d-flex">
                                             <div>
-                                                <div class="mb-2">
-                                                    {% get_income_last_month as total_income_last_month %}
-                                                    <h2 style='font-size:1rem;'>Php {{total_income_last_month}}</h2>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <h2 style='font-size:1rem;' class='text-muted'>Income Last Month</h2>
-                                                </div>
+                                                {% user_type_checker user as account_type %}
+                                                {% if account_type == 'Admin' %}
+                                                    <div class="mb-2">
+                                                        {% get_income_last_month as total_income_last_month %}
+                                                        <h2 style='font-size:1rem;'>Php {{total_income_last_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Income Last Month</h2>
+                                                    </div>
+                                                {% elif account_type == 'Driver' %}
+                                                    <div class="mb-2">
+                                                        {% get_my_number_of_travel_last_month user.driveraccount as total_travel_last_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_travel_last_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Travel Last Month</h2>
+                                                    </div>
+                                                {% elif account_type == 'Passenger' %}
+                                                    <div class="mb-2">
+                                                        {% get_my_total_availed_services_last_month user.passengeraccount as total_availed_services_last_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_availed_services_last_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Availed Last Month</h2>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-4 mb-lg-0">
+                                <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class="d-flex">
                                             <div>
-                                                <div class="mb-2">
-                                                    {% get_income_this_month as total_income_this_month %}
-                                                    <h2 style='font-size:1rem;'>Php {{total_income_this_month}}</h2>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <h2 style='font-size:1rem;' class='text-muted'>Income Last Month</h2>
-                                                </div>
+                                                {% user_type_checker user as account_type %}
+                                                {% if account_type == 'Admin' %}
+                                                    <div class="mb-2">
+                                                        {% get_income_this_month as total_income_this_month %}
+                                                        <h2 style='font-size:1rem;'>Php {{total_income_this_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Income This Month</h2>
+                                                    </div>
+                                                {% elif account_type == 'Driver' %}
+                                                    <div class="mb-2">
+                                                        {% get_my_number_of_travel_this_month user.driveraccount as total_travel_this_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_travel_this_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Travel This Month</h2>
+                                                    </div>
+                                                {% elif account_type == 'Passenger' %}
+                                                    <div class="mb-2">
+                                                        {% get_my_total_availed_services_this_month user.passengeraccount as total_availed_services_this_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_availed_services_this_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Availed This Month</h2>
+                                                    </div>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -484,21 +530,19 @@
                             </div>
                         </div>
 
-
-
                         <div class="container">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class='display-flex'>
                                             <h2 style='font-size:1rem;'>Graphs</h2>
-                                            <select name="map_filter" class="form-control" style='width:50%; position:absolute; right:0; margin-right:20px;' required id="map_filter" onchange="">
-                                                <option disabled selected>--- Select Filter --- </option>
-                                                <option value='Carpool'>--- Carpool --- </option>
-                                                <option value='Rental'>--- Rental --- </option>
+                                            <select name="chart_type" class="form-control" style='width:50%; position:absolute; right:0; margin-right:20px;' required id="chart_type">
+                                                <option value="rental" selected>--- Rental ---</option>
+                                                <option value="carpooling">--- Carpooling ---</option>
+                                                <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
                                             </select>
                                         </div><br>
-                                        <canvas id='myChart' />
+                                        <canvas id='myChart'></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -567,8 +611,6 @@
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
-
-
                                         </table>
                                     </div>
                                 </div>
@@ -614,26 +656,75 @@
         
         <script>
             const ctx = document.getElementById('myChart');
-          
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            let currentChartType = 'bar'; // Default chart type
+            let rentalOrCarpooling = 'rental'
+
+            let x_axis = [];
+            let y_axis = [];
+
+            const fetchData = (rentalOrCarpooling) => {
+                fetch(`get-chart-values/${rentalOrCarpooling}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        x_axis = data['x_axis'];
+                        y_axis = data['y_axis'];
+                        console.log(data);
+                        initializeChart();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            }
+
+            function initializeChart() {
+                if (chart) {
+                    chart.destroy();
+                }
+
+                chart = new Chart(ctx, {
+                    type: currentChartType,
+                    data: {
+                        labels: y_axis,
                         datasets: [{
                             label: '# of Votes',
-                            data: [12, 19, 3, 5, 2, 3],
+                            data: x_axis,
                             borderWidth: 1
                         }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
+                });
+            }
+
+            function updateChartType() {
+                const chartTypeSelect = document.getElementById('chart_type');
+                const selectedChartType = chartTypeSelect.value;
+                rentalOrCarpooling = chartTypeSelect.value;
+                fetchData(rentalOrCarpooling);
+
+                if (selectedChartType === 'line') {
+                    currentChartType = 'line';
+                    initializeChart();
+                } else if (selectedChartType === 'bar') {
+                    currentChartType = 'bar';
+                    initializeChart();
                 }
-            });
+            }
+
+            fetchData(rentalOrCarpooling);
+
+            let chart = null; // Initialize chart variable
+
+            const chartTypeSelect = document.getElementById('chart_type');
+            chartTypeSelect.addEventListener('change', updateChartType);
+
         </script>
+
 
         <script>
             function changeRecords(event){

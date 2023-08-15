@@ -31,5 +31,6 @@ urlpatterns = [
     path('pending-driver-info/<id>/', get_pending_driver_info, name='get_pending_driver_info'),
     path('get-address-destination/<id>/', get_destination_address, name='get_destination_address'),
     path('get-carpooling-information/<id>/', get_carpooling_information, name='get_carpooling_information'),
+    path('get-chart-values/<rentalOrCarpooling>/', get_chart_values, name='get_chart_values'),
     # path('test', add_municipality, name='add_municipality'),
 ]

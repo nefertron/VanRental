@@ -79,6 +79,87 @@ def get_income_this_month():
     return overall_income
 
 @register.simple_tag
+def get_my_total_availed_services_last_month(passenger_account):
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+
+    target_month = 0
+    target_year = 0
+    
+
+    if month == 1:
+        target_year = year - 1
+        target_month = 12
+    else:
+        target_year = year
+        target_month = month - 1
+
+        if target_month < 10:
+            target_month = f'0{target_month}'
+        else:
+            target_month = target_month
+
+    all_rental = RentedVan.objects.filter(rented_by = passenger_account, is_done = True, travel_date__year = target_year, travel_date__month = target_month).count()
+    all_carpooling = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True, date_dropped__year = target_year, date_dropped__month = target_month).count()
+    total = all_rental + all_carpooling
+    return total
+
+
+@register.simple_tag
+def get_my_total_availed_services_this_month(passenger_account):
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+    
+    all_rental = RentedVan.objects.filter(rented_by = passenger_account, is_done = True, travel_date__year = year, travel_date__month = month).count()
+    all_carpooling = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True, date_dropped__year = year, date_dropped__month = month).count()
+    total = all_rental + all_carpooling
+    return total
+
+
+@register.simple_tag
+def get_my_number_of_travel_last_month(driver_account):
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+
+    target_month = 0
+    target_year = 0
+    
+
+    if month == 1:
+        target_year = year - 1
+        target_month = 12
+    else:
+        target_year = year
+        target_month = month - 1
+
+        if target_month < 10:
+            target_month = f'0{target_month}'
+        else:
+            target_month = target_month
+
+
+    all_rental = RentedVan.objects.filter(driver_id = driver_account, is_done = True, travel_date__year = target_year, travel_date__month = target_month).count()
+    all_carpooling = CarpoolVan.objects.filter(driver_id = driver_account, is_done = True, date_recorded__year = target_year, date_recorded__month = target_month).count()
+    total = all_rental + all_carpooling
+    return total
+
+
+@register.simple_tag
+def get_my_number_of_travel_this_month(driver_account):
+    date_today = datetime.now()
+    month = date_today.month
+    year = date_today.year
+    
+    all_rental = RentedVan.objects.filter(driver_id = driver_account, is_done = True, travel_date__year = year, travel_date__month = month).count()
+    all_carpooling = CarpoolVan.objects.filter(driver_id = driver_account, is_done = True, date_recorded__year = year, date_recorded__month = month).count()
+    total = all_rental + all_carpooling
+    return total
+
+
+@register.simple_tag
 def get_all_rental_services():
     all_rental_services = RentedVan.objects.filter(is_done = True).all()
     return all_rental_services
