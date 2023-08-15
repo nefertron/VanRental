@@ -1,6 +1,7 @@
 
 
 pip3 install django
+pip3 install django-pwa
 
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 

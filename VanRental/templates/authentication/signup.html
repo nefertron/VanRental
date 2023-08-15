@@ -1,4 +1,6 @@
 {% load static %}
+{% load pwa %}
+{% progressive_web_app_meta %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -103,6 +105,7 @@
                                         {% csrf_token %}
                                         <h4 class="mb-4 pb-2">Signup</h4>
 
+                                        <label class="form-label">Account Type</label>
                                         <select name="user_type" class="form-control" required>
                                             <option disabled selected>--- Choose an account type --- </option>
                                             <option value="passenger">I am a passenger</option>
@@ -112,46 +115,55 @@
                                             Please enter your preferred username.
                                         </div>
 
+                                        <label class="form-label">Username</label>
                                         <input type="text" name="username" class="form-control" placeholder="Username" required>
                                         <div class="invalid-feedback">
                                             Please enter your preferred username.
                                         </div>
 
+                                        <label class="form-label">First Name</label>
                                         <input type="text" name="fname" class="form-control" placeholder="First Name" required>
                                         <div class="invalid-feedback">
                                             Please enter your first name.
                                         </div>
 
+                                        <label class="form-label">Last Name</label>
                                         <input type="text" name="lname" class="form-control" placeholder="Last Name" required>
                                         <div class="invalid-feedback">
                                             Please enter your last name.
                                         </div>
 
+                                        <label class="form-label">Email</label>
                                         <input type="email" name="email" class="form-control" placeholder="Email" required>
                                         <div class="invalid-feedback">
                                             Please enter your email.
                                         </div>
 
+                                        <label class="form-label">Birth Date</label>
                                         <input type="date" name="bday" class="form-control" max="{% now 'Y-m-d' %}" id="birthdate-input" placeholder="Birth Date" required>
                                         <div class="invalid-feedback">
                                             Please enter your birthdate.
                                         </div>
 
+                                        <label class="form-label">Contact No.</label>
                                         <input type="text" name="contact_no" class="form-control" placeholder="Contact No." required>
                                         <div class="invalid-feedback">
                                             Please enter your contact no.
                                         </div>
                                         
+                                        <label class="form-label">Complete Address</label>
                                         <input type="text" name="address" class="form-control" placeholder="Complete Address" required>
                                         <div class="invalid-feedback">
                                             Please enter your complete address
                                         </div>
 
+                                        <label class="form-label">Password</label>
                                         <input type="password" name="pass1" class="form-control" placeholder="Enter your password" required>
                                         <div class="invalid-feedback">
                                             Please enter your password.
                                         </div>
 
+                                        <label class="form-label">Confirm Password</label>
                                         <input type="password" name="pass2" class="form-control" placeholder="Confirm your password" required>
                                         <div class="invalid-feedback">
                                             Confirm your password.

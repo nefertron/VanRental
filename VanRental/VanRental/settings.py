@@ -15,7 +15,7 @@ import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/assets/js', 'serviceworker.js')
 
 
 ################################################ PWA SETUP #######################################################
@@ -24,26 +24,26 @@ PWA_APP_DESCRIPTION = 'Van Rental'
 PWA_APP_THEME_COLOR = '#3cd070'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY = 'standalone'
-PWA_APP_SCOPE = '/index.html'
+PWA_APP_SCOPE = '/index'
 PWA_APP_ORIENTATION = 'any'
-PWA_APP_START_URL = '/index.html'
+PWA_APP_START_URL = '/index'
 PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
         # 'src': 'static/assets/images/dll-ices-icon.png',
-        'src': '',
+        'src': 'static/assets/images/car-pwa-icon.svg',
         'sizes': '160x160'
     }
 ]
 PWA_APP_ICONS_APPLE = [
     {
-        'src': '',
+        'src': 'static/assets/images/car-pwa-icon.svg',
         'sizes': '160x160'
     }
 ]
 PWA_APP_SPLASH_SCREEN = [
     {
-        'src': '',
+        'src': 'static/assets/images/car-pwa-icon.svg',
         'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
     }
 ]
@@ -74,7 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'webpage',
-    # 'pwa',
+    'pwa',
 ]
 
 MIDDLEWARE = [
