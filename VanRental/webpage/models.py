@@ -155,6 +155,18 @@ class Review(models.Model):
 
 
 
+class Messages(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    date_sent = models.DateTimeField(default=datetime.now())
+    date_seen = models.DateTimeField(default=datetime.now())
+    message = models.TextField()
+    message_id = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'SENDER : {self.sender.username} || MESSAGE : {self.message}'
+    
+
 class ListOfMunicipalities(models.Model):
     municipality_name = models.CharField(max_length=255)
 

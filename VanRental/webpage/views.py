@@ -13,6 +13,9 @@ from django.core.mail import send_mail
 from django.http import JsonResponse
 from json import dumps
 import json
+from django.core.serializers import serialize
+from django.utils import timezone
+
 
 from django.db import transaction
 from django.db.models import Sum
@@ -91,13 +94,25 @@ def loginAccount(request, username, password):
 ################ REUSABLE BOOKING DEF FUNCTION
 
 
+################ CALENDAR SAMPLE
+def calendar_view(request):
+    # Retrieve and serialize RentedVan objects with travel_date field
+    rented_vans = RentedVan.objects.all().values('travel_date')
+    booked_dates = [item['travel_date'] for item in rented_vans]
+    
+    # Convert datetime objects to ISO 8601 format
+    iso_dates = [date.strftime('%Y-%m-%dT%H:%M:%SZ') for date in booked_dates]
+
+    booked_dates_json = json.dumps(iso_dates)
+    return render(request, 'messages/calendar.html', {'booked_dates': booked_dates_json})
+
+
 ################ HOME PAGE
 def index(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        package_rent = request.POST.get('package_rent')
         van_id = request.POST.get('van_id')
         from_destination_municipality_id = request.POST.get('from_destination_municipality')
         from_destination = request.POST.get('from_destination')
@@ -115,7 +130,6 @@ def index(request):
 
             create_rent_van = RentedVan.objects.create(plate_no = Van.objects.filter(id = van_id).first(),
                                                         rented_by = request.user.passengeraccount,
-                                                        package_price = package_rent,
                                                         from_destination = f'{from_destination}, {_from_municipality.municipality_name}',
                                                         to_destination = f'{to_destination}, {_to_municipality.municipality_name}',
                                                         travel_date = travel_date,
@@ -1317,7 +1331,7 @@ def rent_a_van(request, id):
     response = {    
         'all_images' : all_images_container,
         'plate_no' : str(van.plate_no),
-        'package_rent' : str(van.package_rent),
+        # 'package_rent' : str(van.package_rent),
         'brand_name' : str(van.brand_name)
     }
 

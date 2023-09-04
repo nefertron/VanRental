@@ -1821,3 +1821,16 @@ blockquote {
   border-radius:50%; 
   font-size:0.80rem;
 }
+
+
+
+.datepicker-days table .disabled-date.day {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.datepicker table tr td.disabled, 
+.datepicker table tr td.disabled:hover {
+  background: #f05c6b;
+  color: #fff;
+}

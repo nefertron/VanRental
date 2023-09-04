@@ -13,6 +13,10 @@
 
         <title>Homepage | Passenger Connect</title>
 
+        <!-- Bootstrap Datepicker CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker3.standalone.min.css">
+    
+
         <!-- CSS FILES -->        
         <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
 
@@ -27,11 +31,9 @@
         <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
 
         <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
-
     </head>
     
     <body id="top">
-
         <main>
             <nav class="navbar navbar-expand-lg">
                 <div class="container">
@@ -553,8 +555,8 @@
                                                     <div class="d-flex">
                                                         <div>
                                                             <h5>{{this_van.brand_name}}</h5>
-                                                            <h6 style="font-size:1rem;">Php {{this_van.package_rent}}</h6>
-                                                            <p class="mb-2">Price starts at</p>
+                                                            {% comment %} <h6 style="font-size:1rem;">Php {{this_van.package_rent}}</h6>
+                                                            <p class="mb-2">Price starts at</p> {% endcomment %}
 
                                                             <p class="mb-0">Plate No. : {{this_van.plate_no}}</p>
                                                         </div>
@@ -618,7 +620,7 @@
                                                         {% if user.is_authenticated %}
                                                             {% user_type_checker user as user_type %}
                                                             {% if user_type == 'Passenger' %}
-                                                                <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{this_van.id}}" onclick="setRent(this, '{{this_van.plate_no}}', '{{this_van.package_rent}}')">Status : Available</button>
+                                                                <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{this_van.id}}" onclick="setRent(this, '{{this_van.plate_no}}')">Status : Available</button>
                                                             {% endif %}
                                                         {% else %}
                                                             <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('loginFirst')">Status : Available</button>
@@ -1329,8 +1331,8 @@
 
                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                         {% csrf_token %}
-                        <label class="form-label">Package Rent (in Php) starts at</label>
-                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required>
+                        {% comment %} <label class="form-label">Package Rent (in Php) starts at</label>
+                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required> {% endcomment %}
                         <input type="hidden" name="van_id" class="form-control" id='van_id' required>
                         
                         <label class="form-label">From Destination</label>
@@ -1360,7 +1362,8 @@
                         </select>
 
                         <label class="form-label">Travel Date</label>
-                        <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required>
+                        <input id="scheduleDate" name="travel_date" class="form-control"  placeholder="Enter the date" required/>
+                        {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
 
 
                         <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Book Now</button>
@@ -1407,7 +1410,7 @@
         <script src="{% static 'assets/js/book-date-checker.js' %}"></script> 
 
         <script>
-            function setRent(button, plate_no, package_rent){
+            function setRent(button, plate_no){ //package_rent
                 var rent_data_id = button.getAttribute('rent-data-id');
                 openModal('setRentVan')
 
@@ -1421,8 +1424,8 @@
                         var plate_no = document.getElementById('rent-van-plate-no');
                         plate_no.textContent = `Plate No. : ${data['plate_no']}`
 
-                        var package_rent = document.getElementById('package_rent');
-                        package_rent.value = data['package_rent']
+                        //var package_rent = document.getElementById('package_rent');
+                        //package_rent.value = data['package_rent']
 
                         var van_id = document.getElementById('van_id');
                         van_id.value = rent_data_id;
@@ -1468,5 +1471,37 @@
 
             }
         </script>
+
+        <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    
+    <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap Datepicker JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script>
+        {% get_unavailable_dates as unavailable_dates %}
+        console.log(JSON.parse('{{ unavailable_dates|safe }}'))
+        
+        var datesForDisable = JSON.parse('{{ unavailable_dates|safe }}');
+    
+        $("[id^='scheduleDate']").datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            weekStart: 1,
+            calendarWeeks: true,
+            todayHighlight: true,
+            datesDisabled: datesForDisable,
+            startDate: new Date()
+        });
+    </script>
+    
+
     </body>
 </html>

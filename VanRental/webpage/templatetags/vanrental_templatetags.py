@@ -2,6 +2,8 @@ from django import template
 from ..models import *
 from django.db.models import Q
 from django.db.models import Sum
+from json import dumps
+import json
 
 register = template.Library()
 
@@ -21,6 +23,20 @@ def user_type_checker(user):
     else:
         return None
 
+
+
+@register.simple_tag
+def get_unavailable_dates():
+    rented_van = RentedVan.objects.all()
+
+    temp_storage = []
+    for van in rented_van:
+        # Format the date as "YYYY-MM-DD" string and append to the list
+        formatted_date = van.travel_date.strftime('%Y-%m-%d')
+        temp_storage.append(formatted_date)
+
+    # Convert the list to a JSON string
+    return json.dumps(temp_storage)
 
 
 

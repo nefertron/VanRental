@@ -24,7 +24,7 @@ urlpatterns = [
     path('rejected-booking', rejected_booking, name='rejected_booking'),
     path('pending-booking', pending_booking, name='pending_booking'),
     path('cancelled-booking', cancelled_booking, name='cancelled_booking'),
-
+    path('calendar_view', calendar_view, name='calendar_view'),
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),
     path('open/notification/<id>/', open_notification, name='open_notification'),
     path('approve-pending-driver/<id>/', approve_pending_driver, name='approve_pending_driver'),

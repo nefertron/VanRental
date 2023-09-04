@@ -40,12 +40,12 @@
                     {% if user.is_authenticated %}
                         <button class='menu-button' id="menu-btn" onclick="openSideBar();">
                             <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
-                            <span>Passenger Connect</span>
+                            {% comment %} <span>Passenger Connect</span> {% endcomment %}
                         </button>
 
                         <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
                             <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
-                            <span>Passenger Connect</span>
+                            {% comment %} <span>Passenger Connect</span> {% endcomment %}
                         </button>
                     {% else %}
                         <button class='menu-button'>
@@ -56,6 +56,16 @@
 
                     {% if user.is_authenticated %}
                     <div class="d-lg-none ms-auto me-4">
+                        <button class="profile-button" onclick="openMessage('mobile');">
+                            <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
                             {% get_unseen_notifications user as unseen_notifications %}
@@ -92,6 +102,22 @@
                                 </li>
                             </ul>
                         </div>
+
+                        <div class="message-box mr-20" id="my-message-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Messages
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    <li  class="custom-button">
+                                        <p>Hello world</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
 
                         <div class="message-box mr-20" id="my-notification-mobile">
                             <div class='message-box-header'>
@@ -160,6 +186,17 @@
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
 
+                            <button class="profile-button" onclick="openMessage('desktop');">
+                                <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+                            
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
                                 {% get_unseen_notifications user as unseen_notifications %}
@@ -202,6 +239,26 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>Hello world asdf  asdfasdfasdfasdfasdfasdf </p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>Aug 09, 2023</i></p>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
 
                             <div class="message-box mr-100" id="my-notification-desktop">
