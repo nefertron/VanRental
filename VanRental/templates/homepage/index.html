@@ -1362,8 +1362,13 @@
                             <option disabled selected>--- Select To Destination --- </option>
                         </select>
 
-                        <label class="form-label">Travel Date</label>
-                        <input id="scheduleDate" name="travel_date" class="form-control"  placeholder="Enter the date" required/>
+                        <label class="form-label">Travel Date (From)</label>
+                        <input id="travelDateFrom" onchange="openTravelDateTo()" name="travel_date_from" class="form-control"  placeholder="Enter your Travel Date (FROM)" required/>
+                        {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
+
+
+                        <label class="form-label">Travel Date (To)</label>
+                        <input id="travelDateTo" onchange="chooseTravelDateTo()" disabled name="travel_date_to" class="form-control"  placeholder="Enter your Travel Date (TO)" required/>
                         {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
 
 
@@ -1413,6 +1418,7 @@
         <script>
             function setRent(button, plate_no){ //package_rent
                 var rent_data_id = button.getAttribute('rent-data-id');
+
                 openModal('setRentVan')
 
                 fetch(`rent-a-van/${rent_data_id}/`)
@@ -1436,53 +1442,143 @@
                         console.error("Error:", error);
                     });
 
+
                 fetch(`get-unavailable-dates/${rent_data_id}/`)
                     .then(response => response.json())
                     .then(data =>{
-
                         var datesForDisable = data;
                         
-                        console.log('dates to disable', rent_data_id, '', datesForDisable)
+                        console.log('From dates disabled', rent_data_id, '', datesForDisable)
                         
-                        var datePicker = $("[id^='scheduleDate']").datepicker({
+                        const config = {
                             format: 'yyyy-mm-dd',
                             autoclose: true,
                             weekStart: 1,
                             calendarWeeks: true,
                             todayHighlight: true,
-                            datesDisabled: datesForDisable,
+                            datesDisabled: data,
                             startDate: new Date()
-                        });
+                        }
+
+                        $("[id^='travelDateFrom']").datepicker(config);
+                    })
+
+            }
+            
+            function openTravelDateTo(){
+                $("[id^='travelDateTo']").datepicker('destroy'); 
+                const van_id = document.getElementById('van_id').value;
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value
+
+                const travelDateTo = document.getElementById('travelDateTo');
+                travelDateTo.disabled = false
+                travelDateTo.value = ''
+
+                const allDisabledDates = []
+
+                fetch(`get-unavailable-dates/${van_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+
+                        for (var x = 0; x < data.length; x++){
+                            allDisabledDates.push(data[x])
+                        }
+
+                        var endDate = new Date(travelDateFrom.value);
+                        var today = new Date();
+                        var dateArray = [];
+
+                        while (today <= endDate) {
+                            allDisabledDates.push(today.toISOString().split('T')[0]);
+                            today.setDate(today.getDate() + 1);
+                        }
+                        
+                        const config = {
+                            format: 'yyyy-mm-dd',
+                            autoclose: true,
+                            weekStart: 1,
+                            calendarWeeks: true,
+                            todayHighlight: true,
+                            datesDisabled: allDisabledDates,
+                            startDate: new Date()
+                        }
+
+                        console.log('To dates disabled', allDisabledDates)
+
+                        $("[id^='travelDateTo']").datepicker(config);
+
+                        if (allDisabledDates.includes(travelDateFrom.value)){
+                            alert('Please select another date. The date you entered is shaded with red!')
+                            travelDateFrom.value=''
+                        }
                     })
             }
 
-            
-            
-            
+
+            // this code will get all the future dates from the time the user set its travel date
+            function chooseTravelDateTo(){
+                const van_id = document.getElementById('van_id').value;
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value
+
+                const travelDateTo = document.getElementById('travelDateTo');
+
+                const allDisabledDates = []
+
+                fetch(`get-unavailable-dates/${van_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+
+                        for (var x = 0; x < data.length; x++){
+                            allDisabledDates.push(data[x])
+                        }
+
+                        var endDate = new Date(travelDateFrom.value);
+                        var today = new Date();
+                        var dateArray = [];
+
+                        while (today <= endDate) {
+                            allDisabledDates.push(today.toISOString().split('T')[0]);
+                            today.setDate(today.getDate() + 1);
+                        }
+
+                        if (allDisabledDates.includes(travelDateTo.value)){
+                            alert('Please select another date. The date you entered is shaded with red!')
+                            travelDateTo.value=''
+                        }
+                    })
+            }
+        </script>
+
+
+        <script>
 
 
         </script>
 
         <script>
             function closeRentModal(overlayId) {
-                var datePicker = $("[id^='scheduleDate']").datepicker({
-                    format: 'yyyy-mm-dd',
-                    autoclose: true,
-                    weekStart: 1,
-                    calendarWeeks: true,
-                    todayHighlight: true,
-                    datesDisabled: datesForDisable,
-                    startDate: new Date()
-                });
+                $("[id^='travelDateFrom']").datepicker('destroy'); 
+                $("[id^='travelDateTo']").datepicker('destroy'); 
 
-                datePicker.data('datepicker').setDatesDisabled([]);
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value = '';
 
+                const travelDateTo = document.getElementById('travelDateTo');
+                travelDateTo.disabled = true;
+                travelDateTo.value = '';
+
+                
+                
                 const modalOverlay = document.getElementById(overlayId);
                 const modal = modalOverlay.querySelector(".modal");
                 modalOverlay.classList.remove("active");
                 modal.classList.remove("active");
             }
+
         </script>
+
 
         <script>
             function getDestination(parent_id, child_id){
@@ -1517,7 +1613,6 @@
                     });
 
             }
-
         </script>
 
         
