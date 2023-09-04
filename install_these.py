@@ -9,6 +9,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned
 TIMER:
     Sept 4  
         1 : 30 - 5 : 00
+        8 : 00 - 
 
 
 # icon source

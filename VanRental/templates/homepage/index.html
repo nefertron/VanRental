@@ -614,7 +614,8 @@
                                                         <p class="mb-0">No. of carpooling service : {{van_services.1}}</p>
                                                     </div>
 
-                                                    {% if this_van.is_rented == True %}
+                                                    {% van_availability_checker this_van as is_available %}
+                                                    {% if is_available == False %}
                                                         <button class="btn custom-btn mt-2 mt-lg-3 btn-danger" rent-data-id="{{this_van.id}}" disabled>Status : Unavailable</button>
                                                     {% else %}
                                                         {% if user.is_authenticated %}
@@ -1368,7 +1369,7 @@
 
                         <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Book Now</button>
                         <br/>
-                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('setRentVan')">Close</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeRentModal('setRentVan')">Close</button>
                     </form>
                 </div>
             </div>
@@ -1434,6 +1435,52 @@
                     .catch(error => {
                         console.error("Error:", error);
                     });
+
+                fetch(`get-unavailable-dates/${rent_data_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+
+                        var datesForDisable = data;
+                        
+                        console.log('dates to disable', rent_data_id, '', datesForDisable)
+                        
+                        var datePicker = $("[id^='scheduleDate']").datepicker({
+                            format: 'yyyy-mm-dd',
+                            autoclose: true,
+                            weekStart: 1,
+                            calendarWeeks: true,
+                            todayHighlight: true,
+                            datesDisabled: datesForDisable,
+                            startDate: new Date()
+                        });
+                    })
+            }
+
+            
+            
+            
+
+
+        </script>
+
+        <script>
+            function closeRentModal(overlayId) {
+                var datePicker = $("[id^='scheduleDate']").datepicker({
+                    format: 'yyyy-mm-dd',
+                    autoclose: true,
+                    weekStart: 1,
+                    calendarWeeks: true,
+                    todayHighlight: true,
+                    datesDisabled: datesForDisable,
+                    startDate: new Date()
+                });
+
+                datePicker.data('datepicker').setDatesDisabled([]);
+
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
             }
         </script>
 
@@ -1470,7 +1517,10 @@
                     });
 
             }
+
         </script>
+
+        
 
         <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
@@ -1483,24 +1533,6 @@
 
     <!-- Bootstrap Datepicker JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
-
-
-    <script>
-        {% get_unavailable_dates as unavailable_dates %}
-        console.log(JSON.parse('{{ unavailable_dates|safe }}'))
-        
-        var datesForDisable = JSON.parse('{{ unavailable_dates|safe }}');
-    
-        $("[id^='scheduleDate']").datepicker({
-            format: 'yyyy-mm-dd',
-            autoclose: true,
-            weekStart: 1,
-            calendarWeeks: true,
-            todayHighlight: true,
-            datesDisabled: datesForDisable,
-            startDate: new Date()
-        });
-    </script>
     
 
     </body>

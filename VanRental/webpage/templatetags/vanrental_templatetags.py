@@ -25,20 +25,20 @@ def user_type_checker(user):
 
 
 
+
+
 @register.simple_tag
-def get_unavailable_dates():
-    rented_van = RentedVan.objects.all()
+def van_availability_checker(van):
+    date_today = datetime.now().strftime('%Y-%m-%d')
 
-    temp_storage = []
-    for van in rented_van:
-        # Format the date as "YYYY-MM-DD" string and append to the list
-        formatted_date = van.travel_date.strftime('%Y-%m-%d')
-        temp_storage.append(formatted_date)
+    if RentedVan.objects.filter(plate_no = van, travel_date = date_today).first():
+        return False
+    else:
+        return True
 
-    # Convert the list to a JSON string
-    return json.dumps(temp_storage)
+    
 
-
+    
 
 @register.simple_tag
 def get_income_last_month():

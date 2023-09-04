@@ -1529,6 +1529,22 @@ def get_chart_values(request, rentalOrCarpooling):
     
 
     return JsonResponse(response)
+
+
+
+
+def get_unavailable_dates(request, id):
+    rented_van = RentedVan.objects.filter(plate_no__id = id).all()
+
+    temp_storage = []
+    for van in rented_van:
+        # Format the date as "YYYY-MM-DD" string and append to the list
+        formatted_date = van.travel_date.strftime('%Y-%m-%d')
+        temp_storage.append(formatted_date)
+
+    # Convert the list to a JSON string
+    return JsonResponse(temp_storage, safe=False)
+
 ############################ THESE ARE USED FOR FETCHING USING JS ####################################################
 
 
