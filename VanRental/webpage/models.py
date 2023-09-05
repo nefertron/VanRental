@@ -88,7 +88,10 @@ class RentedVan(models.Model):
     package_price = models.IntegerField(default=0)
     from_destination = models.TextField()
     to_destination = models.TextField()
+
     travel_date = models.DateTimeField()
+    travel_date_end = models.DateTimeField(default=None, null=True, blank=True)
+
     date_recorded = models.DateTimeField(default=datetime.now())
     is_confirmed = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)

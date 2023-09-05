@@ -57,7 +57,10 @@ def loginAccount(request, username, password):
                 if passenger_account or admin_account or driver_account:
                     login(request, user)
                     messages.info(request, 'You logged in successfully!')
-                    return redirect('/index')
+                    if passenger_account:
+                        return redirect('/index')
+                    else:
+                        return redirect('/index')
                 else:
                     if passenger_account:
                         messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
@@ -81,7 +84,11 @@ def loginAccount(request, username, password):
                 if passenger_account or admin_account or driver_account:
                     login(request, user)
                     messages.info(request, 'You logged in successfully!')
-                    return redirect('/index')
+
+                    if passenger_account:
+                        return redirect('/index')
+                    else:
+                        return redirect('/dashboard')
                 else:
                     if passenger_account:
                         messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
@@ -94,17 +101,25 @@ def loginAccount(request, username, password):
 ################ REUSABLE BOOKING DEF FUNCTION
 
 
-################ CALENDAR SAMPLE
-def calendar_view(request):
-    # Retrieve and serialize RentedVan objects with travel_date field
-    rented_vans = RentedVan.objects.all().values('travel_date')
-    booked_dates = [item['travel_date'] for item in rented_vans]
-    
-    # Convert datetime objects to ISO 8601 format
-    iso_dates = [date.strftime('%Y-%m-%dT%H:%M:%SZ') for date in booked_dates]
+################ TRAVEL DATE CONVERTER
+def convertTravelDateFrom(date, time):
+    travel_date_start = datetime.strptime(date, '%Y-%m-%d')
+    start_time = datetime.strptime(time, '%I:%M %p').time()
 
-    booked_dates_json = json.dumps(iso_dates)
-    return render(request, 'messages/calendar.html', {'booked_dates': booked_dates_json})
+    complete_travel_date_start = datetime.combine(travel_date_start, start_time)
+
+    return complete_travel_date_start
+
+
+def convertTravelDateTo(date, time):
+    travel_date_end = datetime.strptime(date, '%Y-%m-%d')
+    end_time = datetime.strptime(time, '%I:%M %p').time()
+    
+    complete_travel_date_end = datetime.combine(travel_date_end, end_time)
+
+    return complete_travel_date_end
+################ TRAVEL DATE CONVERTER
+
 
 
 ################ HOME PAGE
@@ -118,7 +133,12 @@ def index(request):
         from_destination = request.POST.get('from_destination')
         to_destination_municipality_id = request.POST.get('to_destination_municipality')
         to_destination = request.POST.get('to_destination')
-        travel_date = request.POST.get('travel_date')
+
+        travel_start_date = request.POST.get('travel_date_start')
+        time_start = request.POST.get('time_start')
+        
+        travel_end_date = request.POST.get('travel_date_end')
+        time_end = request.POST.get('time_end')
 
 
         if username and password:
@@ -128,11 +148,15 @@ def index(request):
             _from_municipality = ListOfMunicipalities.objects.filter(id = from_destination_municipality_id).first()
             _to_municipality = ListOfMunicipalities.objects.filter(id = to_destination_municipality_id).first()
 
+            travel_date_from = convertTravelDateFrom(travel_start_date, time_start)
+            travel_date_to = convertTravelDateTo(travel_end_date, time_end)
+
             create_rent_van = RentedVan.objects.create(plate_no = Van.objects.filter(id = van_id).first(),
                                                         rented_by = request.user.passengeraccount,
                                                         from_destination = f'{from_destination}, {_from_municipality.municipality_name}',
                                                         to_destination = f'{to_destination}, {_to_municipality.municipality_name}',
-                                                        travel_date = travel_date,
+                                                        travel_date = travel_date_from,
+                                                        travel_date_end = travel_date_to,
                                                         date_recorded = datetime.now())
             create_rent_van.rent_id = f'RENT{create_rent_van.id}'
             create_rent_van.save()
@@ -145,10 +169,11 @@ def index(request):
             create_notification(request, request.user, message)
 
             admin_account = User.objects.filter(is_superuser = True).first()
-            message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date}. Please visit the booking section for more details.'
+            message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date_from}. Please visit the booking section for more details.'
             create_notification(request, admin_account, message_to_admin)
 
             messages.info(request, message)
+
             return redirect('/pending-booking')
 
 

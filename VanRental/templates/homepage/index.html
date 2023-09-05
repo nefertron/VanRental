@@ -15,7 +15,9 @@
 
         <!-- Bootstrap Datepicker CSS -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker3.standalone.min.css">
-    
+        <!-- Include Bootstrap DateTimePicker CDN -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"rel="stylesheet">
+     
 
         <!-- CSS FILES -->        
         <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
@@ -1363,12 +1365,28 @@
                         </select>
 
                         <label class="form-label">Travel Date (From)</label>
-                        <input id="travelDateFrom" onchange="openTravelDateTo()" name="travel_date_from" class="form-control"  placeholder="Enter your Travel Date (FROM)" required/>
-                        {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
+                        <div class='row'>
+                            <div class="col-md-6">
+                                <input id="travelDateFrom" onchange="openTravelDateTo()" name="travel_date_start" class="form-control"  placeholder="Enter your Travel Date (FROM)" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" id="datetimeFrom" name="time_start"/>
+                            </div>
+                        </div>
+                                {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
+
 
 
                         <label class="form-label">Travel Date (To)</label>
-                        <input id="travelDateTo" onchange="chooseTravelDateTo()" disabled name="travel_date_to" class="form-control"  placeholder="Enter your Travel Date (TO)" required/>
+                        <div class='row'>
+                            <div class="col-md-6">
+                                <input id="travelDateTo" onchange="chooseTravelDateTo()" disabled name="travel_date_end" class="form-control"  placeholder="Enter your Travel Date (TO)" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" id="datetimeTo" name="time_end" />
+                            </div>
+                        </div>
+
                         {% comment %} <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required> {% endcomment %}
 
 
@@ -1518,11 +1536,14 @@
 
             // this code will get all the future dates from the time the user set its travel date
             function chooseTravelDateTo(){
+
                 const van_id = document.getElementById('van_id').value;
                 const travelDateFrom = document.getElementById('travelDateFrom');
                 travelDateFrom.value
 
                 const travelDateTo = document.getElementById('travelDateTo');
+
+                
 
                 const allDisabledDates = []
 
@@ -1615,7 +1636,28 @@
             }
         </script>
 
-        
+        <!-- Include Bootstrap CDN -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+        <!-- Include Moment.js CDN -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+
+        <script>
+            $('#datetimeFrom').datetimepicker({
+                format: 'hh:mm a'
+            });
+        </script>
+
+        <script>
+            $('#datetimeTo').datetimepicker({
+                format: 'hh:mm a'
+            });
+        </script>
+
 
         <!-- jQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
@@ -1628,6 +1670,9 @@
 
     <!-- Bootstrap Datepicker JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+    
+    
+
     
 
     </body>
