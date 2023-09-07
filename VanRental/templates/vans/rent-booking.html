@@ -456,7 +456,13 @@
                                                     <div class='mb-2 line-height-5'>
                                                         <p><b>Booking Information : </b></p>
                                                             <div class='ml-10'>
-                                                                <p><b>Budget :</b> {{pending_booking.package_price}} php</p>
+                                                                <p><b>Rent :</b> 
+                                                                    {% if pending_booking.package_price > 0 %}
+                                                                        {{pending_booking.package_price}} php
+                                                                    {% else %}
+                                                                        Not Set
+                                                                    {% endif %}
+                                                                </p>
                                                                 <p><b>From Destination :</b> {{pending_booking.from_destination}} </p>
                                                                 <p><b>To Destination :</b> {{pending_booking.to_destination}} </p>
                                                                 <p><b>Preferred Schedule :</b> {{pending_booking.travel_date.date}} </p>
@@ -540,9 +546,26 @@
                                                         {% endfor %}
                                                     </select>
                                                 </form>
-                                                
+
+
+                                                <form id='setPriceBookingForm' method='POST'>
+                                                    {% csrf_token %}
+                                                    <input type='hidden' name='booking_id' id='booking_id' value='{{pending_booking.id}}' />
+                                                    
+                                                    <label class="form-label" style='display: none;' id="set_rent_{{pending_booking.id}}">Set the rent
+                                                        <input type="text" name="package_rent" class="form-control" placeholder="Set the rent..." required>
+                                                    </label>   
+                                                </form>
+
                                                 <button class="btn custom-btn mt-2 mt-lg-3" id='submitButton_{{pending_booking.id}}' style='display:none;' onclick="submitApproveBookingForm('approveBookingForm_modal_{{pending_booking.id}}');" >Submit</button>
-                                                <button class="btn custom-btn mt-2 mt-lg-3" id='approveButton_{{pending_booking.id}}' onclick="openBookingModal('{{pending_booking.id}}');">Approve</button>
+                                                
+                                                <button class="btn custom-btn mt-2 mt-lg-3" id='submitSetPriceButton_{{pending_booking.id}}' style='display:none;' onclick="submitApproveBookingForm('setPriceBookingForm_modal_{{pending_booking.id}}');" >Submit</button>
+
+                                                {% if pending_booking.package_price > 0 %}
+                                                    <button class="btn custom-btn mt-2 mt-lg-3" id='approveButton_{{pending_booking.id}}' onclick="openBookingModal('{{pending_booking.id}}');">Approve</button>
+                                                {% else %}
+                                                    <button class="btn custom-btn mt-2 mt-lg-3" id='setPriceButton_{{pending_booking.id}}' onclick="setPriceBookingModal('{{pending_booking.id}}');">Set Price</button>
+                                                {% endif %}
                                                 <button class="custom-btn mt-2 mt-lg-3 btn-danger" id='rejectButton_{{pending_booking.id}}' onclick="openRejectBookingModal('{{pending_booking.id}}');">Reject</button>
                                             </div>
                                         </div>
@@ -608,6 +631,23 @@
             </div>
         </div>
 
+        <div class="modal-overlay" id="set_price_booking" style='height: 100vh;'>
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm">
+                        Set Price For This Booking
+                    </h2>
+                    
+                    <div id="set-price-booking-body-holder" style='height: 100vh;'>
+                        <!-- this will be changed once the admin proceeds -->
+                    </div>
+                    
+                    <input type='hidden' name='modal_id' id='modal_id'/>
+                    <button class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeSetPriceBookingModal('set_price_booking')">Close</button>
+                </div>
+            </div>
+        </div>
+
 
         <div class="modal-overlay" id="reject_booking">
             <div class="modal">
@@ -644,7 +684,8 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
-        
+        <script>
+        </script>
         <script>
             function openBookingModal(rent_id){
                 var rejectButton = document.getElementById(`rejectButton_${rent_id}`);
@@ -673,6 +714,8 @@
                 modal_id.value = rent_id;
             }
 
+
+
                         
             function closeBookingModal(modal_id) {
                 var modal_number = document.getElementById('modal_id');
@@ -697,6 +740,61 @@
                 modalOverlay.classList.remove("active");
                 modal.classList.remove("active");
             }
+
+            
+            function setPriceBookingModal(rent_id){
+                var rejectButton = document.getElementById(`rejectButton_${rent_id}`);
+                rejectButton.style.display = "none";
+
+                var approveButton = document.getElementById(`setPriceButton_${rent_id}`);
+                approveButton.style.display = "none";
+
+                var set_rent = document.getElementById(`set_rent_${rent_id}`);
+                set_rent.style.display = 'block';
+
+                var submitButton = document.getElementById(`submitSetPriceButton_${rent_id}`);
+                submitButton.style.display = "block";
+
+                var content_of_parent_booking_div = document.getElementById(`pending_booking_${rent_id}`).innerHTML;
+                var modifiedContent = content_of_parent_booking_div.replace(/id="setPriceBookingForm/g, `id="setPriceBookingForm_modal_${rent_id}`);
+
+                var approve_booking_body_holder = document.getElementById('set-price-booking-body-holder').innerHTML = modifiedContent;
+                
+                const modalOverlay = document.getElementById('set_price_booking');
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+
+                var modal_id = document.getElementById('modal_id');
+                modal_id.value = rent_id;
+            }
+
+            function closeSetPriceBookingModal(modal_id) {
+                var modal_number = document.getElementById('modal_id');
+                rent_id = modal_number.value;
+
+                var rejectButton = document.getElementById(`rejectButton_${rent_id}`);
+                rejectButton.style.display = "block";
+
+                var approveButton = document.getElementById(`setPriceButton_${rent_id}`);
+                approveButton.style.display = "block";
+
+                var submitButton = document.getElementById(`submitSetPriceButton_${rent_id}`);
+                if (submitButton.classList.contains('block')){
+                    submitButton.style.display = "none";
+                }
+
+                var set_rent = document.getElementById(`set_rent_${rent_id}`);
+                set_rent.style.display = 'none';
+
+                var approve_booking_body_holder = document.getElementById('set-price-booking-body-holder').innerHTML = '';
+
+                const modalOverlay = document.getElementById(modal_id);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+
 
             function openRejectBookingModal(booking_id){
                 const modalOverlay = document.getElementById('reject_booking');

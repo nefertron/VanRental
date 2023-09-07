@@ -414,7 +414,8 @@
                             <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Messages</li>
+                                    <li class="breadcrumb-item"><a href="/messages">Messages</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Menard</li>
                                 </ol>
                             </nav>
                         </div>
@@ -428,37 +429,114 @@
 
                         <div class="container">
                             <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5 mt-3">
-                                <div class="d-flex">
-                                    <div class="table-responsive table-x-overflow">
-                                        <table class="table table-striped table-full">
-                                            <tbody>
-                                                <td>
-                                                    <img src="{% static 'assets/images/default-profile.png' %}" style='margin-left: 20px; height: 40px; width: 40px;'/>
-                                                </td>
-                                                <td style="margin-top: auto; margin-bottom: auto;">
-                                                    <p>
-                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt, est?
-                                                        <br>
-                                                        <span>Aug 08, 2023</span>
-                                                    </p>
-                                                </td>
-                                            </tbody>
+                                <h2 style='font-size:1rem;'>{{convo_with.first_name}} {{convo_with.last_name}}</h2>
+                                    
+                                <div style='height: 500px; overflow-y: auto; padding: 10px;'>
+                                    {% if all_messages|length > 0 %}
+                                        {% for msg in all_messages %}
+                                            {% if msg.sender == user %}
+                                                <div class='message-right'>
+                                                    <div class='message-right-box'>
+                                                        <h6 style="font-size: 0.875rem;">
+                                                            {{msg.sender.first_name}} {{msg.sender.last_name}}
+                                                        </h6>
+                                                        
+                                                        <p style="font-size: 0.75rem;">
+                                                            {{msg.message}}
+                                                        </p>
+                                                    
+                                                        <p style="font-size: 0.75rem;">
+                                                            {{msg.date_sent}}
+                                                        </p>
+                                                    </div>
+                                                    {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='message-right-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-right-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='message-right-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-right-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='message-right-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-right-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            {% else %}
+                                                <div class='message-left'>
+                                                    {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='message-left-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-left-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='message-left-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-left-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='message-left-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-left-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
 
-                                            <tbody>
-                                                <td>
-                                                    <img src="{% static 'assets/images/default-profile.png' %}" style='margin-left: 20px; height: 40px; width: 40px;'/>
-                                                </td>
-                                                <td style="margin-top: auto; margin-bottom: auto;">
-                                                    <p>
-                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt, est?
-                                                        <br>
-                                                        <span>Aug 08, 2023</span>
-                                                    </p>
-                                                </td>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                    <div class='message-left-box'>
+                                                        <h6 style="font-size: 0.875rem;">
+                                                            {{msg.sender.first_name}} {{msg.sender.last_name}}
+                                                        </h6>
+                                                        
+                                                        <p style="font-size: 0.75rem;">
+                                                            {{msg.message}}
+                                                        </p>
+                                                    
+                                                        <p style="font-size: 0.75rem;">
+                                                            {{msg.date_sent}}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                    {% else %}
+                                        <div class='message-right'>
+                                            <div class='message-right-box'>
+                                                <h6 style="font-size: 0.875rem;">
+                                                    No message
+                                                </h6>
+                                                
+                                                <p style="font-size: 0.75rem;">
+                                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sunt, est?
+                                                </p>
+                                            
+                                                <p style="font-size: 0.75rem;">
+                                                    Aug. 10, 2023 3:00 pm
+                                                </p>
+                                            </div>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" class='message-right-profile' style='bottom: 0;'/>
+                                        </div>
+                                    {% endif %}
                                 </div>
+
+                                <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                    {% csrf_token %}
+                                    <div class="new-message-container">
+                                        <input type="text" name="new_message" class="form-control message-input " id="van_id" required>
+                                        <button type="submit" class="message-submit-button" style='width: 40px; height: 40px;'>
+                                            <img src="{% static 'assets/images/send.svg' %}" alt="Submit">
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

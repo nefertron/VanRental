@@ -24,6 +24,8 @@ urlpatterns = [
     path('rejected-booking', rejected_booking, name='rejected_booking'),
     path('pending-booking', pending_booking, name='pending_booking'),
     path('cancelled-booking', cancelled_booking, name='cancelled_booking'),
+    path('messages', user_messages, name='user_messages'),
+    path('messages-<id>/', filtered_messages, name='filtered_messages'),
 
     path('get-unavailable-dates/<id>/', get_unavailable_dates, name='get_unavailable_dates'),
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),

@@ -4,7 +4,7 @@ from .models import *
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout as auth_logout
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 
 from django.conf import settings
@@ -18,7 +18,7 @@ from django.utils import timezone
 
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 # Create your views here.
 
@@ -49,7 +49,7 @@ def loginAccount(request, username, password):
             
             if to_login is None:
                 messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
-                return redirect('/login')
+                return 'invalid'
             else:
                 passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
                 admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
@@ -58,17 +58,18 @@ def loginAccount(request, username, password):
                     login(request, user)
                     messages.info(request, 'You logged in successfully!')
                     if passenger_account:
-                        return redirect('/index')
+                        return 'passenger'
                     else:
-                        return redirect('/index')
+                        return 'not_passenger'
                 else:
                     if passenger_account:
                         messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
                     else:
                         messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
-                    return redirect('/login')
+                    return 'invalid'
         else:
             messages.info(request, f'Sorry, we couldn`t find an account with email {username}!')
+            return 'invalid'
 
     else:
         user = User.objects.filter(username = username).first()
@@ -76,7 +77,7 @@ def loginAccount(request, username, password):
             to_login = authenticate(username = username, password = password)
             if to_login is None:
                 messages.info(request, 'Sorry, the password you entered is invalid. Please try again!')
-                return redirect('/login')
+                return 'invalid'
             else:
                 passenger_account = PassengerAccount.objects.filter(user_id = user, is_verified = True).first()
                 admin_account = AdminAccount.objects.filter(user_id = user, is_verified = True).first()
@@ -86,17 +87,18 @@ def loginAccount(request, username, password):
                     messages.info(request, 'You logged in successfully!')
 
                     if passenger_account:
-                        return redirect('/index')
+                        return 'passenger'
                     else:
-                        return redirect('/dashboard')
+                        return 'not_passenger'
                 else:
                     if passenger_account:
                         messages.info(request, 'It seems like your account is not verified yet. Please check your email for the verification')
                     else:
                         messages.info(request, 'It seems like your account is not verified yet. Please contact the administrator to verify your account!')
-                    return redirect('/login')
+                    return 'invalid'
         else:
             messages.info(request, f'Sorry, we couldn`t find an account with username {username}!')
+            return 'invalid'
 
 ################ REUSABLE BOOKING DEF FUNCTION
 
@@ -142,7 +144,14 @@ def index(request):
 
 
         if username and password:
-            loginAccount(request, username, password)
+            log_in_attempt = loginAccount(request, username, password)
+
+            if log_in_attempt == 'invalid':
+                return redirect('/login')
+            elif log_in_attempt == 'passenger':
+                return redirect('/index')
+            else:
+                return redirect('/dashboard')
         
         else:
             _from_municipality = ListOfMunicipalities.objects.filter(id = from_destination_municipality_id).first()
@@ -165,7 +174,7 @@ def index(request):
             van.is_rented = True
             van.save()
 
-            message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent is subjected to an adjustment.'
+            message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent will be set later by the admin after. You can either set an offer or accept the set price.'
             create_notification(request, request.user, message)
 
             admin_account = User.objects.filter(is_superuser = True).first()
@@ -198,9 +207,15 @@ def login_page(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-        loginAccount(request, username, password)
 
-        return redirect('/index')
+        log_in_attempt = loginAccount(request, username, password)
+
+        if log_in_attempt == 'invalid':
+            return redirect('/login')
+        elif log_in_attempt == 'passenger':
+            return redirect('/index')
+        else:
+            return redirect('/dashboard')
     
     return render(request, 'authentication/login.html')
 
@@ -621,9 +636,11 @@ def rent_booking_list(request):
         booking_id = request.POST.get('booking_id')
         driver_id = request.POST.get('driver_id')
 
+        package_rent = request.POST.get('package_rent')
+
         rejected_booking_id = request.POST.get('rejected_booking_id')
 
-        if not booking_id is None and not driver_id is None:
+        if not driver_id is None:
             booking_target = RentedVan.objects.filter(id = booking_id).first()
             driver_target = DriverAccount.objects.filter(id = driver_id).first()
 
@@ -663,6 +680,20 @@ def rent_booking_list(request):
             van.is_rented = False
             van.save()
 
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
+
+            messages.info(request, message_to_admin)
+            return redirect('/rent-booking')
+        
+        elif not package_rent is None:
+            booking_target = RentedVan.objects.filter(id = booking_id).first()
+            booking_target.package_price = package_rent
+            booking_target.save()
+
+            message_to_admin = f'You set {package_rent} Php as package rent of booking with RENT ID : {booking_target.rent_id}, with destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}'
+            message_to_passenger = f'The admin set {package_rent} Php as package rent of your booking with RENT ID : {booking_target.rent_id}, and has a destination FROM {booking_target.from_destination} TO {booking_target.to_destination} on {booking_target.travel_date}. Please view your booking status and choose either accept the price or make an offer.'
+            
             create_notification(request, request.user, message_to_admin)
             create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
 
@@ -1269,6 +1300,70 @@ def past_booking(request):
     return render(request, 'vans/past-booking.html', context)
 
     
+################ MESSAGES PAGE
+def user_messages(request):
+
+    if not request.user.is_authenticated:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/login')
+    
+
+    return render(request, 'messages/messages.html')
+
+################ MESSAGES PAGE
+def filtered_messages(request, id):
+
+    if not request.user.is_authenticated:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/login')
+    
+    else:
+
+        convo_with = User.objects.filter(id=id).first()
+
+        if not convo_with is None:
+            
+            all_messages = Messages.objects.filter(Q(sender=convo_with) | Q(receiver=convo_with)).all().order_by('id')
+
+            context = {
+                'all_messages': all_messages,
+                'convo_with' : convo_with
+            }
+
+            passenger_account = PassengerAccount.objects.filter(user_id = convo_with).first()
+            admin_account = AdminAccount.objects.filter(user_id = convo_with).first()
+            driver_account = DriverAccount.objects.filter(user_id = convo_with).first()
+
+            if passenger_account:
+                context['message_sender'] = 'Passenger'
+            elif driver_account:
+                context['message_sender'] = 'Driver'
+            else:
+                context['message_sender'] = 'Admin'
+
+
+
+
+            if request.method == 'POST':
+                new_message = request.POST.get('new_message')
+
+                if not new_message is None:
+                    create_new_message = Messages.objects.create(sender = request.user,
+                                                                receiver = convo_with,
+                                                                date_sent = datetime.now(),
+                                                                message = new_message)
+                    create_new_message.message_id = f'MSG{create_new_message.id}'
+                    create_new_message.save()
+
+
+
+            return render(request, 'messages/filtered-messages.html', context)
+
+        else:
+            messages.info(request, f'Sorry, we couldn`t find an account with ID {id}')
+            return redirect('/messages')
+        
+    
 
 
 
@@ -1559,13 +1654,21 @@ def get_chart_values(request, rentalOrCarpooling):
 
 
 def get_unavailable_dates(request, id):
-    rented_van = RentedVan.objects.filter(plate_no__id = id).all()
+    rented_van = RentedVan.objects.filter(plate_no__id=id, is_confirmed = True, is_done = False).all()
 
     temp_storage = []
     for van in rented_van:
-        # Format the date as "YYYY-MM-DD" string and append to the list
-        formatted_date = van.travel_date.strftime('%Y-%m-%d')
-        temp_storage.append(formatted_date)
+        # Start from the travel_date
+        current_date = van.travel_date.date()
+
+        # Loop until travel_date_end if it's not None
+        while current_date <= (van.travel_date_end.date() if van.travel_date_end else van.travel_date.date()):
+            # Format the date as "YYYY-MM-DD" string and append to the list
+            formatted_date = current_date.strftime('%Y-%m-%d')
+            temp_storage.append(formatted_date)
+            
+            # Move to the next day
+            current_date += timedelta(days=1)
 
     # Convert the list to a JSON string
     return JsonResponse(temp_storage, safe=False)

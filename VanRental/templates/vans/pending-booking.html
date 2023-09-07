@@ -456,7 +456,13 @@
                                                     <div class='mb-2 line-height-5'>
                                                         <p><b>Booking Information : </b></p>
                                                         <div class='ml-10'>
-                                                            <p><b>Budget :</b> {{pending_booking.package_price}} php</p>
+                                                            <p><b>Rent :</b> 
+                                                                {% if pending_booking.package_price > 0 %}
+                                                                    {{pending_booking.package_price}} php
+                                                                {% else %}
+                                                                    Not Set
+                                                                {% endif %}
+                                                            </p>
                                                             <p><b>From Destination :</b> {{pending_booking.from_destination}} </p>
                                                             <p><b>To Destination :</b> {{pending_booking.to_destination}} </p>
                                                             <p><b>Preferred Schedule :</b> {{pending_booking.travel_date.date}} </p>
@@ -529,6 +535,10 @@
                                                 </p>
                                                 
                                                 {% if account_type == 'Passenger' %}
+                                                    {% if pending_booking.package_price > 0 %}
+                                                        <button class="btn custom-btn mt-2 mt-lg-3" id='submitSetPriceButton_{{pending_booking.id}}' onclick="submitApproveBookingForm('setPriceBookingForm_modal_{{pending_booking.id}}');" >Accept</button>
+                                                        <button class="btn custom-btn mt-2 mt-lg-3 btn-primary" id='submitSetPriceButton_{{pending_booking.id}}' onclick="submitApproveBookingForm('setPriceBookingForm_modal_{{pending_booking.id}}');" >Make an offer</button>
+                                                    {% endif %}
                                                     <button class="custom-btn mt-2 mt-lg-3 btn-danger" onclick="openCancelBookingModal('{{pending_booking.id}}');">Cancel</button>
                                                 {% endif %}
                                             </div>

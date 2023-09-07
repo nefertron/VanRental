@@ -1741,6 +1741,10 @@ blockquote {
   background-color: #dc3545;
 }
 
+.btn-primary{
+  background-color: #00557a;
+}
+
 
 
 
@@ -1786,6 +1790,7 @@ blockquote {
  /* #################### FOR STAR RATING ################################# */
 
 
+ /* #################### COMMENT SECTION ################################# */
 
 .comment-section{
   display: flex; 
@@ -1809,6 +1814,99 @@ blockquote {
   padding:10px; 
   border-radius: 20px;
 }
+ /* #################### COMMENT SECTION ################################# */
+
+
+ /* #################### CONVERSATION ################################# */
+ /* #################### LEFT ################################# */
+ 
+.message-left{
+  display: flex; 
+  margin-bottom: 20px;
+}
+
+.message-left:hover{
+  transform: scale(1.02);
+}
+
+.message-left-profile{
+  width: 30px; 
+  height: 30px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  border-radius: 50%;
+  align-self: flex-end;
+}
+
+.message-left-box{
+  width: 100%;
+  margin-left: 10px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  padding:10px; 
+  border-radius: 20px;
+}
+ /* #################### LEFT ################################# */
+
+
+
+
+ /* #################### RIGHT ################################# */
+ 
+.message-right{
+  display: flex; 
+  margin-bottom: 20px;
+}
+
+.message-right:hover{
+  transform: scale(1.02);
+}
+
+.message-right-profile{
+  width: 30px; 
+  height: 30px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  border-radius: 50%;
+  align-self: flex-end;
+  margin-left: 10px;
+
+}
+
+.message-right-box{
+  width: 100%;
+  margin-left: 10px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  padding:10px; 
+  border-radius: 20px;
+}
+ /* #################### RIGHT ################################# */
+
+ /* #################### SEND MESSAGE DIV ################################# */
+ .new-message-container {
+  margin-top: 20px;
+  position: relative;
+  display: inline-block;
+  width: 105%;
+}
+
+.message-input {
+  padding-right: 40px;
+  width: 100%;
+}
+
+.message-submit-button {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+ /* #################### SEND MESSAGE DIV ################################# */
+
+
+
+
+ /* #################### CONVERSATION ################################# */
 
 
 .red-circle{
