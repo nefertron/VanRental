@@ -17,6 +17,4 @@ TIMER:
 
 
 
-Status of My Booking
-
-available carpooling
+CONTINUE THE GALLERY

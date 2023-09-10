@@ -1273,8 +1273,21 @@ blockquote {
 
 .modal-title{
   border-bottom: 2px solid #7fffd4;
-  font-size: 2rem;
   margin-bottom: 30px;
+  font-size: 1.2rem; 
+  padding-bottom: 10px;
+}
+
+
+.close-btn{
+  position: absolute;
+  right: 0;
+  font-size: 0.75rem;
+  border-radius: 10px;
+  padding: 5px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  margin-right: 10px;
+  border: none;
 }
 
 
@@ -1476,6 +1489,7 @@ blockquote {
 }
 
 
+/* margin right */
 .mr-20{
   margin-right: 20px;
 }
@@ -1488,7 +1502,10 @@ blockquote {
 .mr-100{
   margin-right: 100px;
 }
+/* margin right */
 
+
+/* margin left */
 .ml-5{
   margin-left: 5px;
 }
@@ -1496,7 +1513,58 @@ blockquote {
 .ml-10{
   margin-left: 10px;
 }
+/* margin left */
 
+
+/* margin bottom */
+.mb-5{
+  margin-bottom: 5px;
+}
+
+.mb-10{
+  margin-bottom: 10px;
+}
+
+.mb-15{
+  margin-bottom: 15px;
+}
+
+.mb-20{
+  margin-bottom: 20px;
+}
+
+.mb-30{
+  margin-bottom: 30px;
+}
+
+.mb-40{
+  margin-bottom: 40px;
+}
+
+.mb-50{
+  margin-bottom: 50px;
+}
+
+
+/* margin bottom */
+
+/* margin top */
+.mt-5{
+  margin-top: 5px;
+}
+
+.mt-10{
+  margin-top: 10px;
+}
+
+.mt-15{
+  margin-top: 15px;
+}
+
+.mt-20{
+  margin-top: 20px;
+}
+/* margin top */
 
 .line-height-5{
   line-height: 5px;
@@ -1838,6 +1906,7 @@ blockquote {
 }
 
 .message-left-box{
+  background-color: #bef9ff;
   width: 100%;
   margin-left: 10px; 
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
@@ -1903,7 +1972,17 @@ blockquote {
 
  /* #################### SEND MESSAGE DIV ################################# */
 
-
+ /* #################### INBOX PROFILE ################################# */
+.inbox-profile{
+  margin-top: auto; 
+  margin-bottom: auto; 
+  margin-left: 10px; 
+  width: 40px; 
+  height: 40px; 
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); 
+  border-radius: 50%;
+}
+ /* #################### INBOX PROFILE ################################# */
 
 
  /* #################### CONVERSATION ################################# */

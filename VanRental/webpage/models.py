@@ -64,6 +64,7 @@ class Van(models.Model):
     color = models.CharField(max_length=20)
     number_of_seats = models.IntegerField(default=0)
     description = models.TextField(default=None, null=True, blank=True)
+    is_airconditioned =  models.BooleanField(default=True, blank=True, null=True)
     is_rented = models.BooleanField(default=False)
     is_carpooled = models.BooleanField(default=False)
     package_rent = models.IntegerField(default=0)
@@ -86,17 +87,22 @@ class RentedVan(models.Model):
     driver_id = models.ForeignKey(DriverAccount, on_delete=models.CASCADE, default=None, blank=True, null=True)
     rented_by = models.ForeignKey(PassengerAccount, on_delete=models.CASCADE)
     package_price = models.IntegerField(default=0)
+    my_offer = models.IntegerField(default=0)
     from_destination = models.TextField()
     to_destination = models.TextField()
 
     travel_date = models.DateTimeField()
     travel_date_end = models.DateTimeField(default=None, null=True, blank=True)
 
+    pick_up_location = models.TextField(default=None, null=True, blank=True)
+
     date_recorded = models.DateTimeField(default=datetime.now())
     is_confirmed = models.BooleanField(default=False)
     is_rejected = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
     is_done = models.BooleanField(default=False)
+
+    is_accepted = models.BooleanField(default=False)
 
     def __str__(self):
         return f'RENT ID {self.rent_id} || IS DONE : {self.is_done} || IS CONFIRMED : {self.is_confirmed} || IS REJECTED : {self.is_rejected}'
@@ -163,8 +169,13 @@ class Messages(models.Model):
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
     date_sent = models.DateTimeField(default=datetime.now())
     date_seen = models.DateTimeField(default=datetime.now())
+    is_seen = models.BooleanField(default=False)
     message = models.TextField()
     message_id = models.CharField(max_length=50)
+
+    offer = models.IntegerField(null=True, blank=True, default=0)
+    rental_attachment = models.ForeignKey(RentedVan, on_delete=models.CASCADE, null=True, blank=True)
+    carpooling_attachment = models.ForeignKey(CarpoolVan, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return f'SENDER : {self.sender.username} || MESSAGE : {self.message}'
@@ -185,5 +196,39 @@ class ListOfDestinations(models.Model):
         return f'{self.destination_name}'
     
 
+class FAQs(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'QUESTION : {self.question} || IS ACTIVE : {self.is_active}'
+    
+class GetInTouch(models.Model):
+    office_address = models.TextField()
+    contact_no = models.CharField(max_length=13)
+    email = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f'OFFICE ADDRESS {self.office_address}'
+    
+
+class TourGallery(models.Model):
+    tour_gallery_id = models.CharField(max_length=50, default=None, null=True, blank=True)
+    rented_van = models.ForeignKey(RentedVan, on_delete=models.CASCADE)
+    description = models.TextField(default=None, null=True, blank=True)
+    title = models.TextField(default=None, null=True, blank=True)
+    is_enabled = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'TITLE : {self.title} || IS ENABLED : {self.is_enabled}'
+    
+class TourGalleryImages(models.Model):
+    tour_gallery = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
+    image = models.TextField()
+    is_enabled = models.BooleanField(default = True)
+
+    def __str__(self):
+        return f'ID : {self.id} || IS ENABLED : {self.is_enabled}'
 
     

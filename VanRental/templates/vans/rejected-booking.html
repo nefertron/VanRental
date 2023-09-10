@@ -132,19 +132,23 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_2">Browse</a>
-                            </li>
-    
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_3">How it works</a>
+                                <a class="nav-link click-scroll" href="/index#rent_section">Rent</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_4">FAQs</a>
+                                <a class="nav-link click-scroll" href="/index#reviews_section">Reviews</a>
                             </li>
     
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="#section_5">Contact</a>
+                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#frequently_asked_questions">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
                             </li>
 
                             {% if not user.is_authenticated %}
@@ -160,6 +164,17 @@
                         {% if user.is_authenticated %}
                         <div class="d-none d-lg-block">
 
+                            <button class="profile-button" onclick="openMessage('desktop');">
+                                <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+                            
                             <button class="profile-button" onclick="openNotification('desktop');">
                                 <img src="{% static 'assets/images/bell-circle.svg' %}"/>
                                 {% get_unseen_notifications user as unseen_notifications %}
@@ -202,6 +217,61 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_all_messages user as all_my_messages %}
+                                        {% if all_my_messages|length > 0 %}
+                                            {% for msg in all_my_messages %}
+                                            
+                                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                                {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        {% else %}
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>We couldn`t find any messages</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
                             </div>
 
                             <div class="message-box mr-100" id="my-notification-desktop">
@@ -399,6 +469,15 @@
                                     </div>                                    
                                 </a>
                             </li>
+
+                            <li>
+                                <a href="/modify-landing-page-content" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Modify Landing Page
+                                    </div>                                    
+                                </a>
+                            </li>
                             {% endif %}
                         </ul>
                     </div>
@@ -455,19 +534,31 @@
                                                     <div class='mb-2 line-height-5'>
                                                         <p><b>Booking Information : </b></p>
                                                         <div class='ml-10'>
-                                                            <p><b>Budget :</b> {{rejected_booking.package_price}} php</p>
+                                                            <p><b>Rent :</b> 
+                                                                {% if rejected_booking.package_price > 0 %}
+                                                                    {{rejected_booking.package_price}} php
+                                                                {% else %}
+                                                                    <i>Not Set</i>
+                                                                {% endif %}
+                                                            </p>
                                                             <p><b>From Destination :</b> {{rejected_booking.from_destination}} </p>
                                                             <p><b>To Destination :</b> {{rejected_booking.to_destination}} </p>
-                                                            <p><b>Preferred Schedule :</b> {{rejected_booking.travel_date.date}} </p>
+                                                            <p><b>Preferred Schedule :</b> {{rejected_booking.travel_date}} </p>
+                                                            <p><b>Travel Until :</b> {{rejected_booking.travel_date_end}} </p>
+                                                            <p><b>Pick Up Location :</b> {{rejected_booking.pick_up_location}} </p>
                                                         </div>
                                                     </div>
                                                     <br>
                                                     <div class='mb-2 line-height-5'>
                                                         <p><b>Assigned Driver : </b></p>
                                                         <div class='ml-10'>
+                                                            {% if reject_booking.driver_id %}
                                                             <p><b>Fullname :</b> {{rejected_booking.driver_id.user_id.first_name}}  {{rejected_booking.driver_id.user_id.last_name}}</p>
                                                             <p><b>Contact No :</b>  {{rejected_booking.driver_id.contact_no}}  </p>
                                                             <p><b>Email :</b> {{rejected_booking.driver_id.user_id.email}} </p>
+                                                            {% else %}  
+                                                                <p><b><i>Not Set</i></b></p> 
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -519,10 +610,20 @@
 
                                                     <p>
                                                         <b>Brand Name :</b> {{rejected_booking.plate_no.brand_name}} <br>
-                                                        <b>Original Rent Price :</b> {{rejected_booking.plate_no.package_rent}} php<br>
                                                         <b>Plate No :</b> {{rejected_booking.plate_no.plate_no}} <br>
+                                                        <b>Color :</b> {{rejected_booking.plate_no.color}} <br>
+                                                        <b>No. Of Seats :</b> {{rejected_booking.plate_no.number_of_seats}} <br>
+                                                        <b>Air Conditioned :</b> 
+                                                            {% if rejected_booking.plate_no.is_airconditioned %}
+                                                                YES
+                                                            {% else %}
+                                                                NO
+                                                            {% endif %}
+                                                        <br>
                                                     </p>
+                                                    
                                                 </div>
+                                                <br>
                                                 <br>
                                                 <br>
                                                 <br>

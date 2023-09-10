@@ -5,6 +5,9 @@ from django.db.models import Sum
 from json import dumps
 import json
 
+from datetime import datetime, timedelta
+
+
 register = template.Library()
 
 @register.simple_tag
@@ -193,6 +196,29 @@ def get_my_notifications(user):
         return my_notifications
     
 @register.simple_tag
+def get_all_messages(user):
+    if user:
+        all_users = User.objects.filter(~Q(id=user.id)).all()
+
+        last_messages = []
+
+        for acc in all_users:
+            # Get the last message sent by acc to the user
+            last_msg = Messages.objects.filter(receiver=user, sender=acc).last()
+
+            print(last_msg)
+            if last_msg:
+                last_messages.append(last_msg)
+
+        # Sort the last_messages list based on the date_sent in descending order
+        last_messages.sort(key=lambda x: x.date_sent, reverse=True)
+
+        return last_messages
+
+
+        
+    
+@register.simple_tag
 def get_unseen_notifications(user):
     if user:
         my_notifications = Notification.objects.filter(receiver_id = user, is_seen = False).count()
@@ -231,6 +257,14 @@ def get_all_van_images(van):
     all_images = VanImages.objects.filter(van_image_id = van).all()
     return all_images
 
+@register.simple_tag
+def get_rented_van_image(van):
+    van_image = VanImages.objects.filter(van_image_id = van).first()
+
+    if van_image:
+        return van_image.vehicle_image
+    else:
+        return ''
 
 @register.simple_tag
 def all_van_images_indices(van):
@@ -378,10 +412,89 @@ def get_all_municipality():
 
 
 @register.simple_tag
-def get_available_drivers():
-    all_driver_accounts = DriverAccount.objects.filter(is_available = True, is_verified = True).all()
+def get_available_drivers(excempted_id, date_start, date_end):
 
-    return all_driver_accounts 
+    temp_driver_storage = []
+    
+    all_driver_accounts = DriverAccount.objects.filter(is_verified = True).all()
+    for driver in all_driver_accounts:
+        all_pending_rental_records = RentedVan.objects.filter(~Q(id = excempted_id),
+                                                              is_rejected = False,
+                                                              is_cancelled = False,
+                                                              is_done = False,
+                                                              driver_id = driver).all()
+        
+        temp_date_storage = []
+        for rental_record in all_pending_rental_records:
+            rental_start_date = rental_record.travel_date.date()
+
+            while rental_start_date <= (rental_record.travel_date_end.date() if rental_record.travel_date_end else rental_record.travel_date.date()):
+                # Format the date as "YYYY-MM-DD" string and append to the list
+                formatted_date = rental_start_date.strftime('%Y-%m-%d')
+                temp_date_storage.append(formatted_date)
+                
+                # Move to the next day
+                rental_start_date += timedelta(days=1)
+
+
+        
+        travel_date_start = date_start.date()
+        driver_is_available = True
+        
+        while travel_date_start <= (date_end.date() if date_end else travel_date_start):
+            # Format the date as "YYYY-MM-DD" string and append to the list
+            formatted_travel_date = travel_date_start.strftime('%Y-%m-%d')
+            
+            if formatted_travel_date in temp_date_storage:
+                driver_is_available = False
+            
+            # Move to the next day
+            travel_date_start += timedelta(days=1)
+
+
+        if driver_is_available:
+            temp_driver_storage.append(driver)
+
+        print('test', temp_date_storage)
+
+    return temp_driver_storage 
+
+@register.simple_tag
+def mark_as_done_availability_checker(date_start, date_end):
+    travel_date_start = date_start.date()
+
+    temp_date_storage = []
+
+    while travel_date_start <= (date_end.date() if date_end else travel_date_start):
+        # Format the date as "YYYY-MM-DD" string and append to the list
+        formatted_travel_date = travel_date_start.strftime('%Y-%m-%d')
+        temp_date_storage.append(formatted_travel_date)
+        
+        # Move to the next day
+        travel_date_start += timedelta(days=1)
+
+    today_date = datetime.now().date()
+
+    print(temp_date_storage)
+    print(today_date.strftime('%Y-%m-%d'))
+    print((date_start.date() - today_date).days)
+    print(today_date.strftime('%Y-%m-%d') in temp_date_storage)
+    
+    days_left = (date_start.date() - today_date).days
+
+    if today_date.strftime('%Y-%m-%d') in temp_date_storage:
+        return 'mark_as_done'
+    elif days_left < 1:
+        return 'mark_as_done'
+    else:
+        if days_left > 1:
+            return f'{days_left} days'
+        else:
+            return f'{days_left} day'
+    
+
+    
+
 
 
 @register.simple_tag
@@ -412,7 +525,8 @@ def get_pending_number_of_seats_in_carpooling(carpool):
     all_pending_booked_passengers = BookedPassenger.objects.filter(carpool_id = carpool,
                                                            is_confirmed = False,
                                                            is_rejected = False,
-                                                           is_cancelled = False,).aggregate(all_pending_booked_passengers = Sum('seats_occupied'))['all_pending_booked_passengers']
+                                                           is_cancelled = False,
+                                                           is_dropped = False).aggregate(all_pending_booked_passengers = Sum('seats_occupied'))['all_pending_booked_passengers']
     if not all_pending_booked_passengers is None:
         return all_pending_booked_passengers
     else:
@@ -451,7 +565,7 @@ def get_my_carpool_booking_information(carpool, passenger_account):
     my_carpool_booking_information = []
 
     my_carpools = BookedPassenger.objects.filter(carpool_id = carpool,
-                                                passenger_id = passenger_account).all()
+                                                passenger_id = passenger_account).all().order_by('-id')
     if my_carpools:
         for carpool in my_carpools:
             dictionary = {}
