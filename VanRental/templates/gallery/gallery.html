@@ -1,0 +1,972 @@
+{% load static %}
+{% load tz %}
+{% load vanrental_templatetags %}
+{% load pwa %}
+{% progressive_web_app_meta %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Gallery | Passenger Connect</title>
+
+        <!-- CSS FILES -->        
+        <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+
+    </head>
+    
+    <body id="top">
+
+        <main>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    {% if user.is_authenticated %}
+                        <button class='menu-button' id="menu-btn" onclick="openSideBar();">
+                            <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+
+                        <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
+                            <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% else %}
+                        <button class='menu-button'>
+                            <img src="{% static 'assets/images/car.svg' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <div class="d-lg-none ms-auto me-4">
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            {% get_my_profile user as my_profile %}
+                            {% if my_profile %}
+                                <img src="{{my_profile}}"/>
+                            {% else %}
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% endif %}
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="/profile">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="/logout">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#rent_section">Rent</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#reviews_section">Reviews</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#frequently_asked_questions">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
+                            </li>
+
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/signup">Signup</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+
+                            <button class="profile-button" onclick="openMessage('desktop');">
+                                <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+                            
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+
+                                
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="/profile">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="/logout">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_all_messages user as all_my_messages %}
+                                        {% if all_my_messages|length > 0 %}
+                                            {% for msg in all_my_messages %}
+                                            
+                                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                                {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        {% else %}
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>We couldn`t find any messages</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_my_notifications user as all_notifications %}
+                                        {% if all_notifications|length > 0 %}
+                                            {% for notif in all_notifications %}
+                                                <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                    <p>{{notif.message}}</p>
+                                                </li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li>
+                                                <p>Cannot find new notifications.</p>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index" class='display-flex'>
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/rent-a-van" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rent A Van
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
+
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Open Bookings
+                                        {% get_total_open_bookings as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/pending-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-alert.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Bookings
+                                        {% get_total_pending_bookings user as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Confirmed Bookings
+                                        {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                        {% if total_confirmed_bookings > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_confirmed_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/cancelled-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-cancel.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Cancelled Bookings
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/rejected-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rejected Bookings
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/profile" class='display-flex'>
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Settings
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/list-of-vans" class='display-flex'>
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        All Vans
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/pending-drivers" class='display-flex'>
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Drivers
+                                        {% get_total_pending_drivers as total_pending_drivers %}
+                                        {% if total_pending_drivers > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_pending_drivers}}
+                                            </div>
+                                        {% endif %}
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/modify-landing-page-content" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Modify Landing Page
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-5 col-12">
+                            <nav aria-label="breadcrumb" style="display:flex;">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Gallery</li>
+                                </ol>
+                                {% if user.is_authenticated %}
+                                    {% user_type_checker user as user_type %}
+                                    {% if user_type == 'Driver' %}
+                                        {% get_all_new_gallery user as all_new_galleries %}
+                                            {% if all_new_galleries|length > 0 %}
+                                                <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_tour');">{{all_new_galleries|length}} New Gallery</button>
+                                            {% endif %}
+                                    {% elif user_type == 'Admin' %}
+                                        {% get_all_pending_new_gallery user as all_pending_new_galleries %}
+                                        {% if all_pending_new_galleries|length > 0 %}
+                                            <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_tour');">{{all_pending_new_galleries|length}} Pending Gallery</button>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </nav>
+                        </div>
+                        
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        <section class="search-section d-flex justify-content-center align-items-center">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-8 col-12 mx-auto">
+                                        <form class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search">
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bi-search" id="basic-addon1">
+                                                </span>
+                                                <input name="tour_keyword" type="search" class="form-control" id="tour_keyword" placeholder="Enter a tour keyword" aria-label="Search">
+                                                <button type="button" onclick='findSearchedWords();' class="form-control">Search</button>
+                                            </div>
+                                        </form>
+                                    </div>
+            
+                                </div>
+                            </div>
+                        </section>
+
+
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class="d-flex">
+                                            <div>
+                                                <div class="mb-2">
+                                                    <h5><a href=''>Baguio Tour</a></h5>
+
+                                                    <p>
+                                                        <b>Location : </b> Baguio Eneme<br>
+                                                        <b>Date : </b> August 9, 2023
+                                                    </p>
+                                                </div>
+    
+                                            </div>
+                                            <span class="badge bg-finance rounded-pill ms-auto">✔</span>
+                                        </div>
+                                        <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
+                                            <!-- Indicators/dots -->
+                                            <div class="carousel-indicators">
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                                            </div>
+                                        
+                                            <!-- The slideshow/carousel -->
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <img src="{% static 'assets/images/car-favicon.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/car-select.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/van-icon.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                            </div>
+                                        
+                                            <!-- Left and right controls/icons -->
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+
+                                            <p>
+                                                <b>Brand Name :</b> Toyota High Ace <br>
+                                                <b>Plate No :</b> HGH343 <br>
+                                                <b>Color :</b> Red <br>
+                                                <b>No. Of Seats :</b> 12 <br>
+                                                <b>Air Conditioned :</b> 
+                                                    YES
+                                                <br>
+                                            </p>
+                                        </div>
+                                        
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                        </p>
+                                        <hr/>
+
+                                        <div style='display : flex; align: center; margin-bottom: 30px;'>
+                                            <div style='display: flex;'>
+                                                <b>150</b>
+                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
+                                                    <img src="{% static 'assets/images/heart.svg' %}" style='width: 30px; height: 30px;'/>
+                                                </button>
+                                            </div>
+
+                                            <div style='display: flex; margin-left: 20px;'>
+                                                <b>150</b>
+                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
+                                                    <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                                </button>
+                                            </div>
+                                        </div>
+
+
+                                        <div id="1_rental_user_comments0">
+                                            <div class='comment-section'>
+                                                <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                <div class='comment-box'>
+                                                    <h6 style="font-size: 0.875rem;">
+                                                        Joshua Geronda
+                                                    </h6>
+                                                    
+                                                    <p style="font-size: 0.75rem;">
+                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                    </p>
+                                                    
+                                                    <p style="font-size: 0.75rem; margin-bottom: 0;">
+                                                        Date : August 9, 2023
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% comment %} <button id="open-comments_1_rental_user_comments" onclick="openAllComments('1_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                        <button id="hide-comments_1_rental_user_comments"  onclick="hideAllComments('1_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button> {% endcomment %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </main>
+        
+        {% if user.is_authenticated %}
+            {% user_type_checker user as user_type %}
+            {% if user_type == 'Driver' %}
+                <div class="modal-overlay" id="list_of_tour" style="width:40%;">
+                    <div class="modal">
+                        <div class="modal-body">
+                            <h2 class="modal-title">Available Galleries
+                                <button type='button' class="close-btn" onclick="closeGalleryModal('list_of_tour')">Close</button>
+                            </h2>
+
+                            <div class="d-flex">
+                                <div class="table-responsive table-x-overflow">
+                                    <table class="table table-striped table-full" id='gallery_list'>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Destination</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% get_all_new_gallery user as all_new_galleries %}
+                                        {% for gallery in all_new_galleries %}
+                                            <tbody>
+                                                <td>{{gallery.id}}</td>
+                                                <td>{{gallery.rented_van.from_destination}}</td>
+                                                <td>{{gallery.rented_van.travel_date}}</td>
+                                                <td class='display-flex'>
+                                                    <button class="approve-button" onclick='openGalleryForm({{gallery.id}})' type="button">Select</button>
+                                                    <button class="approve-button btn-danger ml-10" type="button">Remove</button>
+                                                </td>
+                                            </tbody>
+                                        {% endfor %}
+                                    </table>
+                                    <br>
+                                </div>
+                            </div>
+
+
+                            {% get_all_new_gallery user as all_new_galleries %}
+                            {% for gallery in all_new_galleries %}
+                                <div id='gallery_form_{{gallery.id}}' style='display:none;'>
+                                    <p>
+                                        <b>Location : </b> {{gallery.rented_van.from_destination}}<br>
+                                        <b>Date : </b> {{gallery.rented_van.travel_date}}
+                                        <br>
+                                        <br>
+                                        <b><i>Note that : </i></b> for this to be posted, the admin must approve this.
+                                        Another, the admin can modify the content of this gallery. 
+                                    </p>
+
+                                    <div id="add_gallery_{{gallery.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                        <!-- Indicators/dots -->
+                                        <div class="carousel-indicators" id='carousel-indicators'>
+                                            {% comment %} <button type="button" data-bs-target="#add_van" data-bs-slide-to="0" class="active"></button>
+                                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="1"></button>
+                                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="2"></button>
+                                            <button type="button" data-bs-target="#add_van" data-bs-slide-to="3"></button> {% endcomment %}
+                                        </div>
+                                    
+                                        <!-- The slideshow/carousel -->
+                                        <div class="carousel-inner" id="carousel-inner">
+                                            <!-- images will go here using the format below, wherein the first image will have "active" class to activate the first child -->
+        
+                                            <!-- <div class="carousel-item active">
+                                                <img src="{% static 'assets/images/van-icon.svg' %}" class="d-block w-100">
+                                            </div> -->
+                                        </div>
+                                    
+                                        <!-- Left and right controls/icons -->
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    </div>
+        
+                                    <h2 class="text-center" id='carousel_title' style='display:none;'>The images of the gallery will appear here</h2>
+                                    <h2 class="text-center" id='carousel_title_1' style='font-size:1rem;'>The images of the gallery will appear here</h2>
+                                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                        {% csrf_token %}
+                                        <label class="form-label">Attach Images</label>
+                                        <input type="file" multiple name="attached_images" class="form-control"  onchange="displayUploadedPreview(event)" required>
+                                        <input type="hidden" multiple name="images" class="form-control" required>
+                                        <input type="hidden" value='{{gallery.id}}' name="gallery_id"  class="form-control" required>
+        
+        
+                                        <label class="form-label">Tour Title</label>
+                                        <input type="text" name="title" class="form-control" placeholder="(ex. Baguio Tour) ..." required>
+                                        
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="description" class="form-control" placeholder="Enter description ..." required>
+        
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="form-control">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+
+            {% if user_type == 'Admin' %}
+                <div class="modal-overlay" id="list_of_tour" style="width:40%;">
+                    <div class="modal">
+                        <div class="modal-body">
+                            <h2 class="modal-title">Pending Galleries
+                                <button type='button' class="close-btn" onclick="closeGalleryModal('list_of_tour')">Close</button>
+                            </h2>
+
+                            <div class="d-flex">
+                                <div class="table-responsive table-x-overflow">
+                                    <table class="table table-striped table-full" id='gallery_list'>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">#</th>
+                                                <th scope="col">Destination</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% get_all_pending_new_gallery user as all_pending_new_galleries %}
+                                        {% for gallery in all_pending_new_galleries %}
+                                            <tbody>
+                                                <td>{{gallery.id}}</td>
+                                                <td>{{gallery.rented_van.from_destination}}</td>
+                                                <td>{{gallery.rented_van.travel_date}}</td>
+                                                <td class='display-flex'>
+                                                    <button class="approve-button" onclick='openGalleryForm({{gallery.id}})' type="button">Select</button>
+                                                    <button class="approve-button btn-danger ml-10" type="button">Remove</button>
+                                                </td>
+                                            </tbody>
+                                        {% endfor %}
+                                    </table>
+                                    <br>
+                                </div>
+                            </div>
+
+
+                            {% get_all_pending_new_gallery user as all_pending_new_galleries %}
+                            {% for gallery in all_pending_new_galleries %}
+                                <div id='gallery_form_{{gallery.id}}' style='display:none;'>
+                                    <p>
+                                        <b>Location : </b> {{gallery.rented_van.from_destination}}<br>
+                                        <b>Date : </b> {{gallery.rented_van.travel_date}}
+                                        <br>
+                                        <br>
+                                        <b><i>Note that : </i></b> for this to be posted, the admin must approve this.
+                                        Another, the admin can modify the content of this gallery. 
+                                    </p>
+
+                                    <div id="add_gallery_{{gallery.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                        <!-- Indicators/dots -->
+                                        <div class="carousel-indicators" id='carousel-indicators'>
+                                            {% get_all_pending_gallery_indices gallery as gallery_indices %}
+                                            {% for i in gallery_indices %}
+                                                {% if i == 0 %}
+                                                    <button type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide-to="{{i}}" class="active"></button>
+                                                {% else %}
+                                                    <button type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide-to="{{i}}"></button>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        
+                                        <!-- The slideshow/carousel -->
+                                        {% get_all_pending_gallery_images gallery as all_gallery_images %}
+                                        <div class="carousel-inner" id="carousel-inner">
+                                            {% for gallery_image in all_gallery_images %}
+                                                {% if forloop.counter0 == 0 %}
+                                                    <div class="carousel-item active">
+                                                        <div class='slider-image-container'>
+                                                            <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="carousel-item">
+                                                        <div class='slider-image-container'>
+                                                            <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                        </div>
+                                                    </div>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    
+                                        <!-- Left and right controls/icons -->
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    </div>
+        
+                                    <h2 class="text-center" id='carousel_title' style='display:none;'>The images of the gallery will appear here</h2>
+                                    <h2 class="text-center" id='carousel_title_1' style='font-size:1rem;'>The images of the gallery will appear here</h2>
+                                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                        {% csrf_token %}
+                                        <label class="form-label">Attach Images</label>
+                                        <input type="file" multiple name="attached_images" class="form-control"  onchange="displayUploadedPreview(event)" required>
+                                        <input type="hidden" multiple name="images" class="form-control" required>
+                                        <input type="hidden" value='{{gallery.id}}' name="gallery_id"  class="form-control" required>
+        
+        
+                                        <label class="form-label">Tour Title</label>
+                                        <input type="text" name="title" class="form-control" placeholder="(ex. Baguio Tour) ..." required>
+                                        
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="description" class="form-control" placeholder="Enter description ..." required>
+        
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="form-control">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+       
+        
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        {% comment %} <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/display-fetched-images.js' %}"></script>  {% endcomment %}
+        
+        <script>
+            function findSearchedWords(){
+                var searched_word = document.getElementById('tour_keyword').value.toLowerCase();
+
+                var all_titles = document.querySelectorAll('[id^="tour-title"]');
+
+                for (var x = 0; x < all_titles.length; x++){
+                    var hrefContent = all_titles[x].querySelector('h5 a').textContent;
+                    
+                    if (hrefContent.toLowerCase().includes(searched_word)){
+                        all_titles[x].style.display = '';
+                    }
+                    else{
+                        all_titles[x].style.display = 'none';
+                    }
+
+                    console.log('href', hrefContent)
+                }
+            }
+        </script>
+
+
+        <script>            
+            function openNewGalleryModal(overlayId){
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+            }
+
+
+            function openGalleryForm(gallery_id){
+                var all_gallery_forms = document.querySelectorAll('[id^="gallery_form_"]');
+                
+                
+                for (var x = 0; x < all_gallery_forms.length; x++){
+                    if (all_gallery_forms[x].id !== `gallery_form_${gallery_id}`){
+                        all_gallery_forms[x].style.display = 'none';
+                    }
+                    else{
+                        all_gallery_forms[x].style.display = '';
+                        var gallery_list = document.getElementById('gallery_list')
+                        gallery_list.style.display = 'none'
+                    }
+                }
+                document.getElementById('carousel_title_1').textContent = 'Tour Images'
+            }
+
+
+            function closeGalleryModal(overlayId) {
+                var gallery_list = document.getElementById('gallery_list')
+                gallery_list.style.display = ''
+
+                openGalleryForm('')
+
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+        </script>
+    </body>
+</html>

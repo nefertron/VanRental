@@ -4,6 +4,7 @@ function displayUploadedPreview(event) {
     const imageArray = [];
 
     for (let i = 0; i < files.length; i++) {
+        console.log('file' , files[i])
         const reader = new FileReader();
         reader.onload = function (e) {
             imageArray.push(e.target.result);

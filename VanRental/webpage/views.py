@@ -1428,7 +1428,60 @@ def filtered_messages(request, id):
             return redirect('/messages')
         
     
+################ GALLERY PAGE
+def gallery(request):
 
+
+    if request.method == 'POST':
+        images = request.POST.get('images')
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        gallery_id = request.POST.get('gallery_id')
+
+
+        if images:
+            images_list = images.split('|||')
+
+            target_tour = TourGallery.objects.filter(id = gallery_id).first()
+            target_tour.title = title
+            target_tour.description = description
+            target_tour.tour_gallery_id = f'TOUR{target_tour.id}'
+            target_tour.is_modified = True
+            target_tour.save()
+            
+            for img in images_list:
+                new_gallery = TourGalleryImages.objects.create(tour_gallery = target_tour,
+                                                               image = img)
+                new_gallery.save()
+            
+            message_to_admin = f'PENDING GALLERY || {request.user.first_name} {request.user.last_name} added new gallery. It requires your approval. Please check it out!'
+            message_to_driver = f'PENDING GALLERY || You added new gallery with title `{title}`. Waiting for the admin`s approval.'
+                
+            create_notification(request, User.objects.filter(is_superuser = True).first(), message_to_admin)
+            create_notification(request, request.user, message_to_driver)
+
+            messages.info(request, message_to_driver)
+
+            return redirect('gallery')
+    return render(request, 'gallery/gallery.html')
+
+
+
+def filtered_gallery(request, id):
+
+    context = {
+        'tour_id' : id
+    }
+    # tour_gallery = TourGallery.objects.filter(id = id).first()
+    
+    # if tour_gallery:
+    #     return render(request, 'gallery/filtered-gallery.html')
+    
+    # else:
+    #     messages.info(request, f'Sorry, the gallery of a tour you want to visit is not available or doesn`t exist.')
+    #     return redirect('/index')
+    
+    return render(request, 'gallery/filtered-gallery.html', context)
 
 
 ################ LOGOUT PAGE
@@ -1736,6 +1789,11 @@ def get_unavailable_dates(request, id):
 
     # Convert the list to a JSON string
     return JsonResponse(temp_storage, safe=False)
+
+
+
+
+
 
 ############################ THESE ARE USED FOR FETCHING USING JS ####################################################
 

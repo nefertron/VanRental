@@ -338,6 +338,14 @@
                                 </a>
                             </li>
                             {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
                             {% if not user.is_superuser %}
                             <li>
                                 <a href="/available-carpooling" class='display-flex'>
@@ -833,7 +841,17 @@
                     <div class="row">
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="rent-review-tab" data-bs-toggle="tab" data-bs-target="#rent-review-tab-pane" type="button" role="tab" aria-controls="rent-review-tab-pane" aria-selected="false">
+                                <button class="nav-link active" id="van-review-tab" data-bs-toggle="tab" data-bs-target="#van-review-tab-pane" type="button" role="tab" aria-controls="van-review-tab-pane" aria-selected="false">
+                                    Van Reviews
+                                    <div class='red-circle'>
+                                        {% get_all_done_rental as all_done_rental %}
+                                        {{all_done_rental|length}}
+                                    </div>
+                                </button>
+                            </li>
+
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="rent-review-tab" data-bs-toggle="tab" data-bs-target="#rent-review-tab-pane" type="button" role="tab" aria-controls="rent-review-tab-pane" aria-selected="false">
                                     Rent Reviews
                                     <div class='red-circle'>
                                         {% get_all_done_rental as all_done_rental %}
@@ -859,8 +877,182 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="tab-content" id="myTabContent">
+                                <!-- FOR VAN REVIEWS PANEL -->
+                                <div class="tab-pane fade show active" id="van-review-tab-pane" role="tabpanel" aria-labelledby="van-tab" tabindex="0">   
+                                    <div class="row">
+                                        {% get_all_done_rental as all_rental %}
+                                        {% if all_rental|length > 0 %}
+                                            {% for done_rental in all_rental %}
+                                                <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-2">
+                                                    <div class="custom-block bg-white shadow-lg">
+                                                        <div class="d-flex">
+                                                            <div>
+                                                                <h5 class="mb-2">{{done_rental.plate_no.brand_name}}</h5>
+                                                                <div>
+                                                                    <p class="mb-2">
+                                                                        <b>Overall Ratings : </b>
+                                                                        {% get_overall_rental_rating done_rental.id as rating %}
+
+                                                                        {% if rating.0 != 0 %}
+                                                                            {% for i in rating.0 %}
+                                                                                <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endfor %}
+
+                                                                            {% if rating.1 != 0 %}
+                                                                                <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            No ratings found
+                                                                        {% endif %}
+                                                                    </p>
+                                                                    <p class='mb-2'>
+                                                                        <b>From Destination : </b> {{done_rental.from_destination}} <br>
+                                                                        <b>To Destination : </b> {{done_rental.to_destination}}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <span class="badge bg-finance rounded-pill ms-auto">
+                                                                {{done_rental.plate_no.number_of_seats}}
+                                                            </span>
+                                                        </div>
+                                                        <br>
+                                                        
+                                                        <div id="doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                            <!-- Indicators/dots -->
+                                                            {% all_van_images_indices done_rental.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                            <div class="carousel-indicators">
+                                                                {% for van_index in van_images_indices %}
+                                                                    {% if van_index == 0 %}
+                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                    {% else %}
+                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                        
+                                                            <!-- The slideshow/carousel -->
+                                                            {% get_all_van_images done_rental.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                            <div class="carousel-inner">
+                                                                {% for van_image in all_van_images %}
+                                                                    {% if forloop.counter0 == 0 %}
+                                                                        <div class="carousel-item active">
+                                                                            <div class='slider-image-container'>
+                                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                            </div>
+                                                                        </div>
+                                                                    {% else %}
+                                                                        <div class="carousel-item">
+                                                                            <div class='slider-image-container'>
+                                                                                <img src="{{van_image.vehicle_image}}" alt="" class="slider-image">
+                                                                            </div>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                            <!-- Left and right controls/icons -->
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="prev">
+                                                                <span class="carousel-control-prev-icon"></span>
+                                                            </button>
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="next">
+                                                                <span class="carousel-control-next-icon"></span>
+                                                            </button>
+
+                                                            <p class='mb-2'>
+                                                                <b>Brand Name : </b> {{done_rental.plate_no.brand_name}} <br>
+                                                                <b>Driver Name : </b> {{done_rental.driver_id.user_id.first_name}} {{done_rental.driver_id.user_id.last_name}}<br>
+                                                                <b>Driver Contact No : </b> {{done_rental.driver_id.contact_no}}<br>
+                                                                <b>Driver Email : </b> {{done_rental.driver_id.user_id.email}}<br>
+                                                                <b>Plate No : </b> {{done_rental.plate_no.plate_no}} <br>
+                                                                <b>Rental ID : </b> {{done_rental.rent_id}}
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <br>
+                                                        <p class="mb-0">
+                                                            {{done_rental.plate_no.description}}
+                                                        </p>
+                                                        <hr/>
+
+
+                                                        <!-- ALL COMMENTS -->
+                                                        {% get_rental_reviews done_rental.id as all_rental_reviews %}
+                                                        {% if all_rental_reviews|length > 0 %}
+                                                            {% for review in all_rental_reviews %}
+                                                                {% if forloop.counter0 < 1 %}
+                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter0}}">
+                                                                {% else %}
+                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter}}" style="display:none;">
+                                                                {% endif %}
+                                                                    <div class='comment-section'>
+                                                                        {% if review.rent_id.rented_by.profile %}
+                                                                            <img src="{{review.rent_id.rented_by.profile}}" class='comment-section-profile'/>
+                                                                        {% else %}
+                                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                        {% endif %}
+                                                                        <div class='comment-box'>
+                                                                            <h6 style="font-size: 0.875rem;">
+                                                                                {{review.rent_id.rented_by.user_id.first_name}} 
+                                                                                {{review.rent_id.rented_by.user_id.last_name}}
+                                                                            </h6>
+                                                                            
+                                                                            <p style="font-size: 0.75rem;">
+                                                                                {{review.comment}}
+                                                                            </p>
+                                                                            <p class="mb-0">
+                                                                                Ratings : 
+
+                                                                                {% convert_rating_to_array review.rating as my_rating%}
+                                                                                {% for i in my_rating %}
+                                                                                    <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                                {% endfor %}
+                
+                                                                                {% if rating.1 != 0 %}
+                                                                                    <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
+                                                                                {% endif %}
+                                                                            </p>
+                                                                            <p style="font-size: 0.75rem;">
+                                                                                Date Recorded : {{review.date_recorded}}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                            <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                            <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                        {% else %}
+                                                            <p style="font-size: 0.75rem;">No comments found</p>
+                                                        {% endif %}
+                                                        <!-- ALL COMMENTS -->
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="col-lg-4 col-md-6 col-12 mb-4 mb-lg-0">
+                                                <div class="custom-block bg-white shadow-lg">
+                                                    <div class="d-flex">
+                                                        <div>
+                                                            <h5 class="mb-2">No Review is recorded</h5>
+                                                            <p class="mb-0"></p>
+                                                        </div>
+                                                        <span class="badge bg-advertising rounded-pill ms-auto">0</span>
+                                                    </div>
+                                                    <img src="{% static 'assets/images/no-carpool.png' %}" class="custom-block-image img-fluid" alt="">
+                                                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Eaque doloribus placeat ab, eius asperiores harum quidem nihil officiis voluptates dolorem!</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <!-- FOR VAN REVIEWS PANEL -->
+
+
                                 <!-- FOR RENT REVIEWS PANEL -->
-                                <div class="tab-pane fade show active" id="rent-review-tab-pane" role="tabpanel" aria-labelledby="finance-tab" tabindex="0">   
+                                <div class="tab-pane fade" id="rent-review-tab-pane" role="tabpanel" aria-labelledby="rent-tab" tabindex="0">   
                                     <div class="row">
                                         {% get_all_done_rental as all_rental %}
                                         {% if all_rental|length > 0 %}

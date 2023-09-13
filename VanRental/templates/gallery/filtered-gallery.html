@@ -1,0 +1,674 @@
+{% load static %}
+{% load tz %}
+{% load vanrental_templatetags %}
+{% load pwa %}
+{% progressive_web_app_meta %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Gallery | Passenger Connect</title>
+
+        <!-- CSS FILES -->        
+        <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+
+    </head>
+    
+    <body id="top">
+
+        <main>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    {% if user.is_authenticated %}
+                        <button class='menu-button' id="menu-btn" onclick="openSideBar();">
+                            <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+
+                        <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
+                            <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% else %}
+                        <button class='menu-button'>
+                            <img src="{% static 'assets/images/car.svg' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <div class="d-lg-none ms-auto me-4">
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            {% get_my_profile user as my_profile %}
+                            {% if my_profile %}
+                                <img src="{{my_profile}}"/>
+                            {% else %}
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% endif %}
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="/profile">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="/logout">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#rent_section">Rent</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#reviews_section">Reviews</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#frequently_asked_questions">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
+                            </li>
+
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/signup">Signup</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+
+                            <button class="profile-button" onclick="openMessage('desktop');">
+                                <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+                            
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+                            
+
+                                
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="/profile">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="/logout">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_all_messages user as all_my_messages %}
+                                        {% if all_my_messages|length > 0 %}
+                                            {% for msg in all_my_messages %}
+                                            
+                                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                                {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        {% else %}
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>We couldn`t find any messages</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_my_notifications user as all_notifications %}
+                                        {% if all_notifications|length > 0 %}
+                                            {% for notif in all_notifications %}
+                                                <li data-message='{{notif.id}}'  class="custom-button {% if not notif.is_seen %}not-seen-bg{% endif %}">
+                                                    <p>{{notif.message}}</p>
+                                                </li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li>
+                                                <p>Cannot find new notifications.</p>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index" class='display-flex'>
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/rent-a-van" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rent A Van
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
+
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Open Bookings
+                                        {% get_total_open_bookings as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/pending-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-alert.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Bookings
+                                        {% get_total_pending_bookings user as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Confirmed Bookings
+                                        {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                        {% if total_confirmed_bookings > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_confirmed_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/cancelled-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-cancel.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Cancelled Bookings
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/rejected-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rejected Bookings
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/profile" class='display-flex'>
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Settings
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/list-of-vans" class='display-flex'>
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        All Vans
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/pending-drivers" class='display-flex'>
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Drivers
+                                        {% get_total_pending_drivers as total_pending_drivers %}
+                                        {% if total_pending_drivers > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_pending_drivers}}
+                                            </div>
+                                        {% endif %}
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/modify-landing-page-content" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Modify Landing Page
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-5 col-12">
+                            <nav aria-label="breadcrumb" style="display:flex;">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
+                                    <li class="breadcrumb-item active">Gallery</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Baguio Tour</li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class="d-flex">
+                                            <div>
+                                                <div class="mb-2">
+                                                    <h5><a href=''>Baguio Tour</a></h5>
+
+                                                    <p>
+                                                        <b>Location : </b> Baguio Eneme<br>
+                                                        <b>Date : </b> August 9, 2023
+                                                    </p>
+                                                </div>
+    
+                                            </div>
+                                            <span class="badge bg-finance rounded-pill ms-auto">✔</span>
+                                        </div>
+                                        <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
+                                            <!-- Indicators/dots -->
+                                            <div class="carousel-indicators">
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                                            </div>
+                                        
+                                            <!-- The slideshow/carousel -->
+                                            <div class="carousel-inner">
+                                                <div class="carousel-item active">
+                                                    <img src="{% static 'assets/images/car-favicon.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/car-select.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                                <div class="carousel-item">
+                                                    <img src="{% static 'assets/images/van-icon.svg' %}" alt="" class="d-block w-100">
+                                                </div>
+                                            </div>
+                                        
+                                            <!-- Left and right controls/icons -->
+                                            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                                                <span class="carousel-control-prev-icon"></span>
+                                            </button>
+                                            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                                                <span class="carousel-control-next-icon"></span>
+                                            </button>
+
+                                            <p>
+                                                <b>Brand Name :</b> Toyota High Ace <br>
+                                                <b>Plate No :</b> HGH343 <br>
+                                                <b>Color :</b> Red <br>
+                                                <b>No. Of Seats :</b> 12 <br>
+                                                <b>Air Conditioned :</b> 
+                                                    YES
+                                                <br>
+                                            </p>
+                                        </div>
+                                        
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <br>
+                                        <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                        </p>
+                                        <hr/>
+
+                                        <div style='display : flex; align: center; margin-bottom: 30px;'>
+                                            <div style='display: flex;'>
+                                                <b>150</b>
+                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
+                                                    <img src="{% static 'assets/images/heart.svg' %}" style='width: 30px; height: 30px;'/>
+                                                </button>
+                                            </div>
+
+                                            <div style='display: flex; margin-left: 20px;'>
+                                                <b>150</b>
+                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
+                                                    <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                                </button>
+                                            </div>
+                                        </div>
+
+
+                                        <div id="1_rental_user_comments0">
+                                            <div class='comment-section'>
+                                                <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                <div class='comment-box'>
+                                                    <h6 style="font-size: 0.875rem;">
+                                                        Joshua Geronda
+                                                    </h6>
+                                                    
+                                                    <p style="font-size: 0.75rem;">
+                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                    </p>
+                                                    
+                                                    <p style="font-size: 0.75rem; margin-bottom: 0;">
+                                                        Date : August 9, 2023
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                            <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </main>
+        
+
+       
+        
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        {% comment %} <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/display-fetched-images.js' %}"></script>  {% endcomment %}
+        
+        <script>
+            function findSearchedWords(){
+
+                var searched_word = document.getElementById('tour_keyword').value.toLowerCase();
+
+                var all_titles = document.querySelectorAll('[id^="tour-title"]');
+
+                for (var x = 0; x < all_titles.length; x++){
+                    var hrefContent = all_titles[x].querySelector('h5 a').textContent;
+                    
+                    if (hrefContent.toLowerCase().includes(searched_word)){
+                        all_titles[x].style.display = '';
+                    }
+                    else{
+                        all_titles[x].style.display = 'none';
+                    }
+
+                    console.log('href', hrefContent)
+                }
+            }
+
+
+        </script>
+    </body>
+</html>

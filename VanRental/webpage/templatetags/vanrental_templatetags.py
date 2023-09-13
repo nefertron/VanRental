@@ -2,8 +2,8 @@ from django import template
 from ..models import *
 from django.db.models import Q
 from django.db.models import Sum
-from json import dumps
-import json
+from django.http import JsonResponse
+
 
 from datetime import datetime, timedelta
 
@@ -26,7 +26,38 @@ def user_type_checker(user):
     else:
         return None
 
+@register.simple_tag
+def get_all_new_gallery(user):
 
+    tour_galleries = TourGallery.objects.filter(is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
+
+    return tour_galleries
+
+
+@register.simple_tag
+def get_all_pending_new_gallery(user):
+
+    pending_tour_galleries = TourGallery.objects.filter(is_enabled = False, is_modified = True).all().order_by('id')
+
+    return pending_tour_galleries
+
+
+@register.simple_tag
+def get_all_pending_gallery_images(tour_gallery):
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery).all()
+
+    return all_images
+
+
+@register.simple_tag
+def get_all_pending_gallery_indices(tour_gallery):
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery).count()
+    indexes = []
+
+    for i in range(0, all_images):
+        indexes.append(i)
+
+    return indexes
 
 
 

@@ -29,8 +29,52 @@ listItems.forEach(item => {
             var modal_body_holder = document.getElementById('modal-body-holder');
             modal_body_holder.textContent = notification
 
+
+            // CONVERT THE DATE
+            const to_convert_date = new Date(date_recorded)
+
+            var months = [
+                "Jan", "Feb", "Mar",
+                "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep",
+                "Oct", "Nov", "Dec"
+            ];
+
+            console.log('to conver', to_convert_date)
+            var monthStr = months[to_convert_date.getMonth()]
+            var day = to_convert_date.getDate()
+            var year = to_convert_date.getFullYear()
+            var hour = to_convert_date.getHours()
+            var minute = to_convert_date.getMinutes()
+
+            let ampm;
+            if (hour > 12){
+                ampm = 'pm'
+                hour -= 12;
+                if (hour < 10){
+                    hour = `0${hour}`
+                }
+            }
+            else{
+                if (hour == 0){
+                    hour = 12
+                }
+                else{
+                    if (hour < 10){
+                        hour = `0${hour}`
+                    }
+                }
+                ampm = 'am'
+            }
+
+            if (minute < 10){
+                minute  = `0${minute}`
+            }
+
+            var formatted_date = `${monthStr} ${day}, ${year}  ${hour} : ${minute} ${ampm}`
+            // CONVERT THE DATE
             var modal_footer = document.getElementById('modal-footer');
-            modal_footer.textContent = `Date Recorded : ${date_recorded} || ID : ${notification_id}`
+            modal_footer.textContent = `Date Recorded : ${formatted_date}\n\nID : ${notification_id}`
 
             console.log('hello')
             const all_notifications = document.querySelectorAll(`[id^="notification_${id_of_notif}"]`);

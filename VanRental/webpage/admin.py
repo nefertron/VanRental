@@ -14,3 +14,12 @@ admin.site.register(Review)
 admin.site.register(Messages)
 admin.site.register(ListOfMunicipalities)
 admin.site.register(ListOfDestinations)
+
+admin.site.register(FAQs)
+admin.site.register(GetInTouch)
+
+admin.site.register(TourGallery)
+admin.site.register(TourGalleryImages)
+
+admin.site.register(HeartReactions)
+admin.site.register(TourCommentSection)

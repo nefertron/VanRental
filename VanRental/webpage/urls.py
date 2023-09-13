@@ -26,6 +26,8 @@ urlpatterns = [
     path('cancelled-booking', cancelled_booking, name='cancelled_booking'),
     path('messages', user_messages, name='user_messages'),
     path('messages-<id>/', filtered_messages, name='filtered_messages'),
+    path('gallery', gallery, name='gallery'),
+    path('gallery/<id>/', filtered_gallery, name='filtered_gallery'),
 
     path('get-unavailable-dates/<id>/', get_unavailable_dates, name='get_unavailable_dates'),
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),

@@ -336,6 +336,15 @@
                                 </a>
                             </li>
                             {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
+
                             {% if not user.is_superuser %}
                             <li>
                                 <a href="/available-carpooling" class='display-flex'>

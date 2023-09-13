@@ -218,10 +218,11 @@ class TourGallery(models.Model):
     rented_van = models.ForeignKey(RentedVan, on_delete=models.CASCADE)
     description = models.TextField(default=None, null=True, blank=True)
     title = models.TextField(default=None, null=True, blank=True)
-    is_enabled = models.BooleanField(default=True)
+    is_modified = models.BooleanField(default=False)
+    is_enabled = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'TITLE : {self.title} || IS ENABLED : {self.is_enabled}'
+        return f'DRIVER: {self.rented_van.driver_id.user_id.first_name} || TITLE : {self.title} || IS ENABLED : {self.is_enabled}'
     
 class TourGalleryImages(models.Model):
     tour_gallery = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
@@ -230,5 +231,20 @@ class TourGalleryImages(models.Model):
 
     def __str__(self):
         return f'ID : {self.id} || IS ENABLED : {self.is_enabled}'
+    
 
+class HeartReactions(models.Model):
+    tour = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
+    heart_count = models.IntegerField()
+
+    def __str__(self):
+        return f'TOUR : {self.tour.title} || HEART REACTS : {self.heart_count}'
+    
+class TourCommentSection(models.Model):
+    tour = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
+    comment = models.TextField()
+    commented_by = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'USER : {self.commented_by.first_name} || COMMENT : {self.comment}'
     
