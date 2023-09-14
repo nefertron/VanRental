@@ -21,5 +21,4 @@ admin.site.register(GetInTouch)
 admin.site.register(TourGallery)
 admin.site.register(TourGalleryImages)
 
-admin.site.register(HeartReactions)
 admin.site.register(TourCommentSection)

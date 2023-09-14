@@ -1339,6 +1339,58 @@ blockquote {
 }
 
 
+.remove-btn{
+  position: absolute;
+  right: 0;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  padding: 5px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+  margin-right: 10px;
+  border: none;
+  height: 30px;
+  width: 30px;
+  font-weight: bold;
+  margin-top: 10px;
+  z-index: 50;
+}
+
+
+.interactions-container{
+  display : flex; 
+  text-align: center; 
+  margin-bottom: 30px;
+}
+
+.heart-btn{
+  border: none;
+  background-color: transparent;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.heart-btn img{
+  height: 30px;
+  width: 30px;
+}
+
+.message-btn{
+  border: none;
+  background-color: transparent;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin-left: 10px;
+}
+
+.message-btn img{
+  height: 30px;
+  width: 30px;
+}
+
+
 @media (max-width: 480px) { /* mobile view */ 
   .profile-bg{
     margin-left: auto;

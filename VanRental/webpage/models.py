@@ -235,16 +235,18 @@ class TourGalleryImages(models.Model):
 
 class HeartReactions(models.Model):
     tour = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
-    heart_count = models.IntegerField()
+    hearted_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_hearted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'TOUR : {self.tour.title} || HEART REACTS : {self.heart_count}'
+        return f'TOUR : {self.tour.title} || HEART REACTS : {self.hearted_by.first_name}'
     
 class TourCommentSection(models.Model):
     tour = models.ForeignKey(TourGallery, on_delete=models.CASCADE)
-    comment = models.TextField()
+    comment = models.TextField(null=True, blank=True, default=None)
     commented_by = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    date_commented = models.DateTimeField(default=datetime.now())
+    
     def __str__(self):
         return f'USER : {self.commented_by.first_name} || COMMENT : {self.comment}'
     

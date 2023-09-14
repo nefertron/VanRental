@@ -548,113 +548,268 @@
 
                         <div class="container">
                             <div class="row">
-                                <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
-                                    <div class="custom-block bg-white shadow-lg">
-                                        <div class="d-flex">
-                                            <div>
-                                                <div class="mb-2">
-                                                    <h5><a href=''>Baguio Tour</a></h5>
-
+                                {% get_all_approved_gallery as approved_gallery  %}
+                                {% if approved_gallery|length > 0 %}
+                                    {% for approved in approved_gallery %}
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
+                                            <div class="custom-block bg-white shadow-lg">
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <div class="mb-2">
+                                                            <h5><a href=''>{{approved.title}}</a></h5>
+        
+                                                            <p>
+                                                                <b>Location : </b> {{approved.rented_van.to_destination}}<br>
+                                                                <b>Date : </b> {{approved.rented_van.travel_date}}
+                                                            </p>
+                                                        </div>
+            
+                                                    </div>
+                                                    <span class="badge bg-finance rounded-pill ms-auto">✔</span>
+                                                </div>
+                                                <div id="approvedGallery_{{approved.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                    <!-- Indicators/dots -->
+                                                    <div class="carousel-indicators">
+                                                        {% get_all_approved_gallery_indices approved as approved_gallery_indices %}
+                                                        {% for i in approved_gallery_indices %}
+                                                            {% if i == 0 %}
+                                                                <button type="button" data-bs-target="#approvedGallery_{{approved.id}}" data-bs-slide-to="{{i}}" class="active"></button>
+                                                            {% else %}
+                                                                <button type="button" data-bs-target="#approvedGallery_{{approved.id}}" data-bs-slide-to="{{i}}"></button>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- The slideshow/carousel -->
+                                                    {% get_all_approved_gallery_images approved as all_approved_gallery_images %}
+                                                    <div class="carousel-inner" id="carousel-inner">
+                                                        {% for gallery_image in all_approved_gallery_images %}
+                                                            {% if forloop.counter0 == 0 %}
+                                                                <div class="carousel-item active">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="carousel-item">
+                                                                    <div class='slider-image-container'>
+                                                                        <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                                    </div>
+                                                                </div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </div>
+                                                
+                                                    <!-- Left and right controls/icons -->
+                                                    <button class="carousel-control-prev" type="button" data-bs-target="#approvedGallery_{{approved.id}}" data-bs-slide="prev">
+                                                        <span class="carousel-control-prev-icon"></span>
+                                                    </button>
+                                                    <button class="carousel-control-next" type="button" data-bs-target="#approvedGallery_{{approved.id}}" data-bs-slide="next">
+                                                        <span class="carousel-control-next-icon"></span>
+                                                    </button>
+        
                                                     <p>
-                                                        <b>Location : </b> Baguio Eneme<br>
-                                                        <b>Date : </b> August 9, 2023
+                                                        <b>Van Used :</b> {{approved.rented_van.plate_no.brand_name}} <br>
+                                                        <b>Plate No :</b> {{approved.rented_van.plate_no.plate_no}} <br>
+                                                        <b>Color :</b> {{approved.rented_van.plate_no.color}}<br>
+                                                        <b>No. Of Seats :</b> {{approved.rented_van.plate_no.number_of_seats}} <br>
+                                                        <b>Air Conditioned :</b> 
+                                                            {% if approved.rented_van.plate_no.is_airconditioned %}
+                                                                YES
+                                                            {% else %}
+                                                                NO
+                                                            {% endif %}
+                                                        <br>
                                                     </p>
                                                 </div>
-    
-                                            </div>
-                                            <span class="badge bg-finance rounded-pill ms-auto">✔</span>
-                                        </div>
-                                        <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
-                                            <!-- Indicators/dots -->
-                                            <div class="carousel-indicators">
-                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                                                <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-                                            </div>
-                                        
-                                            <!-- The slideshow/carousel -->
-                                            <div class="carousel-inner">
-                                                <div class="carousel-item active">
-                                                    <img src="{% static 'assets/images/car-favicon.svg' %}" alt="" class="d-block w-100">
-                                                </div>
-                                                <div class="carousel-item">
-                                                    <img src="{% static 'assets/images/car-select.svg' %}" alt="" class="d-block w-100">
-                                                </div>
-                                                <div class="carousel-item">
-                                                    <img src="{% static 'assets/images/van-icon.svg' %}" alt="" class="d-block w-100">
-                                                </div>
-                                            </div>
-                                        
-                                            <!-- Left and right controls/icons -->
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-                                                <span class="carousel-control-prev-icon"></span>
-                                            </button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-                                                <span class="carousel-control-next-icon"></span>
-                                            </button>
-
-                                            <p>
-                                                <b>Brand Name :</b> Toyota High Ace <br>
-                                                <b>Plate No :</b> HGH343 <br>
-                                                <b>Color :</b> Red <br>
-                                                <b>No. Of Seats :</b> 12 <br>
-                                                <b>Air Conditioned :</b> 
-                                                    YES
                                                 <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <br>
+                                                <p class="mb-2">
+                                                    {{approved.description}}
+                                                </p>
+                                                <hr/>
+        
+                                                <div class='interactions-container'>
+                                                    <div style='display: flex;'>
+                                                        {% if user.is_authenticated %}
+                                                            {% get_all_heart_reactions_count user approved as all_heart_reactions_count %}
+                                                            <b>{{all_heart_reactions_count}}</b>
+                                                            <form method='POST'>
+                                                                {% csrf_token %}
+                                                                <input type='hidden' name='to_heart_react_tour_id' value='{{approved.id}}' />
+                                                                <button class='heart-btn' type='submit'>
+                                                                    <img src="{% static 'assets/images/heart.svg' %}"/>
+                                                                </button>
+                                                            </form>
+                                                        {% else %}
+                                                            {% get_all_heart_reactions_count 'None' approved as all_heart_reactions_count %}
+                                                            <b>{{all_heart_reactions_count}}</b>
+                                                            <button class='heart-btn'>
+                                                                <img src="{% static 'assets/images/heart.svg' %}"/>
+                                                            </button>
+                                                        {% endif %}
+                                                    </div>
+        
+                                                    <div style='display: flex; margin-left: 20px;'>
+                                                        {% get_all_tour_comments approved as all_tour_comments %}
+                                                        <b>{{all_tour_comments|length}}</b>
+                                                        <button class='message-btn'>
+                                                            <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                                        </button>
+                                                    </div>
+                                                </div>
+        
+        
+                                                {% get_all_tour_comments approved as all_tour_comments %}
+                                                {% if all_tour_comments|length > 0 %}
+                                                    {% for comment in all_tour_comments %}
+                                                        {% if forloop.counter0 < 1 %}
+                                                        <div id="{{approved.id}}_rental_user_comments{{forloop.counter0}}">
+                                                        {% else %}
+                                                        <div id="{{approved.id}}_rental_user_comments{{forloop.counter}}" style="display:none;">
+                                                        {% endif %}
+                                                            <div class='comment-section'>
+                                                                {% if comment.commented_by.passengeraccount.profile %}
+                                                                    <img src="{{comment.commented_by.passengeraccount.profile}}" class='comment-section-profile'/>
+                                                                {% elif comment.commented_by.driveraccount.profile %}
+                                                                    <img src="{{comment.commented_by.driveraccount.profile}}" class='comment-section-profile'/>
+                                                                {% elif comment.commented_by.adminaccount.profile %}
+                                                                    <img src="{{comment.commented_by.adminaccount.profile}}" class='comment-section-profile'/>
+                                                                {% else %}
+                                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                                {% endif %}
+                                                                <div class='comment-box'>
+                                                                    <h6 style="font-size: 0.875rem;">
+                                                                        {{comment.commented_by.first_name}} 
+                                                                        {{comment.commented_by.last_name}} 
+                                                                    </h6>
+                                                                    
+                                                                    <p style="font-size: 0.75rem;">
+                                                                        {{comment.comment}}
+                                                                    </p>
+                                                                    <p style="font-size: 0.75rem; margin-bottom: 0;">
+                                                                        Date Recorded : {{comment.date_commented}}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                    <button id="open-tour-comments_{{approved.id}}_rental_user_comments" onclick="openAllComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                    <button id="hide-tour-comments_{{approved.id}}_rental_user_comments"  onclick="hideAllComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                {% else %}
+                                                    <p style="font-size: 0.75rem;">No comments found</p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
+                                        <div class="custom-block bg-white shadow-lg">
+                                            <div class="d-flex">
+                                                <div>
+                                                    <div class="mb-2">
+                                                        <h5><a href=''>Baguio Tour</a></h5>
+                                                        <p>
+                                                            <b>Location : </b> Baguio Eneme<br>
+                                                            <b>Date : </b> August 9, 2023
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <span class="badge bg-finance rounded-pill ms-auto">✔</span>
+                                            </div>
+                                            <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                <!-- Indicators/dots -->
+                                                <div class="carousel-indicators">
+                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
+                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
+                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
+                                                </div>
+                                            
+                                                <!-- The slideshow/carousel -->
+                                                <div class="carousel-inner">
+                                                    <div class="carousel-item active">
+                                                        <img src="{% static 'assets/images/car-favicon.svg' %}" alt="" class="d-block w-100">
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <img src="{% static 'assets/images/car-select.svg' %}" alt="" class="d-block w-100">
+                                                    </div>
+                                                    <div class="carousel-item">
+                                                        <img src="{% static 'assets/images/van-icon.svg' %}" alt="" class="d-block w-100">
+                                                    </div>
+                                                </div>
+                                            
+                                                <!-- Left and right controls/icons -->
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon"></span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon"></span>
+                                                </button>
+
+                                                <p>
+                                                    <b>Van Used :</b> Toyota High Ace <br>
+                                                    <b>Plate No :</b> HGH343 <br>
+                                                    <b>Color :</b> Red <br>
+                                                    <b>No. Of Seats :</b> 12 <br>
+                                                    <b>Air Conditioned :</b> 
+                                                        YES
+                                                    <br>
+                                                </p>
+                                            </div>
+                                            
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
                                             </p>
-                                        </div>
-                                        
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                        </p>
-                                        <hr/>
+                                            <hr/>
 
-                                        <div style='display : flex; align: center; margin-bottom: 30px;'>
-                                            <div style='display: flex;'>
-                                                <b>150</b>
-                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
-                                                    <img src="{% static 'assets/images/heart.svg' %}" style='width: 30px; height: 30px;'/>
-                                                </button>
+                                            <div class='interactions-container'>
+                                                <div style='display: flex;'>
+                                                    <b>150</b>
+                                                    <button class='heart-btn'>
+                                                        <img src="{% static 'assets/images/heart.svg' %}"/>
+                                                    </button>
+                                                </div>
+
+                                                <div style='display: flex; margin-left: 20px;'>
+                                                    <b>150</b>
+                                                    <button class='message-btn'>
+                                                        <img src="{% static 'assets/images/message.svg' %}"/>
+                                                    </button>
+                                                </div>
                                             </div>
 
-                                            <div style='display: flex; margin-left: 20px;'>
-                                                <b>150</b>
-                                                <button style='border: none; background-color: transparent; width: 30px; height: 30px; padding: 0; margin-left: 10px;'>
-                                                    <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
-                                                </button>
-                                            </div>
-                                        </div>
 
-
-                                        <div id="1_rental_user_comments0">
-                                            <div class='comment-section'>
-                                                <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
-                                                <div class='comment-box'>
-                                                    <h6 style="font-size: 0.875rem;">
-                                                        Joshua Geronda
-                                                    </h6>
-                                                    
-                                                    <p style="font-size: 0.75rem;">
-                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                                    </p>
-                                                    
-                                                    <p style="font-size: 0.75rem; margin-bottom: 0;">
-                                                        Date : August 9, 2023
-                                                    </p>
+                                            <div id="1_rental_user_comments0">
+                                                <div class='comment-section'>
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
+                                                    <div class='comment-box'>
+                                                        <h6 style="font-size: 0.875rem;">
+                                                            Sample User
+                                                        </h6>
+                                                        
+                                                        <p style="font-size: 0.75rem;">
+                                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
+                                                        </p>
+                                                        
+                                                        <p style="font-size: 0.75rem; margin-bottom: 0;">
+                                                            Date : August 9, 2023
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        {% comment %} <button id="open-comments_1_rental_user_comments" onclick="openAllComments('1_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                        <button id="hide-comments_1_rental_user_comments"  onclick="hideAllComments('1_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button> {% endcomment %}
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -814,9 +969,6 @@
                                         <b>Location : </b> {{gallery.rented_van.from_destination}}<br>
                                         <b>Date : </b> {{gallery.rented_van.travel_date}}
                                         <br>
-                                        <br>
-                                        <b><i>Note that : </i></b> for this to be posted, the admin must approve this.
-                                        Another, the admin can modify the content of this gallery. 
                                     </p>
 
                                     <div id="add_gallery_{{gallery.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
@@ -849,6 +1001,7 @@
                                                         </div>
                                                     </div>
                                                 {% endif %}
+                                                <button class='remove-btn' onclick='removeThisImage({{gallery_image.id}})'>x</button>
                                             {% endfor %}
                                         </div>
                                     
@@ -861,25 +1014,22 @@
                                         </button>
                                     </div>
         
-                                    <h2 class="text-center" id='carousel_title' style='display:none;'>The images of the gallery will appear here</h2>
-                                    <h2 class="text-center" id='carousel_title_1' style='font-size:1rem;'>The images of the gallery will appear here</h2>
+                                    <h2 class="text-center font-bold" style='font-size: 1rem;'>Tour Images</h2>
+                                    <br>
+                                    <br>
                                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                                         {% csrf_token %}
-                                        <label class="form-label">Attach Images</label>
-                                        <input type="file" multiple name="attached_images" class="form-control"  onchange="displayUploadedPreview(event)" required>
-                                        <input type="hidden" multiple name="images" class="form-control" required>
-                                        <input type="hidden" value='{{gallery.id}}' name="gallery_id"  class="form-control" required>
         
-        
-                                        <label class="form-label">Tour Title</label>
-                                        <input type="text" name="title" class="form-control" placeholder="(ex. Baguio Tour) ..." required>
+                                        <label class="form-label">Title</label>
+                                        <input type="hidden" name="to_approve_gallery_id" value='{{gallery.id}}' class="form-control" required>
+                                        <input type="text" name="title" class="form-control" value='{{gallery.title}}' placeholder="(ex. Baguio Tour) ..." required>
                                         
                                         <label class="form-label">Description</label>
-                                        <input type="text" name="description" class="form-control" placeholder="Enter description ..." required>
+                                        <textarea name="description" class="form-control" style='height: 150px; border-radius: 15px;' value='{{gallery.description}}'  placeholder="Enter description ..." required>{{gallery.description}}</textarea>
         
                                         <div class="row">
                                             <div class="col-md-12">
-                                                <button type="submit" class="form-control">Save</button>
+                                                <button type="submit" class="form-control">Approve</button>
                                             </div>
                                         </div>
                                     </form>
@@ -900,6 +1050,7 @@
 
         <script src="{% static 'assets/js/form-validator.js' %}"></script>
         <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-tour-comments.js' %}"></script>
         <script src="{% static 'assets/js/open-notification.js' %}"></script>
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
@@ -966,6 +1117,26 @@
                 const modal = modalOverlay.querySelector(".modal");
                 modalOverlay.classList.remove("active");
                 modal.classList.remove("active");
+            }
+
+
+            function removeThisImage(image_id){
+
+                if (confirm('Are you sure you want to delete this image?')){
+                    
+                    fetch(`disable-gallery-image/${image_id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        alert(data)
+                    })
+                    
+                    .catch(error => {
+                        alert(error);
+                    });
+                }
+                else{
+                    console.log('declined')
+                }
             }
         </script>
     </body>

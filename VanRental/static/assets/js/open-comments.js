@@ -14,7 +14,6 @@ function openAllComments(id){
     
     var hide_btn = document.getElementById(`hide-comments_${id}`)
     hide_btn.style.display = '';
-
 }
 
 function hideAllComments(id){

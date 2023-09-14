@@ -44,20 +44,75 @@ def get_all_pending_new_gallery(user):
 
 @register.simple_tag
 def get_all_pending_gallery_images(tour_gallery):
-    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery).all()
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).all()
 
     return all_images
 
 
 @register.simple_tag
 def get_all_pending_gallery_indices(tour_gallery):
-    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery).count()
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).count()
     indexes = []
 
     for i in range(0, all_images):
         indexes.append(i)
 
     return indexes
+
+
+@register.simple_tag
+def get_all_approved_gallery():
+    all_approved_gallery = TourGallery.objects.filter(is_enabled = True).all().order_by('id')
+    return all_approved_gallery
+
+@register.simple_tag
+def get_all_approved_gallery_indices(tour_gallery):
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).count()
+    indexes = []
+
+    for i in range(0, all_images):
+        indexes.append(i)
+
+    return indexes
+
+@register.simple_tag
+def get_all_approved_gallery_images(tour_gallery):
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).all()
+    return all_images
+
+
+@register.simple_tag
+def get_all_heart_reactions_count(user, tour_gallery):
+
+    heart_details_storage = None
+
+    all_heart_reactions = HeartReactions.objects.filter(tour = tour_gallery, is_hearted = True).count()
+
+    if not user == 'None':
+        heart_checker = HeartReactions.objects.filter(tour = tour_gallery, is_hearted = True, hearted_by = user).first()
+
+        if heart_checker:
+            if all_heart_reactions > 1:
+                heart_details_storage = f'You and {all_heart_reactions - 1} others'
+            else:
+                heart_details_storage = f'You'
+        else:
+            heart_details_storage = all_heart_reactions
+    
+    else:
+        heart_details_storage = all_heart_reactions
+
+    return heart_details_storage
+
+
+@register.simple_tag
+def get_all_tour_comments(tour_gallery):
+    
+    all_tour_comments = TourCommentSection.objects.filter(tour = tour_gallery).all().order_by('id')
+
+    return all_tour_comments
+
+
 
 
 

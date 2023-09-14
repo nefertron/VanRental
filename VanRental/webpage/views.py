@@ -1438,6 +1438,9 @@ def gallery(request):
         description = request.POST.get('description')
         gallery_id = request.POST.get('gallery_id')
 
+        to_approve_gallery_id = request.POST.get('to_approve_gallery_id')
+
+        to_heart_react_tour_id = request.POST.get('to_heart_react_tour_id')
 
         if images:
             images_list = images.split('|||')
@@ -1463,6 +1466,55 @@ def gallery(request):
             messages.info(request, message_to_driver)
 
             return redirect('gallery')
+        
+        elif to_approve_gallery_id:
+            to_approve = TourGallery.objects.filter(id = to_approve_gallery_id).first()
+            to_approve.title = title
+            to_approve.description = description
+            to_approve.is_enabled = True
+            to_approve.save()
+
+
+            message_to_admin = f'APPROVED GALLERY || You successfully approved a gallery with title {title} and Gallery ID : {to_approve.tour_gallery_id}'
+            message_to_driver = f'APPROVED GALLERY || The gallery for tour you uploaded with title {title} has been approved.'
+                
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, to_approve.rented_van.driver_id.user_id, message_to_driver)
+
+            messages.info(request, message_to_admin)
+            return redirect('gallery')
+        
+        elif to_heart_react_tour_id:
+            target_tour = TourGallery.objects.filter(id=to_heart_react_tour_id).first()
+
+            if target_tour:
+                heart_react_checker = HeartReactions.objects.filter(tour = target_tour, hearted_by = request.user).first()
+
+                if heart_react_checker:
+
+                    if heart_react_checker.is_hearted == True:
+                        heart_react_checker.is_hearted = False
+                    else:
+                        messages.info(request,  f'You hearted the {target_tour.title}')
+                        heart_react_checker.is_hearted = True
+                    heart_react_checker.save()
+
+                    return redirect('gallery')  
+                
+                else:
+                    new_heart_react = HeartReactions.objects.create(tour = target_tour,
+                                                                    hearted_by = request.user,
+                                                                    is_hearted = True)
+                    new_heart_react.save()
+
+                    messages.info(request, f'You hearted the {target_tour.title}')                    
+                    return redirect('gallery')  
+            else:
+                messages.info(request, 'Something went wrong. Please try again!')
+                return redirect('gallery')  
+
+
+
     return render(request, 'gallery/gallery.html')
 
 
@@ -1791,6 +1843,22 @@ def get_unavailable_dates(request, id):
     return JsonResponse(temp_storage, safe=False)
 
 
+
+
+def disable_gallery_image(request, id):
+
+    target_image = TourGalleryImages.objects.filter(id=id).first()
+
+    if target_image:
+        target_image.is_enabled = False
+        target_image.save()
+
+        messsage = 'An image has been successfully disabled.'
+        return JsonResponse(messsage, safe=False)
+    
+    else:
+        messsage = 'Something went wrong. Please try again!'
+        return JsonResponse(messsage, safe=False)
 
 
 
