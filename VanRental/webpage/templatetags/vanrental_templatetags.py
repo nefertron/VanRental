@@ -92,7 +92,9 @@ def get_all_heart_reactions_count(user, tour_gallery):
         heart_checker = HeartReactions.objects.filter(tour = tour_gallery, is_hearted = True, hearted_by = user).first()
 
         if heart_checker:
-            if all_heart_reactions > 1:
+            if all_heart_reactions == 2:
+                heart_details_storage = f'You and {all_heart_reactions - 1} other'
+            elif all_heart_reactions > 2:
                 heart_details_storage = f'You and {all_heart_reactions - 1} others'
             else:
                 heart_details_storage = f'You'
@@ -292,7 +294,7 @@ def get_all_messages(user):
             # Get the last message sent by acc to the user
             last_msg = Messages.objects.filter(receiver=user, sender=acc).last()
 
-            print(last_msg)
+            # print(last_msg)
             if last_msg:
                 last_messages.append(last_msg)
 
@@ -541,8 +543,6 @@ def get_available_drivers(excempted_id, date_start, date_end):
         if driver_is_available:
             temp_driver_storage.append(driver)
 
-        print('test', temp_date_storage)
-
     return temp_driver_storage 
 
 @register.simple_tag
@@ -561,10 +561,10 @@ def mark_as_done_availability_checker(date_start, date_end):
 
     today_date = datetime.now().date()
 
-    print(temp_date_storage)
-    print(today_date.strftime('%Y-%m-%d'))
-    print((date_start.date() - today_date).days)
-    print(today_date.strftime('%Y-%m-%d') in temp_date_storage)
+    # print(temp_date_storage)
+    # print(today_date.strftime('%Y-%m-%d'))
+    # print((date_start.date() - today_date).days)
+    # print(today_date.strftime('%Y-%m-%d') in temp_date_storage)
     
     days_left = (date_start.date() - today_date).days
 
@@ -707,6 +707,18 @@ def get_total_pending_drivers():
     return total_pending_drivers
 
 
+
+@register.simple_tag
+def get_all_FAQs():
+    all_faqs = FAQs.objects.filter(is_active = True).all().order_by('id')
+
+    return all_faqs
+
+@register.simple_tag
+def get_getInTouch():
+    get_in_touch_checker = GetInTouch.objects.filter().first()
+
+    return get_in_touch_checker
 
 
 

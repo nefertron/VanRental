@@ -1,0 +1,1101 @@
+{% load static %}
+{% load tz %}
+{% load vanrental_templatetags %}
+{% load pwa %}
+{% progressive_web_app_meta %}
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Modify Landing Page | Passenger Connect</title>
+
+        <!-- CSS FILES -->        
+        <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Open+Sans&display=swap" rel="stylesheet">
+                        
+        <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/bootstrap-icons.css' %}" rel="stylesheet">
+
+        <link href="{% static 'assets/css/templatemo-topic-listing.css' %}" rel="stylesheet">      
+
+    </head>
+    
+    <body id="top">
+
+        <main>
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    {% if user.is_authenticated %}
+                        <button class='menu-button' id="menu-btn" onclick="openSideBar();">
+                            <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
+                            {% comment %} <span>Passenger Connect</span> {% endcomment %}
+                        </button>
+
+                        <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
+                            <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
+                            {% comment %} <span>Passenger Connect</span> {% endcomment %}
+                        </button>
+                    {% else %}
+                        <button class='menu-button'>
+                            <img src="{% static 'assets/images/car.svg' %}" class='h-45 w-45'/>
+                            <span>Passenger Connect</span>
+                        </button>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                    <div class="d-lg-none ms-auto me-4">
+                        <button class="profile-button" onclick="openMessage('mobile');">
+                            <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
+                        <button class="profile-button" onclick="openNotification('mobile');">
+                            <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
+                        <button class="profile-button" onclick="openProfile('mobile');">
+                            {% get_my_profile user as my_profile %}
+                            {% if my_profile %}
+                                <img src="{{my_profile}}"/>
+                            {% else %}
+                                <img src="{% static 'assets/images/default-profile.png' %}"/>
+                            {% endif %}
+                        </button>
+
+                        <div class="message-box mr-20" id="my-profile-mobile">
+                            <ul>
+                                <li>
+                                    <a href="/profile">
+                                        <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                        My Profile
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="/logout">
+                                        <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                        Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="message-box mr-20" id="my-message-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Messages
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    <li class="custom-button">
+                                        <p>Hello world</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                        <div class="message-box mr-20" id="my-notification-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Notifications
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    {% get_my_notifications user as all_notifications %}
+                                    {% if all_notifications|length > 0 %}
+                                        {% for notif in all_notifications %}
+                                            <li data-message='{{notif.id}}'  id='notification_{{notif.id}}' class="custom-button notification-button" style="{% if not notif.is_seen %}background-color: #c7e9fc; {% endif %}">
+                                                <p>{{notif.message}}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <li>
+                                            <p>Cannot find new notifications.</p>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endif %}
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index">Home</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#rent_section">Rent</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#reviews_section">Reviews</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#frequently_asked_questions">FAQs</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
+                            </li>
+
+                            {% if not user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/signup">Signup</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+
+                        {% if user.is_authenticated %}
+                        <div class="d-none d-lg-block">
+
+                            <button class="profile-button" onclick="openMessage('desktop');">
+                                <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+
+                            
+                            <button class="profile-button" onclick="openNotification('desktop');">
+                                <img src="{% static 'assets/images/bell-circle.svg' %}"/>
+                                {% get_unseen_notifications user as unseen_notifications %}
+                                {% if unseen_notifications > 0 %}
+                                    <div class='notification-alert'>
+                                            {{unseen_notifications}}
+                                    </div>
+                                {% endif %}
+                            </button>
+
+                                
+                            <button class="profile-button" onclick="openProfile('desktop');">
+                                {% get_my_profile user as my_profile %}
+                                {% if my_profile %}
+                                    <img src="{{my_profile}}"/>
+                                {% else %}
+                                    <img src="{% static 'assets/images/default-profile.png' %}"/>
+                                {% endif %}
+                            </button>
+
+                            <div class="message-box mr-100" id="my-profile-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Profile
+                                    </p>
+                                </div>
+                                <ul>
+                                    <li>
+                                        <a href="/profile">
+                                            <img src="{% static 'assets/images/account-settings.svg' %}" class="h-30 w-30"/>
+                                            My Profile
+                                        </a>
+                                    </li>
+    
+                                    <li>
+                                        <a href="/logout">
+                                            <img src="{% static 'assets/images/logout.svg' %}" class="h-30 w-30"/>
+                                            Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_all_messages user as all_my_messages %}
+                                        {% if all_my_messages|length > 0 %}
+                                            {% for msg in all_my_messages %}
+                                            
+                                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                                {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        {% else %}
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>We couldn`t find any messages</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-message-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Messages
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_all_messages user as all_my_messages %}
+                                        {% if all_my_messages|length > 0 %}
+                                            {% for msg in all_my_messages %}
+                                            
+                                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                                {% if msg.sender.passengeraccount %}
+                                                        {% if msg.sender.passengeraccount.profile %}
+                                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% elif msg.sender.driveraccount %}
+                                                        {% if msg.sender.driveraccount.profile %}
+                                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        {% if msg.sender.adminaccount.profile %}
+                                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                        {% else %}
+                                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                        {% endif %}
+                                                    {% endif %}
+
+                                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                                </div>
+                                            </li>
+                                            {% endfor %}
+                                        {% else %}
+                                        <li class="custom-button" style='display: flex;'>
+                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p>We couldn`t find any messages</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
+                                            </div>
+                                        </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="message-box mr-100" id="my-notification-desktop">
+                                <div class='message-box-header'>
+                                    <p>
+                                        Notifications
+                                    </p>
+                                </div>
+                                <div class='notification-scroll'>
+                                    <ul>
+                                        {% get_my_notifications user as all_notifications %}
+                                        {% if all_notifications|length > 0 %}
+                                            {% for notif in all_notifications %}
+                                                <li data-message='{{notif.id}}' id='notification_{{notif.id}}' class="custom-button notification-button" style="{% if not notif.is_seen %}background-color: #c7e9fc; {% endif %}">
+                                                    <p>{{notif.message}}</p>
+                                                </li>
+                                            {% endfor %}
+                                        {% else %}
+                                            <li>
+                                                <p>Cannot find new notifications.</p>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+
+            {% if user.is_authenticated %}
+            <div class="side-bar-header">   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index" class='display-flex'>
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/rent-a-van" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rent A Van
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Open Bookings
+                                        {% get_total_open_bookings as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/pending-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-alert.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Bookings
+                                        {% get_total_pending_bookings user as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Confirmed Bookings
+                                        {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                        {% if total_confirmed_bookings > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_confirmed_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/cancelled-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-cancel.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Cancelled Bookings
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/rejected-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rejected Bookings
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/profile" class='display-flex'>
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Settings
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/list-of-vans" class='display-flex'>
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        All Vans
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/pending-drivers" class='display-flex'>
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Drivers
+                                        {% get_total_pending_drivers as total_pending_drivers %}
+                                        {% if total_pending_drivers > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_pending_drivers}}
+                                            </div>
+                                        {% endif %}
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/modify-landing-page-content" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Modify Landing Page
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-5 col-12">
+                            <nav aria-label="breadcrumb" style="display:flex;">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Modify Landing Page</li>
+                                </ol>
+                            </nav>
+                        </div>
+
+                        {% for message in messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {{message}}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        
+                        <div class="container">
+                            <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5 mt-3">
+                                <div class="col-lg-12 col-12 m-auto">
+                                    <div class="accordion" id="accordionExample">
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="howHeading">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#HowDoesItWork" aria-expanded="false" aria-controls="HowDoesItWork">
+                                                    How Does It Work Section
+                                                </button>
+                                            </h2>
+        
+                                            <div id="HowDoesItWork" class="accordion-collapse collapse" aria-labelledby="howHeading" data-bs-parent="#accordionExample">
+                                                <div class="accordion-body">
+                                                    <section class="timeline-section section-padding" id="how_does_it_work">
+                                                        <div class="section-overlay"></div>
+                                        
+                                                        <div class="container">
+                                                            <div class="row">
+                                        
+                                                                <div class="col-12 text-center">
+                                                                    <h2 class="text-white mb-4">How does it work?</h1>
+                                                                </div>
+                                        
+                                                                <div class="col-lg-10 col-12 mx-auto">
+                                                                    <div class="timeline-container">
+                                                                        <ul class="vertical-scrollable-timeline" id="vertical-scrollable-timeline">
+                                                                            <div class="list-progress">
+                                                                                <div class="inner"></div>
+                                                                            </div>
+                                        
+                                                                            <li>
+                                                                                <h4 class="text-white mb-3">Select a van of your choice</h4>
+                                        
+                                                                                <p class="text-white">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reiciendis, cumque magnam? Sequi, cupiditate quibusdam alias illum sed esse ad dignissimos libero sunt, quisquam numquam aliquam? Voluptas, accusamus omnis?</p>
+                                        
+                                                                                <div class="icon-holder">
+                                                                                  <i class="bi-search"></i>
+                                                                                </div>
+                                                                            </li>
+                                                                            
+                                                                            <li>
+                                                                                <h4 class="text-white mb-3">Book &amp; and wait for the confirmation</h4>
+                                        
+                                                                                <p class="text-white">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sint animi necessitatibus aperiam repudiandae nam omnis est vel quo, nihil repellat quia velit error modi earum similique odit labore. Doloremque, repudiandae?</p>
+                                        
+                                                                                <div class="icon-holder">
+                                                                                  <i class="bi-bookmark"></i>
+                                                                                </div>
+                                                                            </li>
+                                        
+                                                                            <li>
+                                                                                <h4 class="text-white mb-3">Ride &amp; Enjoy</h4>
+                                        
+                                                                                <p class="text-white">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Animi vero quisquam, rem assumenda similique voluptas distinctio, iste est hic eveniet debitis ut ducimus beatae id? Quam culpa deleniti officiis autem?</p>
+                                        
+                                                                                <div class="icon-holder">
+                                                                                  <i class="bi-book"></i>
+                                                                                </div>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="FAQsHeading">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#FAQsSection" aria-expanded="false" aria-controls="FAQsSection">
+                                                    FAQs Section
+                                                </button>
+                                            </h2>
+        
+                                            <div id="FAQsSection" class="accordion-collapse collapse" aria-labelledby="FAQsHeading" data-bs-parent="#accordionExample">
+                                                <div class="accordion-body">
+                                                    <section class="faq-section section-padding" id="frequently_asked_questions">
+                                                        <div class="container">
+                                                            <div class="row">
+                                                                <div class="col-lg-6 col-12">
+                                                                    <h2 class="mb-4">Frequently Asked Questions</h2>
+                                                                </div>
+                                        
+                                                                <div class="clearfix"></div>
+                                        
+                                                                <div class="col-lg-5 col-12">
+                                                                    <img src="{% static 'assets/images/faq_graphic.jpg' %}" class="img-fluid" alt="FAQs">
+                                                                </div>
+                                        
+                                                                <div class="col-lg-6 col-12 m-auto">
+                                                                    <div id='accordions-container'>
+                                                                        {% get_all_FAQs as all_faqs %}
+                                                                        {% if all_faqs|length > 0 %}
+                                                                            <div class="accordion" id="faqs1">
+                                                                                {% for freq in all_faqs %}
+                                                                                    <div class="accordion-item">
+                                                                                        <h2 class="accordion-header" id="heading{{freq.id}}">
+                                                                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{freq.id}}" aria-expanded="true" aria-controls="collapse{{freq.id}}">
+                                                                                                {{freq.question}}
+                                                                                            </button>
+                                                                                        </h2>
+                                                    
+                                                                                        <div id="collapse{{freq.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{freq.id}}" data-bs-parent="#faqs1">
+                                                                                            <div class="accordion-body">
+                                                                                                {{freq.answer}}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                {% endfor %}
+                                                                            </div>
+                                                                        {% else %}
+                                                                            <div class="accordion" id="faqs1">
+                                                                                <div class="accordion-item">
+                                                                                    <h2 class="accordion-header" id="headingOne">
+                                                                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                                                            What is Van Rental?
+                                                                                        </button>
+                                                                                    </h2>
+                                                
+                                                                                    <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqs1">
+                                                                                        <div class="accordion-body">
+                                                                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                                                                        <strong>Lorem ipsum dolor sit amet.</strong>
+                                                                                        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                
+                                                                                <div class="accordion-item">
+                                                                                    <h2 class="accordion-header" id="headingTwo">
+                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                                                        How to book?
+                                                                                    </button>
+                                                                                    </h2>
+                                                
+                                                                                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqs1">
+                                                                                        <div class="accordion-body">
+                                                                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                                                                            <strong>Lorem ipsum dolor sit amet.</strong>
+                                                                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                
+                                                                                <div class="accordion-item">
+                                                                                    <h2 class="accordion-header" id="headingThree">
+                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                                                        Does it need to paid?
+                                                                                    </button>
+                                                                                    </h2>
+                                                
+                                                                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqs1">
+                                                                                        <div class="accordion-body">
+                                                                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                                                                            <strong>Lorem ipsum dolor sit amet.</strong>
+                                                                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        {% endif %}
+                                                                    </div>
+
+                                                                    <div id='inputs-container' style='display: none;'>
+                                                                        <form method='POST' id='FAQsForm' class='custom-form subscribe-form g-3 needs-validation'>
+                                                                            {% csrf_token %}
+                                                                            {% get_all_FAQs as all_faqs %}
+                                                                            {% for freq in all_faqs %}
+                                                                                <h6>FAQs #{{forloop.counter}}</h6>
+                                                                                <input type="hidden" name='faq_id' class="form-control" value='{{freq.id}}' required>
+                                                                                
+                                                                                <label class="form-label">Question</label>
+                                                                                <textarea name='faq_question_{{freq.id}}' class="form-control" style='border-radius: 10px;' value='{{freq.question}}' placeholder="{{freq.question}}" required>{{freq.question}}</textarea>
+                                                                                
+                                                                                <label class="form-label">Answer</label>
+                                                                                <textarea name='faq_answer_{{freq.id}}' class="form-control" style='border-radius: 10px;' value='{{freq.answer}}' placeholder="{{freq.answer}}" required>{{freq.answer}}</textarea>
+                                                                                
+                                                                                <div class='row'>
+                                                                                    <div class='col-md-6 col-lg-6 col-6'>
+                                                                                        <label class="form-label">Disable</label>
+                                                                                        <input type='checkbox' name='faq_disable_{{freq.id}}'>
+                                                                                    </div>
+
+                                                                                    <div class='col-md-6 col-lg-6 col-6'>
+                                                                                        <label class="form-label">Delete</label>
+                                                                                        <input type='checkbox' name='faq_delete_{{freq.id}}'>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <hr style='margin-bottom: 30px; color: red;'/>
+                                                                            {% endfor %}
+                                                                        </form>
+                                                                    </div>
+                                                                    
+
+                                                                    <div id='add-faqs-container' style='display: none;'>
+                                                                        <br>
+                                                                        <br>
+                                                                        <form method='POST' class='custom-form subscribe-form g-3 needs-validation' novalidate>
+                                                                            {% csrf_token %}
+                                                                            <label class="form-label">Question</label>
+                                                                            <textarea name='new_question' class="form-control" style='border-radius: 10px;' placeholder="Compose new question ..." required></textarea>
+                                                                            
+                                                                            <label class="form-label">Answer</label>
+                                                                            <textarea name='new_answer' class="form-control" style='border-radius: 10px;' placeholder="Compose an answer ... " required></textarea>
+
+                                                                            <button type='submit' class='custom-btn mt-2 mt-lg-3 w-100'>Add</button>
+                                                                        </form>
+                                                                    </div>
+
+                                                                    <button onclick='addNewFAQs();' id='add-btn' class='custom-btn mt-2 mt-lg-3 w-100 btn-primary' >
+                                                                        Add
+                                                                    </button>
+
+                                                                    <button onclick='allowFAQsEdit();' id='edit-btn' class='custom-btn mt-2 mt-lg-3 w-100'>
+                                                                        Edit
+                                                                    </button>
+
+                                                                    <button onclick='submitBtn();' id='submit-btn' style='display : none;'  class='custom-btn mt-2 mt-lg-3 w-100'>
+                                                                        Submit
+                                                                    </button>
+
+                                                                    <button onclick='cancelFAQsEdit();' id='cancel-btn' style='display : none;' class='custom-btn mt-2 mt-lg-3 btn-danger w-100'>
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
+                                        
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                </div>
+                                            </div>
+                                        </div>
+        
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="GetInTouchHeading">
+                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#GetInTouchSection" aria-expanded="false" aria-controls="GetInTouchSection">
+                                                    Get In Touch Section
+                                                </button>
+                                            </h2>
+        
+                                            <div id="GetInTouchSection" class="accordion-collapse collapse" aria-labelledby="GetInTouchHeading" data-bs-parent="#accordionExample">
+                                                <div class="accordion-body">
+                                                    <section class="contact-section section-padding section-bg" id="get_in_touch">
+                                                        <div class="container">
+                                                            <div class="row">
+                                        
+                                                                <div class="col-lg-12 col-12 text-center">
+                                                                    <h2 class="mb-5">Get in touch</h2>
+                                                                </div>
+                                        
+                                                                
+                                                                {% get_getInTouch as get_in_touch_data %}
+                                                                {% if get_in_touch_data %}
+                                                                    <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto" id='get-in-touch'>
+                                                                        <h4 class="mb-3">Head office</h4>
+                                            
+                                                                        <p>{{get_in_touch_data.office_address}}</p>
+                                            
+                                                                        <hr>
+                                            
+                                                                        <p class="d-flex align-items-center mb-1">
+                                                                            <span class="me-2">Phone</span>
+                                            
+                                                                            <a href="#" class="site-footer-link">
+                                                                                {{get_in_touch_data.contact_no}}
+                                                                            </a>
+                                                                        </p>
+                                            
+                                                                        <p class="d-flex align-items-center">
+                                                                            <span class="me-2">Email</span>
+                                            
+                                                                            <a href="mailto:{{get_in_touch_data.email}}" class="site-footer-link">
+                                                                                {{get_in_touch_data.email}}
+                                                                            </a>
+                                                                        </p>
+                                                                    </div>
+                                                                {% else %}
+                                                                
+                                                                    <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto" id='get-in-touch'>
+                                                                        <h4 class="mb-3">Head office</h4>
+                                            
+                                                                        <p>Barangay Isabang, Lucena City, Quezon, Philippines 4301</p>
+                                            
+                                                                        <hr>
+                                            
+                                                                        <p class="d-flex align-items-center mb-1">
+                                                                            <span class="me-2">Phone</span>
+                                            
+                                                                            <a href="#" class="site-footer-link">
+                                                                                0919-473-5688
+                                                                            </a>
+                                                                        </p>
+                                            
+                                                                        <p class="d-flex align-items-center">
+                                                                            <span class="me-2">Email</span>
+                                            
+                                                                            <a href="mailto:passengerconnect@gmail.com" class="site-footer-link">
+                                                                                passengerconnect@gmail.com
+                                                                            </a>
+                                                                        </p>
+                                                                    </div>
+                                                                {% endif %}
+
+
+                                                                <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto" style='display: none;' id='get-in-touch-form'>
+                                                                    <h4 class="mb-3">Head office</h4>
+                                                                    <form method='POST' class='custom-form subscribe-form g-3 needs-validation' novalidate>
+                                                                        {% csrf_token %}
+                                                                        {% get_getInTouch as get_in_touch_data %}
+
+
+                                                                        <input type='text' class='form-control' name='office_address'
+                                                                            value='{% if get_in_touch_data %}{{get_in_touch_data.office_address}}{% else %}Barangay Isabang, Lucena City, Quezon, Philippines 4301{%endif%}'
+                                                                        >
+                                                                        <hr>
+                                                                        <label class="form-label">Phone</label>
+                                                                        <input type='text' class='form-control' name='contact_no'
+                                                                        value='{% if get_in_touch_data %}{{get_in_touch_data.contact_no}}{% else %}0919-473-5688{%endif%}'
+                                                                        >
+                                        
+                                                                        <label class="form-label">Email</label>
+                                                                        <input type='email' class='form-control' name='email'
+                                                                        value='{% if get_in_touch_data %}{{get_in_touch_data.email}}{% else %}passengerconnect@gmail.com{%endif%}'
+                                                                        >
+
+                                                                        <div class='row'>
+                                                                            <div class='col-md-12 col-lg-6 col-12'>
+                                                                                <button type='submit' style='height: 50px;' class='custom-btn mt-2 mt-lg-3 w-100'>
+                                                                                    Submit
+                                                                                </button>
+                                                                            </div>
+
+                                                                            <div class='col-md-12 col-lg-6 col-12'>
+                                                                                <button type='button' onclick='cancelGetInTouchEdit();' class='custom-btn mt-2 mt-lg-3 w-100 btn-danger'>
+                                                                                    Cancel
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+
+
+                                                                <button onclick='editGetInTouch();' id='edit-get-in-touch-btn' class='custom-btn mt-2 mt-lg-3 w-100'>
+                                                                    Edit
+                                                                </button>
+
+
+                                                            </div>
+                                                        </div>
+                                                    </section>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        </main>
+
+        <div class="modal-overlay" id="seen_message">
+            <div class="modal">
+                <div class="modal-body">
+                    <h2 class="modal-title text-sm" id="modal-title-holder">
+                        <!-- a header will be generated by the javascript -->
+                    </h2>
+                    <p id="modal-body-holder">
+                        <!-- this will be changed once the admin proceeds -->
+                    </p>
+
+                    <p id="modal-footer">
+                        <!-- Date Recorded : 0000-00-00 -->
+                    </p>
+                    <button type='submit' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('seen_message')">Close</button>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- JAVASCRIPT FILES -->
+        <script src="{% static 'assets/js/jquery.min.js' %}"></script>
+        <script src="{% static 'assets/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static 'assets/js/jquery.sticky.js' %}"></script>
+        <script src="{% static 'assets/js/custom.js' %}"></script>
+
+        <script src="{% static 'assets/js/form-validator.js' %}"></script>
+        <script src="{% static 'assets/js/open-modal.js' %}"></script>
+        <script src="{% static 'assets/js/open-notification.js' %}"></script>
+        <script src="{% static 'assets/js/update-notification.js' %}"></script> 
+        <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
+        <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        
+        <script>
+            function allowFAQsEdit(){
+                var accordions = document.getElementById('accordions-container');
+                accordions.style.display = 'none';
+
+                var editBtn = document.getElementById('edit-btn')
+                editBtn.style.display = 'none'
+                
+                var addBtn = document.getElementById('add-btn')
+                addBtn.style.display = 'none'
+
+                var submitBtn = document.getElementById('submit-btn')
+                submitBtn.style.display = ''
+
+                var cancelBtn = document.getElementById('cancel-btn')
+                cancelBtn.style.display = ''
+
+                var inputsContainer = document.getElementById('inputs-container')
+                inputsContainer.style.display = ''
+                
+                var addFaqsContainer = document.getElementById('add-faqs-container')
+                addFaqsContainer.style.display = 'none'
+            }
+
+
+
+            function cancelFAQsEdit(){
+                var accordions = document.getElementById('accordions-container');
+                accordions.style.display = '';
+
+                var editBtn = document.getElementById('edit-btn')
+                editBtn.style.display = ''
+
+                var addBtn = document.getElementById('add-btn')
+                addBtn.style.display = ''
+                
+                var submitBtn = document.getElementById('submit-btn')
+                submitBtn.style.display = 'none'
+
+                var cancelBtn = document.getElementById('cancel-btn')
+                cancelBtn.style.display = 'none'
+
+                var inputsContainer = document.getElementById('inputs-container')
+                inputsContainer.style.display = 'none'
+
+                
+                var addFaqsContainer = document.getElementById('add-faqs-container')
+                addFaqsContainer.style.display = 'none'
+            }
+
+
+            function addNewFAQs(){
+                var editBtn = document.getElementById('edit-btn')
+                editBtn.style.display = 'none'
+                
+                var addBtn = document.getElementById('add-btn')
+                addBtn.style.display = 'none'
+
+                var submitBtn = document.getElementById('submit-btn')
+                submitBtn.style.display = 'none'
+
+                var cancelBtn = document.getElementById('cancel-btn')
+                cancelBtn.style.display = ''
+                
+                var addFaqsContainer = document.getElementById('add-faqs-container')
+                addFaqsContainer.style.display = ''
+
+                var inputsContainer = document.getElementById('inputs-container')
+                inputsContainer.style.display = 'none'
+
+            }
+
+
+            function submitBtn(){
+                var FAQsForm = document.getElementById('FAQsForm');
+                FAQsForm.submit()
+                
+            }
+
+
+            function editGetInTouch(){
+                var getInTouch = document.getElementById('get-in-touch')
+                getInTouch.style.display = 'none'
+                
+                var getInTouchBTN = document.getElementById('edit-get-in-touch-btn')
+                getInTouchBTN.style.display = 'none'
+
+                var getInTouchForm = document.getElementById('get-in-touch-form')
+                getInTouchForm.style.display = ''
+
+            }
+
+            function cancelGetInTouchEdit(){
+                var getInTouch = document.getElementById('get-in-touch')
+                getInTouch.style.display = ''
+                
+                var getInTouchBTN = document.getElementById('edit-get-in-touch-btn')
+                getInTouchBTN.style.display = ''
+
+                var getInTouchForm = document.getElementById('get-in-touch-form')
+                getInTouchForm.style.display = 'none'
+            }
+        </script>
+
+
+
+    </body>
+</html>

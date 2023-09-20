@@ -496,7 +496,7 @@
             {% endif %}
             
 
-            <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
+            <section class="hero-section d-flex justify-content-center align-items-center" style='margin-top: -100px;' id="section_1">
                 <div class="container">
                     <div class="row">
                         {% for message in messages %}
@@ -507,11 +507,11 @@
                         {% endfor %}
 
                         <div class="col-lg-8 col-12 mx-auto">
-                            <h1 class="text-white text-center">Search. Book. Enjoy</h1>
+                            <h1 class="text-white text-center">Browse. Book. Enjoy</h1>
 
                             <h6 class="text-center">platform for van rental and carpooling services</h6>
 
-                            <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search">
+                            {% comment %} <form method="get" class="custom-form mt-4 pt-2 mb-lg-0 mb-5" role="search">
                                 <div class="input-group input-group-lg">
                                     <span class="input-group-text bi-search" id="basic-addon1">
                                         
@@ -521,7 +521,7 @@
 
                                     <button type="submit" class="form-control">Search</button>
                                 </div>
-                            </form>
+                            </form> {% endcomment %}
                         </div>
 
                     </div>
@@ -546,6 +546,23 @@
                                 </div>
 
                                 <img src="{% static 'assets/images/van-rental-bg-2.png' %}" class="custom-block-image img-fluid" alt="">
+
+                                <hr/>
+                                <div class='interactions-container'>
+                                    <div style='display: flex;'>
+                                        <b>120</b>
+                                        <button class='heart-btn'>
+                                            <img src="{% static 'assets/images/heart.svg' %}"/>
+                                        </button>
+                                    </div>
+
+                                    <div style='display: flex; margin-left: 20px;'>
+                                        <b>100</b>
+                                        <button class='message-btn'>
+                                            <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1474,57 +1491,77 @@
                         </div>
 
                         <div class="col-lg-6 col-12 m-auto">
-                            <div class="accordion" id="accordionExample">
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingOne">
-                                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        What is Van Rental?
+                            {% get_all_FAQs as all_faqs %}
+                            {% if all_faqs|length > 0 %}
+                                <div class="accordion" id="faqs1">
+                                    {% for freq in all_faqs %}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading{{freq.id}}">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{freq.id}}" aria-expanded="true" aria-controls="collapse{{freq.id}}">
+                                                    {{freq.question}}
+                                                </button>
+                                            </h2>
+        
+                                            <div id="collapse{{freq.id}}" class="accordion-collapse collapse" aria-labelledby="heading{{freq.id}}" data-bs-parent="#faqs1">
+                                                <div class="accordion-body">
+                                                    {{freq.answer}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="accordion" id="faqs1">
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                What is Van Rental?
+                                            </button>
+                                        </h2>
+    
+                                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqs1">
+                                            <div class="accordion-body">
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                            <strong>Lorem ipsum dolor sit amet.</strong>
+                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingTwo">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            How to book?
                                         </button>
-                                    </h2>
-
-                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                           Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
-                                           <strong>Lorem ipsum dolor sit amet.</strong>
-                                           Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                        </h2>
+    
+                                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqs1">
+                                            <div class="accordion-body">
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                                <strong>Lorem ipsum dolor sit amet.</strong>
+                                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingThree">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                            Does it need to paid?
+                                        </button>
+                                        </h2>
+    
+                                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqs1">
+                                            <div class="accordion-body">
+                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
+                                                <strong>Lorem ipsum dolor sit amet.</strong>
+                                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingTwo">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        How to book?
-                                    </button>
-                                    </h2>
-
-                                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
-                                            <strong>Lorem ipsum dolor sit amet.</strong>
-                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
-                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="accordion-item">
-                                    <h2 class="accordion-header" id="headingThree">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                        Does it need to paid?
-                                    </button>
-                                    </h2>
-
-                                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                                        <div class="accordion-body">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Repudiandae, excepturi.
-                                            <strong>Lorem ipsum dolor sit amet.</strong>
-                                            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Distinctio eius itaque voluptatibus nostrum? Fuga voluptate provident voluptates magni porro facilis.
-                                         </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {% endif %}
                         </div>
-
                     </div>
                 </div>
             </section>
@@ -1540,29 +1577,57 @@
 
                         
 
-                        <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
-                            <h4 class="mb-3">Head office</h4>
-
-                            <p>Barangay Isabang, Lucena City, Quezon, Philippines 4301</p>
-
-                            <hr>
-
-                            <p class="d-flex align-items-center mb-1">
-                                <span class="me-2">Phone</span>
-
-                                <a href="tel: 305-240-9671" class="site-footer-link">
-                                    0919-473-5688
-                                </a>
-                            </p>
-
-                            <p class="d-flex align-items-center">
-                                <span class="me-2">Email</span>
-
-                                <a href="mailto:vanrental@gmail.com" class="site-footer-link">
-                                    passengerconnect@gmail.com
-                                </a>
-                            </p>
-                        </div>
+                        {% get_getInTouch as get_in_touch_data %}
+                        {% if get_in_touch_data %}
+                            <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto">
+                                <h4 class="mb-3">Head office</h4>
+    
+                                <p>{{get_in_touch_data.office_address}}</p>
+    
+                                <hr>
+    
+                                <p class="d-flex align-items-center mb-1">
+                                    <span class="me-2">Phone</span>
+    
+                                    <a href="#" class="site-footer-link">
+                                        {{get_in_touch_data.contact_no}}
+                                    </a>
+                                </p>
+    
+                                <p class="d-flex align-items-center">
+                                    <span class="me-2">Email</span>
+    
+                                    <a href="mailto:{{get_in_touch_data.email}}" class="site-footer-link">
+                                        {{get_in_touch_data.email}}
+                                    </a>
+                                </p>
+                            </div>
+                        {% else %}
+                        
+                            <div class="col-lg-12 col-md-12 col-12 mb-3 mb-lg- mb-md-0 ms-auto" id='get-in-touch'>
+                                <h4 class="mb-3">Head office</h4>
+    
+                                <p>Barangay Isabang, Lucena City, Quezon, Philippines 4301</p>
+    
+                                <hr>
+    
+                                <p class="d-flex align-items-center mb-1">
+                                    <span class="me-2">Phone</span>
+    
+                                    <a href="#" class="site-footer-link">
+                                        0919-473-5688
+                                    </a>
+                                </p>
+    
+                                <p class="d-flex align-items-center">
+                                    <span class="me-2">Email</span>
+    
+                                    <a href="mailto:passengerconnect@gmail.com" class="site-footer-link">
+                                        passengerconnect@gmail.com
+                                    </a>
+                                </p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </section>

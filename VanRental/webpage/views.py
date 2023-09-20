@@ -1431,7 +1431,6 @@ def filtered_messages(request, id):
 ################ GALLERY PAGE
 def gallery(request):
 
-
     if request.method == 'POST':
         images = request.POST.get('images')
         title = request.POST.get('title')
@@ -1441,6 +1440,11 @@ def gallery(request):
         to_approve_gallery_id = request.POST.get('to_approve_gallery_id')
 
         to_heart_react_tour_id = request.POST.get('to_heart_react_tour_id')
+
+        tour_id = request.POST.get('tour_id')
+        new_comment = request.POST.get('new_comment')
+
+
 
         if images:
             images_list = images.split('|||')
@@ -1513,17 +1517,168 @@ def gallery(request):
                 messages.info(request, 'Something went wrong. Please try again!')
                 return redirect('gallery')  
 
+        elif tour_id:
+            target_tour = TourGallery.objects.filter(id = tour_id).first()
+            create_new_comment = TourCommentSection.objects.create(tour = target_tour,
+                                                            commented_by = request.user,
+                                                            comment = new_comment)
+            create_new_comment.save()
+            return redirect('gallery')  
+
 
 
     return render(request, 'gallery/gallery.html')
 
 
 
+################ MODIFY LANDING PAGE
+def modify_landing_page(request):
+    
+    if not request.user.is_superuser:
+        messages.info(request, f'The page you are trying to access is not available.')
+        return redirect('/login')
+
+
+    if request.method == 'POST':
+        all_faq_id = request.POST.getlist('faq_id')
+        new_question = request.POST.get('new_question')
+        new_answer = request.POST.get('new_answer')
+
+
+        office_address = request.POST.get('office_address')
+        contact_no = request.POST.get('contact_no')
+        email = request.POST.get('email')
+
+        if all_faq_id:
+            all_deleted = 0
+            all_disabled = 0
+
+            for i in all_faq_id:
+                delete = request.POST.get(f'faq_delete_{i}')
+                disable = request.POST.get(f'faq_disable_{i}')
+
+                if delete:
+                    del_faqs = FAQs.objects.filter(id=i).first()
+                    del_faqs.delete()
+                    all_deleted = all_deleted + 1
+                
+                elif disable:
+                    FAQs.objects.filter(id=i).update(is_active = False)
+                    all_disabled = all_disabled + 1
+
+                FAQs.objects.filter(id=i).update(question = request.POST.get(f'faq_question_{i}'),
+                                                  answer = request.POST.get(f'faq_answer_{i}'))
+            
+            messages.info(request, 'Your FAQs has been modified!')
+
+            if all_deleted == 1:
+                messages.info(request, '1 FAQ has been deleted.')
+            elif all_deleted > 1:
+                messages.info(request, f'{all_deleted} FAQs have been deleted.')
+
+            if all_disabled == 1:
+                messages.info(request, '1 FAQ has been disabled.')
+            elif all_disabled > 1:
+                messages.info(request, f'{all_disabled} FAQs have been disabled.')
+
+
+            return redirect('/modify-landing-page-content')
+
+
+
+        elif new_question:
+            create_faqs = FAQs.objects.create(question = new_question,
+                                              answer = new_answer)
+            create_faqs.save()
+
+            messages.info(request, 'New FAQS has been added!')
+            return redirect('/modify-landing-page-content')
+        
+
+        elif office_address:
+            get_in_touch_checker = GetInTouch.objects.filter().first()
+
+            if get_in_touch_checker:
+                get_in_touch_checker.office_address = office_address
+                get_in_touch_checker.contact_no = contact_no
+                get_in_touch_checker.email = email
+                get_in_touch_checker.save()
+
+            else:
+                create_get_in_touch = GetInTouch.objects.create(office_address = office_address,
+                                                                contact_no = contact_no,
+                                                                email = email)
+                create_get_in_touch.save()
+
+            messages.info(request, 'Get In Touch section has been modified!')
+            return redirect('/modify-landing-page-content')
+
+    return render(request, 'homepage/modify-landing-page.html')
+
+
 def filtered_gallery(request, id):
 
-    context = {
-        'tour_id' : id
-    }
+    context = {}
+
+
+    find_tour = TourGallery.objects.filter(id = id).first()
+
+    if find_tour:
+        context['approved'] = find_tour
+
+
+        if request.method == 'POST':
+            to_heart_react_tour_id = request.POST.get('to_heart_react_tour_id')
+            tour_id = request.POST.get('tour_id')
+            new_comment = request.POST.get('new_comment')
+            
+            if to_heart_react_tour_id:
+                target_tour = TourGallery.objects.filter(id=to_heart_react_tour_id).first()
+
+                if target_tour:
+                    heart_react_checker = HeartReactions.objects.filter(tour = target_tour, hearted_by = request.user).first()
+
+                    if heart_react_checker:
+
+                        if heart_react_checker.is_hearted == True:
+                            heart_react_checker.is_hearted = False
+                        else:
+                            messages.info(request,  f'You hearted the {target_tour.title}')
+                            heart_react_checker.is_hearted = True
+                        heart_react_checker.save()
+
+                        return redirect(f'/gallery/{id}/')  
+                    else:
+                        new_heart_react = HeartReactions.objects.create(tour = target_tour,
+                                                                        hearted_by = request.user,
+                                                                        is_hearted = True)
+                        new_heart_react.save()
+
+                        messages.info(request, f'You hearted the {target_tour.title}')                    
+                        return redirect(f'/gallery/{id}/')  
+                else:
+                    messages.info(request, 'Something went wrong. Please try again!')
+                    return redirect(f'/gallery/{id}/')  
+            elif tour_id:
+                target_tour = TourGallery.objects.filter(id = tour_id).first()
+                create_new_comment = TourCommentSection.objects.create(tour = target_tour,
+                                                                commented_by = request.user,
+                                                                comment = new_comment)
+                create_new_comment.save()
+                return redirect(f'/gallery/{id}/')  
+
+
+
+
+
+
+        return render(request, 'gallery/filtered-gallery.html', context)
+
+    else:
+        messages.info(request, 'Sorry,  we couldn`t find a gallery with that ID. Please try again!')
+        return redirect('/gallery')
+
+
     # tour_gallery = TourGallery.objects.filter(id = id).first()
     
     # if tour_gallery:
@@ -1533,7 +1688,6 @@ def filtered_gallery(request, id):
     #     messages.info(request, f'Sorry, the gallery of a tour you want to visit is not available or doesn`t exist.')
     #     return redirect('/index')
     
-    return render(request, 'gallery/filtered-gallery.html', context)
 
 
 ################ LOGOUT PAGE

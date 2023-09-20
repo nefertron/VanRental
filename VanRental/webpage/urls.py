@@ -28,6 +28,9 @@ urlpatterns = [
     path('messages-<id>/', filtered_messages, name='filtered_messages'),
     path('gallery', gallery, name='gallery'),
     path('gallery/<id>/', filtered_gallery, name='filtered_gallery'),
+    path('modify-landing-page-content', modify_landing_page, name='modify_landing_page'),
+
+
 
     path('get-unavailable-dates/<id>/', get_unavailable_dates, name='get_unavailable_dates'),
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),

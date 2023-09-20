@@ -596,9 +596,13 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
-                                    <div class="custom-block bg-white shadow-lg">
-                                        <div class="d-flex">
-                                            <div>
+                                    <div class="custom-block bg-white shadow-lg" style='padding: auto; padding-right: 0.5rem; padding-left: 0.5rem;'>
+                                        <div style='display: flex;'>
+                                            <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #005c7e; background-color: rgba(0, 93, 126, 0.3); width: 50px; height: 50px;'>
+                                                <img src="{% static 'assets/images/car-estate.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
+                                            </div>
+                                            
+                                            <div style='margin-left: 15px;'>
                                                 <div class="mb-2">
                                                     {% get_total_open_bookings as total_open_bookings %} 
                                                     <h2 style='font-size:1rem;'>{{total_open_bookings}}</h2>
@@ -612,9 +616,13 @@
                                 </div>
 
                                 <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
-                                    <div class="custom-block bg-white shadow-lg">
-                                        <div class="d-flex">
-                                            <div>
+                                    <div class="custom-block bg-white shadow-lg" style='padding: auto; padding-right: 0.5rem; padding-left: 0.5rem;'>
+                                        <div style='display: flex;'>
+                                            <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #fe7876; background-color: rgba(254, 120, 118, 0.3); width: 50px; height: 50px;'>
+                                                <img src="{% static 'assets/images/car-select-2.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
+                                            </div>
+                                            
+                                            <div style='margin-left: 15px;'>
                                                 <div class="mb-2">
                                                     {% get_total_open_carpool as total_open_carpool %} 
                                                     <h2 style='font-size:1rem;'>{{total_open_carpool}}</h2>
@@ -628,52 +636,61 @@
                                 </div>
 
                                 <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
-                                    <div class="custom-block bg-white shadow-lg">
-                                        <div class="d-flex">
-                                            <div>
-                                                {% user_type_checker user as account_type %}
-                                                {% if account_type == 'Admin' %}
+                                    <div class="custom-block bg-white shadow-lg" style='padding: auto; padding-right: 0.5rem; padding-left: 0.5rem;'>
+                                        <div style='display: flex;'>
+                                            {% user_type_checker user as account_type %}
+                                            {% if account_type == 'Admin' %}
+                                                <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd9b4; background-color: rgba(92, 217, 180, 0.3); width: 50px; height: 50px;'>
+                                                    <img src="{% static 'assets/images/content-paste.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
+                                                </div>
+                                                
+                                                <div style='margin-left: 15px;'>
                                                     <div class="mb-2">
-                                                        {% get_income_last_month as total_income_last_month %}
+                                                    {% get_income_last_month as total_income_last_month %}
                                                         <h2 style='font-size:1rem;'>Php {{total_income_last_month}}</h2>
                                                     </div>
                                                     <div class="mb-2">
                                                         <h2 style='font-size:1rem;' class='text-muted'>Income Last Month</h2>
                                                     </div>
-                                                {% elif account_type == 'Driver' %}
-                                                    <div class="mb-2">
-                                                        {% get_my_number_of_travel_last_month user.driveraccount as total_travel_last_month %}
-                                                        <h2 style='font-size:1rem;'>{{total_travel_last_month}}</h2>
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <h2 style='font-size:1rem;' class='text-muted'>Travel Last Month</h2>
-                                                    </div>
-                                                {% elif account_type == 'Passenger' %}
-                                                    <div class="mb-2">
-                                                        {% get_my_total_availed_services_last_month user.passengeraccount as total_availed_services_last_month %}
-                                                        <h2 style='font-size:1rem;'>{{total_availed_services_last_month}}</h2>
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <h2 style='font-size:1rem;' class='text-muted'>Availed Last Month</h2>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
+                                                </div>
+                                            {% elif account_type == 'Driver' %}
+                                                <div class="mb-2">
+                                                    {% get_my_number_of_travel_last_month user.driveraccount as total_travel_last_month %}
+                                                    <h2 style='font-size:1rem;'>{{total_travel_last_month}}</h2>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <h2 style='font-size:1rem;' class='text-muted'>Travel Last Month</h2>
+                                                </div>
+                                            {% elif account_type == 'Passenger' %}
+                                                <div class="mb-2">
+                                                    {% get_my_total_availed_services_last_month user.passengeraccount as total_availed_services_last_month %}
+                                                    <h2 style='font-size:1rem;'>{{total_availed_services_last_month}}</h2>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <h2 style='font-size:1rem;' class='text-muted'>Availed Last Month</h2>
+                                                </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
 
                                 <div class="col-lg-3 col-md-3 col-12 mt-3 mb-lg-0">
-                                    <div class="custom-block bg-white shadow-lg">
-                                        <div class="d-flex">
-                                            <div>
+                                    <div class="custom-block bg-white shadow-lg" style='padding: auto; padding-right: 0.5rem; padding-left: 0.5rem;'>
+                                            <div style='display: flex;'>
                                                 {% user_type_checker user as account_type %}
                                                 {% if account_type == 'Admin' %}
-                                                    <div class="mb-2">
-                                                        {% get_income_this_month as total_income_this_month %}
-                                                        <h2 style='font-size:1rem;'>Php {{total_income_this_month}}</h2>
+                                                    <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd960; background-color: rgba(92, 217, 96, 0.3); width: 50px; height: 50px;'>
+                                                        <img src="{% static 'assets/images/currency-php.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
                                                     </div>
-                                                    <div class="mb-2">
-                                                        <h2 style='font-size:1rem;' class='text-muted'>Income This Month</h2>
+
+                                                    <div style='margin-left: 15px;'>
+                                                        <div class="mb-2">
+                                                            {% get_income_this_month as total_income_this_month %}
+                                                            <h2 style='font-size:1rem;'>Php {{total_income_this_month}}</h2>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <h2 style='font-size:1rem;' class='text-muted'>Income This Month</h2>
+                                                        </div>
                                                     </div>
                                                 {% elif account_type == 'Driver' %}
                                                     <div class="mb-2">
@@ -693,7 +710,6 @@
                                                     </div>
                                                 {% endif %}
                                             </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -701,11 +717,25 @@
 
                         <div class="container">
                             <div class="row">
-                                <div class="col-lg-12 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class='display-flex'>
+                                            <h2 style='font-size:1rem;'>Sales</h2>
+                                            <select name="chart_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_type">
+                                                <option value="rental" selected>--- Rental ---</option>
+                                                <option value="carpooling">--- Carpooling ---</option>
+                                                <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
+                                            </select>
+                                        </div><br>
+                                        <canvas id='myCChart'></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class='display-flex'>
                                             <h2 style='font-size:1rem;'>Graphs</h2>
-                                            <select name="chart_type" class="form-control" style='width:50%; position:absolute; right:0; margin-right:20px;' required id="chart_type">
+                                            <select name="chart_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_type">
                                                 <option value="rental" selected>--- Rental ---</option>
                                                 <option value="carpooling">--- Carpooling ---</option>
                                                 <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
@@ -718,10 +748,152 @@
                         </div>
 
                         <div class="container">
+                            <div class='row'>
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
+                                        <div class='display-flex'>
+                                            <h2 style='font-size:1rem;'>Pending Bookings</h2>
+                                            <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                                <option disabled selected>--- Select Filter --- </option>
+                                                <option value='Carpool'>--- Carpool --- </option>
+                                                <option value='Rental'>--- Rental --- </option>
+                                            </select>
+                                        </div><br>
+                                        <div class="d-flex">
+                                            <div class="table-responsive table-x-overflow">
+                                                <table class="table table-striped table-full">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Service</th>
+                                                            <th scope="col">Customer Name</th>
+                                                            <th scope="col">Fare</th>
+                                                            <th scope="col">From Destination</th>
+                                                            <th scope="col">To Destination</th>
+                                                            <th scope="col">Date</th>
+                                                            <th scope="col">Status</th>
+                                                        </tr>
+                                                    </thead>
+            
+                                                    <tbody>
+                                                        {% get_all_rental_services as all_rental_services %}
+                                                        {% for rental_service in all_rental_services %}
+                                                            <tr id='rental_services_{{forloop.counter}}'>
+                                                                <td class="font-bold">{{forloop.counter}}</td>
+                                                                <td>Rental</td>
+                                                                <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
+                                                                <td>{{rental_service.package_price}}</td>
+                                                                <td>{{rental_service.from_destination}}</td>
+                                                                <td>{{rental_service.to_destination}}</td>
+                                                                <td>{{rental_service.travel_date.date}}</td>
+                                                                <td>
+                                                                    <button class="approve-button">Done</button>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+
+                                                        {% get_all_carpool_services as all_carpool_services %}
+                                                        {% for carpool_service in all_carpool_services %}
+                                                            <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
+                                                                <td class="font-bold">{{forloop.counter}}</td>
+                                                                <td>Carpool</td>
+                                                                    {% if carpool_service.passenger_id %}
+                                                                        <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
+                                                                    {% else %}
+                                                                        <td>Picked Up Passenger</p>
+                                                                    {% endif %}
+                                                                <td>{{carpool_service.fare}}</td>
+                                                                <td>{{carpool_service.pick_up_location}}</td>
+                                                                <td>{{carpool_service.destination}}</td>
+                                                                <td>{{carpool_service.date_dropped.date}}</td>
+                                                                <td>
+                                                                    <button class="approve-button">Dropped</button>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
+                                        <div class='display-flex'>
+                                            <h2 style='font-size:1rem;'>Pending Gallery</h2>
+                                            <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                                <option disabled selected>--- Select Filter --- </option>
+                                                <option value='Carpool'>--- Carpool --- </option>
+                                                <option value='Rental'>--- Rental --- </option>
+                                            </select>
+                                        </div><br>
+                                        <div class="d-flex">
+                                            <div class="table-responsive table-x-overflow">
+                                                <table class="table table-striped table-full">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">#</th>
+                                                            <th scope="col">Service</th>
+                                                            <th scope="col">Customer Name</th>
+                                                            <th scope="col">Fare</th>
+                                                            <th scope="col">From Destination</th>
+                                                            <th scope="col">To Destination</th>
+                                                            <th scope="col">Date</th>
+                                                            <th scope="col">Status</th>
+                                                        </tr>
+                                                    </thead>
+            
+                                                    <tbody>
+                                                        {% get_all_rental_services as all_rental_services %}
+                                                        {% for rental_service in all_rental_services %}
+                                                            <tr id='rental_services_{{forloop.counter}}'>
+                                                                <td class="font-bold">{{forloop.counter}}</td>
+                                                                <td>Rental</td>
+                                                                <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
+                                                                <td>{{rental_service.package_price}}</td>
+                                                                <td>{{rental_service.from_destination}}</td>
+                                                                <td>{{rental_service.to_destination}}</td>
+                                                                <td>{{rental_service.travel_date.date}}</td>
+                                                                <td>
+                                                                    <button class="approve-button">Done</button>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+
+                                                        {% get_all_carpool_services as all_carpool_services %}
+                                                        {% for carpool_service in all_carpool_services %}
+                                                            <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
+                                                                <td class="font-bold">{{forloop.counter}}</td>
+                                                                <td>Carpool</td>
+                                                                    {% if carpool_service.passenger_id %}
+                                                                        <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
+                                                                    {% else %}
+                                                                        <td>Picked Up Passenger</p>
+                                                                    {% endif %}
+                                                                <td>{{carpool_service.fare}}</td>
+                                                                <td>{{carpool_service.pick_up_location}}</td>
+                                                                <td>{{carpool_service.destination}}</td>
+                                                                <td>{{carpool_service.date_dropped.date}}</td>
+                                                                <td>
+                                                                    <button class="approve-button">Dropped</button>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="container">
                             <div class="custom-block custom-block-topics-listing bg-white shadow-lg mb-5 mt-3">
                                 <div class='display-flex'>
                                     <h2 style='font-size:1rem;'>Past Transactions</h2>
-                                    <select name="transaction_filter" class="form-control mb-2" style='width:35%; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                    <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
                                         <option disabled selected>--- Select Filter --- </option>
                                         <option value='Carpool'>--- Carpool --- </option>
                                         <option value='Rental'>--- Rental --- </option>
@@ -825,7 +997,7 @@
         
         <script>
             const ctx = document.getElementById('myChart');
-            let currentChartType = 'bar'; // Default chart type
+            let currentChartType = 'line'; // Default chart type
             let rentalOrCarpooling = 'rental'
 
             let x_axis = [];
@@ -857,7 +1029,8 @@
                         datasets: [{
                             label: '# of Votes',
                             data: x_axis,
-                            borderWidth: 1
+                            borderWidth: 1,
+                            tension: 0.4
                         }]
                     },
                     options: {
