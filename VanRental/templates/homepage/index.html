@@ -42,22 +42,33 @@
                     {% if user.is_authenticated %}
                         <button class='menu-button' id="menu-btn" onclick="openSideBar();">
                             <img src="{% static 'assets/images/car-menu-button.png' %}" class='h-45 w-45'/>
-                            <span>Passenger Connect</span>
+                            <span class='passenger-connect-header'>Passenger Connect</span>
                         </button>
 
                         <button class='menu-button-x' id='close-menu-btn' onclick="closeSideBar();">
                             <img src="{% static 'assets/images/car-menu-left-arrow.png' %}" class='h-45 w-45'/>
-                            <span>Passenger Connect</span>
+                            <span class='passenger-connect-header'>Passenger Connect</span>
                         </button>
                     {% else %}
                         <button class='menu-button' onclick="openModal('loginFirst')">
                             <img src="{% static 'assets/images/car.svg' %}" class='h-45 w-45'/>
-                            <span>Passenger Connect</span>
+                            <span class='passenger-connect-header'>Passenger Connect</span>
                         </button>
                     {% endif %}
 
                     {% if user.is_authenticated %}
-                    <div class="d-lg-none ms-auto me-4">
+                    <div class="d-lg-none me-4" style='margin-left: -30px;'>
+
+                        <button class="profile-button" onclick="openMessage('mobile');">
+                            <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
+                            {% get_unseen_notifications user as unseen_notifications %}
+                            {% if unseen_notifications > 0 %}
+                                <div class='notification-alert'>
+                                    {{unseen_notifications}}
+                                </div>
+                            {% endif %}
+                        </button>
+
                         <button class="profile-button" onclick="openNotification('mobile');">
                             <img src="{% static 'assets/images/bell-circle.svg' %}"/>
                             {% get_unseen_notifications user as unseen_notifications %}
@@ -94,6 +105,61 @@
                                 </li>
                             </ul>
                         </div>
+
+
+                        <div class="message-box mr-20" id="my-message-mobile">
+                            <div class='message-box-header'>
+                                <p>
+                                    Messages
+                                </p>
+                            </div>
+                            <div class='notification-scroll'>
+                                <ul>
+                                    {% get_all_messages user as all_my_messages %}
+                                    {% if all_my_messages|length > 0 %}
+                                        {% for msg in all_my_messages %}
+                                        
+                                        <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
+                                            {% if msg.sender.passengeraccount %}
+                                                    {% if msg.sender.passengeraccount.profile %}
+                                                        <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                    {% else %}
+                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                    {% endif %}
+                                                {% elif msg.sender.driveraccount %}
+                                                    {% if msg.sender.driveraccount.profile %}
+                                                        <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                    {% else %}
+                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                    {% endif %}
+                                                {% else %}
+                                                    {% if msg.sender.adminaccount.profile %}
+                                                        <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                    {% else %}
+                                                        <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                    {% endif %}
+                                                {% endif %}
+
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                            </div>
+                                        </li>
+                                        {% endfor %}
+                                    {% else %}
+                                    <li class="custom-button" style='display: flex;'>
+                                        <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                    width: full; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                            <p>We couldn`t find any messages</p>
+                                        </div>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+
 
                         <div class="message-box mr-20" id="my-notification-mobile">
                             <div class='message-box-header'>
@@ -264,11 +330,9 @@
                                             {% endfor %}
                                         {% else %}
                                         <li class="custom-button" style='display: flex;'>
-                                            <img src="{% static 'assets/images/default-profile.png' %}" style='margin-top: auto; margin-bottom: auto; margin-left: 10px; width: 40px; height: 40px; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8); border-radius: 50%;'/>
                                             <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
-                                                        width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                        width: full; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
                                                 <p>We couldn`t find any messages</p>
-                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>00, 00 0000</i></p>
                                             </div>
                                         </li>
                                         {% endif %}
@@ -308,7 +372,7 @@
             </nav>
 
             {% if user.is_authenticated %}
-            <div class="side-bar-header">   
+            <div class="side-bar-header" style='margin-top: -1rem;'>   
                 <div class="side-bar" id="van-rental-sidebar">
                     <div class="van-nav-items">
                         <ul>
@@ -710,6 +774,8 @@
                                                         {% if user_type == 'Passenger' %}
                                                             <button class="btn custom-btn mt-2 mt-lg-3" rent-data-id="{{this_van.id}}" onclick="setRent(this, '{{this_van.plate_no}}')">Book Now!</button>
                                                         {% endif %}
+                                                    {% else %}
+                                                        <button class="btn custom-btn mt-2 mt-lg-3" onclick="openModal('loginFirst')">Book Now!</button>
                                                     {% endif %}
                                                 </div>
                                             </div>

@@ -68,6 +68,7 @@ class Van(models.Model):
     is_rented = models.BooleanField(default=False)
     is_carpooled = models.BooleanField(default=False)
     package_rent = models.IntegerField(default=0)
+    color_coding = models.TextField(default=None, null=True, blank=True)
 
     def __str__(self):
         return f'PLATE NO. : {self.plate_no} || COLOR : {self.color}'

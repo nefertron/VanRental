@@ -1119,6 +1119,7 @@ blockquote {
   RESPONSIVE STYLES               
 -----------------------------------------*/
 @media screen and (max-width: 991px) {
+
   h1 {
     font-size: 48px;
   }
@@ -1209,6 +1210,7 @@ blockquote {
 }
 
 @media screen and (max-width: 480px) {
+
   h1 {
     font-size: 36px;
   }
@@ -1879,6 +1881,23 @@ blockquote {
 }
 
 
+.color-coding-btn{
+  margin-left: 10px;
+  border-radius: 10px;
+  border: transparent;
+  height: 35px;
+  width: auto;
+  margin-top: 10px;
+  background-color: #13547a;
+  color: whitesmoke;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.8);
+}
+
+.color-coding-btn:hover{
+  transform: scale(1.02);
+}
+
+
 .van-slider{
   border-radius: 10px; 
   margin-left: auto; 
@@ -2110,4 +2129,34 @@ blockquote {
 .datepicker table tr td.disabled:hover {
   background: #f05c6b;
   color: #fff;
+}
+
+
+#btn-back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 48px;
+  font-size: 1rem;
+  color: white;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  border:none;  
+  background-color: #80d0c7;
+  z-index: 10;
+}
+
+
+.passenger-connect-header {
+  display: block;
+}
+
+@media only screen and (max-width: 767px) {
+  .passenger-connect-header {
+    display: none;
+  }
 }

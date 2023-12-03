@@ -582,6 +582,17 @@
                                         
                                         <p class="mb-2">{{van.description}}</p>
 
+
+                                        {% get_color_coding van as all_color_coding %}
+                                        <h6>Not available every : </h6>
+                                        <div class='row'>
+                                        {% for day in all_color_coding %}
+                                            <button class="color-coding-btn">{{day}}</button>
+                                        {% endfor %}
+                                        </div>
+
+                                        <button class="btn custom-btn mt-2 mt-lg-3">Edit Information</button>
+
                                         {% if van.is_rented == True %}
                                             <button class="btn custom-btn mt-2 mt-lg-3">Status : Rented</button>
                                         {% elif van.is_carpooled == True %}
@@ -705,8 +716,6 @@
                         <label class="form-label">Color</label>
                         <input type="text" name="color" class="form-control" placeholder="Color" required>
 
-                        <label class="form-label">No. of seats</label>
-                        <input type="text" name="number_of_seats" class="form-control" placeholder="No. of seats" required>
                         
                         <label class="form-label">Air Conditioned</label>
                         <select type="text" name="is_airconditioned" class="form-control" placeholder="No. of seats" required>
@@ -714,11 +723,49 @@
                             <option value='yes'>YES</option>
                             <option value='no'>NO</option>
                         </select>
-                        
 
                         <label class="form-label">Van Description</label>
                         <input type="text" name="description" class="form-control" placeholder="Van Description" required>
-                        
+
+                        <div class="container" style='margin-top : 10px; margin-bottom: 10px;'>
+                            <h6>Color Coding</h6>
+                            <div class="btn-group" data-toggle="buttons">
+                                <div class='row'>
+                                    <div>
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Monday" id="Monday" autocomplete="off" checked> Monday
+                                        </label>
+                                    
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Tuesday" id="Tuesday" autocomplete="off"> Tuesday
+                                        </label>
+                                    
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Wednesday" id="Wednesday" autocomplete="off"> Wednesday
+                                        </label>
+                                    
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Thursday" id="Thursday" autocomplete="off"> Thursday
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Friday" id="Friday" autocomplete="off"> Friday
+                                        </label>
+                                    
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Saturday" id="Saturday" autocomplete="off"> Saturday
+                                        </label>
+                                    
+                                        <label class="btn btn-primary">
+                                            <input type="checkbox" name="Sunday" id="Sunday" autocomplete="off"> Sunday
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                          
                         <div class="row">
                             <div class="col-md-6">
                                 <button type="submit" class="form-control">Save</button>
@@ -727,7 +774,7 @@
                             <br/>
                             <br/>
                             <div class="col-md-6">
-                                <button type='button' class="form-control" onclick="closeModal('add_van_modal')">Close</button>
+                                <button type='button' class="btn btn-danger form-control text-white" onclick="closeModal('add_van_modal')">Close</button>
                             </div>
                         </div>
                     </form>

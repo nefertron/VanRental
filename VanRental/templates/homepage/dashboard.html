@@ -177,6 +177,10 @@
                                 <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
                             </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Gallery</a>
+                            </li>
+
                             {% if not user.is_authenticated %}
                             <li class="nav-item">
                                 <a class="nav-link click-scroll" href="/login">Login</a>
@@ -962,6 +966,10 @@
             </header>
         </main>
 
+        <button type="button" class="btn-danger btn-floating btn-lg" id="btn-back-to-top">
+            <img src="{% static 'assets/images/arrow-up.svg' %}" class='h-30 w-30'/>
+        </button>
+
         <div class="modal-overlay" id="seen_message">
             <div class="modal">
                 <div class="modal-body">
@@ -993,6 +1001,7 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/scroll-up.js' %}"></script> 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         
         <script>
@@ -1030,7 +1039,9 @@
                             label: '# of Votes',
                             data: x_axis,
                             borderWidth: 1,
-                            tension: 0.4
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            tension: 0.4,
                         }]
                     },
                     options: {

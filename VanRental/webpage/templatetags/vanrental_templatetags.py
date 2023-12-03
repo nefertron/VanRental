@@ -722,4 +722,14 @@ def get_getInTouch():
 
 
 
+@register.simple_tag
+def get_color_coding(van):
+    if (van.color_coding):
+        all_color_coding = van.color_coding.split('|||')
+        return all_color_coding
+    else:
+        return ''
+
+
+
         
