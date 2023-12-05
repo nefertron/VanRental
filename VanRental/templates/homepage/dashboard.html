@@ -166,7 +166,7 @@
                             </li>
     
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
+                                <a class="nav-link click-scroll" href="/index#how_does_it_work">HOW</a>
                             </li>
 
                             <li class="nav-item">
@@ -178,7 +178,7 @@
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#get_in_touch">Gallery</a>
+                                <a class="nav-link click-scroll" href="/index#get_in_touch">Tour Gallery</a>
                             </li>
 
                             {% if not user.is_authenticated %}
@@ -658,21 +658,36 @@
                                                     </div>
                                                 </div>
                                             {% elif account_type == 'Driver' %}
-                                                <div class="mb-2">
-                                                    {% get_my_number_of_travel_last_month user.driveraccount as total_travel_last_month %}
-                                                    <h2 style='font-size:1rem;'>{{total_travel_last_month}}</h2>
+                                                <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd9b4; background-color: rgba(92, 217, 180, 0.3); width: 50px; height: 50px;'>
+                                                    <img src="{% static 'assets/images/content-paste.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
                                                 </div>
-                                                <div class="mb-2">
-                                                    <h2 style='font-size:1rem;' class='text-muted'>Travel Last Month</h2>
+                                                
+                                                <div style='margin-left: 15px;'>
+                                                    <div class="mb-2">
+                                                    {% get_my_number_of_travel_last_month user.driveraccount as total_travel_last_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_travel_last_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Travel Last Month</h2>
+                                                    </div>
                                                 </div>
                                             {% elif account_type == 'Passenger' %}
-                                                <div class="mb-2">
-                                                    {% get_my_total_availed_services_last_month user.passengeraccount as total_availed_services_last_month %}
-                                                    <h2 style='font-size:1rem;'>{{total_availed_services_last_month}}</h2>
+
+                                                <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd9b4; background-color: rgba(92, 217, 180, 0.3); width: 50px; height: 50px;'>
+                                                    <img src="{% static 'assets/images/content-paste.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
                                                 </div>
-                                                <div class="mb-2">
-                                                    <h2 style='font-size:1rem;' class='text-muted'>Availed Last Month</h2>
+                                                
+                                                <div style='margin-left: 15px;'>
+                                                    <div class="mb-2">
+                                                        {% get_my_total_availed_services_last_month user.passengeraccount as total_availed_services_last_month %}
+                                                        <h2 style='font-size:1rem;'>{{total_availed_services_last_month}}</h2>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <h2 style='font-size:1rem;' class='text-muted'>Availed Last Month</h2>
+                                                    </div>
                                                 </div>
+
+
                                             {% endif %}
                                         </div>
                                     </div>
@@ -697,20 +712,32 @@
                                                         </div>
                                                     </div>
                                                 {% elif account_type == 'Driver' %}
-                                                    <div class="mb-2">
-                                                        {% get_my_number_of_travel_this_month user.driveraccount as total_travel_this_month %}
-                                                        <h2 style='font-size:1rem;'>{{total_travel_this_month}}</h2>
+                                                    <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd960; background-color: rgba(92, 217, 96, 0.3); width: 50px; height: 50px;'>
+                                                        <img src="{% static 'assets/images/currency-php.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
                                                     </div>
-                                                    <div class="mb-2">
-                                                        <h2 style='font-size:1rem;' class='text-muted'>Travel This Month</h2>
+
+                                                    <div style='margin-left: 15px;'>
+                                                        <div class="mb-2">
+                                                            {% get_my_number_of_travel_this_month user.driveraccount as total_travel_this_month %}
+                                                            <h2 style='font-size:1rem;'>{{total_travel_this_month}}</h2>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <h2 style='font-size:1rem;' class='text-muted'>Travel This Month</h2>
+                                                        </div>
                                                     </div>
                                                 {% elif account_type == 'Passenger' %}
-                                                    <div class="mb-2">
-                                                        {% get_my_total_availed_services_this_month user.passengeraccount as total_availed_services_this_month %}
-                                                        <h2 style='font-size:1rem;'>{{total_availed_services_this_month}}</h2>
+                                                    <div style='display: flex; border-radius: 10px; margin-left: 10px; align: center; border: 2px solid #5cd960; background-color: rgba(92, 217, 96, 0.3); width: 50px; height: 50px;'>
+                                                        <img src="{% static 'assets/images/currency-php.svg' %}" style='margin: auto; height: 30px; width: 30px'/>
                                                     </div>
-                                                    <div class="mb-2">
-                                                        <h2 style='font-size:1rem;' class='text-muted'>Availed This Month</h2>
+
+                                                    <div style='margin-left: 15px;'>
+                                                        <div class="mb-2">
+                                                            {% get_my_total_availed_services_this_month user.passengeraccount as total_availed_services_this_month %}
+                                                            <h2 style='font-size:1rem;'>{{total_availed_services_this_month}}</h2>
+                                                        </div>
+                                                        <div class="mb-2">
+                                                            <h2 style='font-size:1rem;' class='text-muted'>Availed This Month</h2>
+                                                        </div>
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -724,28 +751,39 @@
                                 <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class='display-flex'>
-                                            <h2 style='font-size:1rem;'>Sales</h2>
-                                            <select name="chart_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_type">
+                                            {% if account_type == 'Admin' or  account_type == 'Driver' %}
+                                                <h2 style='font-size:1rem;'>Sales</h2>
+                                            {% elif account_type == 'Passenger' %}
+                                                <h2 style='font-size:1rem;'>Spending</h2>
+                                            {% endif %}
+
+                                            <select name="chart_of_sales_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_sales_type">
                                                 <option value="rental" selected>--- Rental ---</option>
                                                 <option value="carpooling">--- Carpooling ---</option>
                                                 <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
                                             </select>
                                         </div><br>
-                                        <canvas id='myCChart'></canvas>
+                                        <canvas id='chartOfSales'></canvas>
                                     </div>
                                 </div>
 
                                 <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
                                     <div class="custom-block bg-white shadow-lg">
                                         <div class='display-flex'>
-                                            <h2 style='font-size:1rem;'>Graphs</h2>
-                                            <select name="chart_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_type">
+                                            {% if account_type == 'Admin' or account_type == 'Driver' %}
+                                                <h2 style='font-size:1rem;'>Services</h2>
+                                            {% elif account_type == 'Passenger' %} 
+                                                <h2 style='font-size:1rem;'>Availed Services</h2>
+                                            {% endif %}
+                                            
+
+                                            <select name="chart_of_services_type" class="form-control" style='width:50%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_services_type">
                                                 <option value="rental" selected>--- Rental ---</option>
                                                 <option value="carpooling">--- Carpooling ---</option>
                                                 <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
                                             </select>
                                         </div><br>
-                                        <canvas id='myChart'></canvas>
+                                        <canvas id='chartOfServices'></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -753,143 +791,215 @@
 
                         <div class="container">
                             <div class='row'>
-                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
-                                    <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
-                                        <div class='display-flex'>
-                                            <h2 style='font-size:1rem;'>Pending Bookings</h2>
-                                            <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
-                                                <option disabled selected>--- Select Filter --- </option>
-                                                <option value='Carpool'>--- Carpool --- </option>
-                                                <option value='Rental'>--- Rental --- </option>
-                                            </select>
-                                        </div><br>
-                                        <div class="d-flex">
-                                            <div class="table-responsive table-x-overflow">
-                                                <table class="table table-striped table-full">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col">#</th>
-                                                            <th scope="col">Service</th>
-                                                            <th scope="col">Customer Name</th>
-                                                            <th scope="col">Fare</th>
-                                                            <th scope="col">From Destination</th>
-                                                            <th scope="col">To Destination</th>
-                                                            <th scope="col">Date</th>
-                                                            <th scope="col">Status</th>
-                                                        </tr>
-                                                    </thead>
-            
-                                                    <tbody>
-                                                        {% get_all_rental_services as all_rental_services %}
-                                                        {% for rental_service in all_rental_services %}
-                                                            <tr id='rental_services_{{forloop.counter}}'>
-                                                                <td class="font-bold">{{forloop.counter}}</td>
-                                                                <td>Rental</td>
-                                                                <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
-                                                                <td>{{rental_service.package_price}}</td>
-                                                                <td>{{rental_service.from_destination}}</td>
-                                                                <td>{{rental_service.to_destination}}</td>
-                                                                <td>{{rental_service.travel_date.date}}</td>
-                                                                <td>
-                                                                    <button class="approve-button">Done</button>
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
+                                {% if account_type == 'Admin' or account_type == 'Driver' %}
+                                    <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
+                                            <div class='display-flex'>
+                                                <h2 style='font-size:1rem;'>Pending Bookings</h2>
 
-                                                        {% get_all_carpool_services as all_carpool_services %}
-                                                        {% for carpool_service in all_carpool_services %}
-                                                            <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
-                                                                <td class="font-bold">{{forloop.counter}}</td>
-                                                                <td>Carpool</td>
-                                                                    {% if carpool_service.passenger_id %}
-                                                                        <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
-                                                                    {% else %}
-                                                                        <td>Picked Up Passenger</p>
-                                                                    {% endif %}
-                                                                <td>{{carpool_service.fare}}</td>
-                                                                <td>{{carpool_service.pick_up_location}}</td>
-                                                                <td>{{carpool_service.destination}}</td>
-                                                                <td>{{carpool_service.date_dropped.date}}</td>
-                                                                <td>
-                                                                    <button class="approve-button">Dropped</button>
-                                                                </td>
+                                                <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                                    <option disabled selected>--- Select Filter --- </option>
+                                                    <option value='Carpool'>--- Carpool --- </option>
+                                                    <option value='Rental'>--- Rental --- </option>
+                                                </select>
+                                            </div><br>
+                                            <div class="d-flex">
+                                                <div class="table-responsive table-x-overflow">
+                                                    <table class="table table-striped table-full">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">#</th>
+                                                                <th scope="col">Service</th>
+                                                                <th scope="col">Customer Name</th>
+                                                                <th scope="col">Fare</th>
+                                                                <th scope="col">From Destination</th>
+                                                                <th scope="col">To Destination</th>
+                                                                <th scope="col">Date</th>
+                                                                <th scope="col">Status</th>
                                                             </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
+                                                        </thead>
+                
+                                                        <tbody>
+                                                            {% get_all_rental_services as all_rental_services %}
+                                                            {% for rental_service in all_rental_services %}
+                                                                <tr id='rental_services_{{forloop.counter}}'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Rental</td>
+                                                                    <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
+                                                                    <td>{{rental_service.package_price}}</td>
+                                                                    <td>{{rental_service.from_destination}}</td>
+                                                                    <td>{{rental_service.to_destination}}</td>
+                                                                    <td>{{rental_service.travel_date.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Done</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+
+                                                            {% get_all_carpool_services as all_carpool_services %}
+                                                            {% for carpool_service in all_carpool_services %}
+                                                                <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Carpool</td>
+                                                                        {% if carpool_service.passenger_id %}
+                                                                            <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
+                                                                        {% else %}
+                                                                            <td>Picked Up Passenger</p>
+                                                                        {% endif %}
+                                                                    <td>{{carpool_service.fare}}</td>
+                                                                    <td>{{carpool_service.pick_up_location}}</td>
+                                                                    <td>{{carpool_service.destination}}</td>
+                                                                    <td>{{carpool_service.date_dropped.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Dropped</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
-                                    <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
-                                        <div class='display-flex'>
-                                            <h2 style='font-size:1rem;'>Pending Gallery</h2>
-                                            <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
-                                                <option disabled selected>--- Select Filter --- </option>
-                                                <option value='Carpool'>--- Carpool --- </option>
-                                                <option value='Rental'>--- Rental --- </option>
-                                            </select>
-                                        </div><br>
-                                        <div class="d-flex">
-                                            <div class="table-responsive table-x-overflow">
-                                                <table class="table table-striped table-full">
-                                                    <thead>
-                                                        <tr>
-                                                            <th scope="col">#</th>
-                                                            <th scope="col">Service</th>
-                                                            <th scope="col">Customer Name</th>
-                                                            <th scope="col">Fare</th>
-                                                            <th scope="col">From Destination</th>
-                                                            <th scope="col">To Destination</th>
-                                                            <th scope="col">Date</th>
-                                                            <th scope="col">Status</th>
-                                                        </tr>
-                                                    </thead>
-            
-                                                    <tbody>
-                                                        {% get_all_rental_services as all_rental_services %}
-                                                        {% for rental_service in all_rental_services %}
-                                                            <tr id='rental_services_{{forloop.counter}}'>
-                                                                <td class="font-bold">{{forloop.counter}}</td>
-                                                                <td>Rental</td>
-                                                                <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
-                                                                <td>{{rental_service.package_price}}</td>
-                                                                <td>{{rental_service.from_destination}}</td>
-                                                                <td>{{rental_service.to_destination}}</td>
-                                                                <td>{{rental_service.travel_date.date}}</td>
-                                                                <td>
-                                                                    <button class="approve-button">Done</button>
-                                                                </td>
+                                
+                                    <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
+                                            <div class='display-flex'>
+                                                <h2 style='font-size:1rem;'>Pending Gallery</h2>
+                                                <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                                    <option disabled selected>--- Select Filter --- </option>
+                                                    <option value='Carpool'>--- Carpool --- </option>
+                                                    <option value='Rental'>--- Rental --- </option>
+                                                </select>
+                                            </div><br>
+                                            <div class="d-flex">
+                                                <div class="table-responsive table-x-overflow">
+                                                    <table class="table table-striped table-full">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">#</th>
+                                                                <th scope="col">Service</th>
+                                                                <th scope="col">Customer Name</th>
+                                                                <th scope="col">Fare</th>
+                                                                <th scope="col">From Destination</th>
+                                                                <th scope="col">To Destination</th>
+                                                                <th scope="col">Date</th>
+                                                                <th scope="col">Status</th>
                                                             </tr>
-                                                        {% endfor %}
+                                                        </thead>
+                
+                                                        <tbody>
+                                                            {% get_all_rental_services as all_rental_services %}
+                                                            {% for rental_service in all_rental_services %}
+                                                                <tr id='rental_services_{{forloop.counter}}'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Rental</td>
+                                                                    <td>{{rental_service.rented_by.user_id.first_name}} {{rental_service.rented_by.user_id.last_name}}</td>
+                                                                    <td>{{rental_service.package_price}}</td>
+                                                                    <td>{{rental_service.from_destination}}</td>
+                                                                    <td>{{rental_service.to_destination}}</td>
+                                                                    <td>{{rental_service.travel_date.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Done</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
 
-                                                        {% get_all_carpool_services as all_carpool_services %}
-                                                        {% for carpool_service in all_carpool_services %}
-                                                            <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
-                                                                <td class="font-bold">{{forloop.counter}}</td>
-                                                                <td>Carpool</td>
-                                                                    {% if carpool_service.passenger_id %}
-                                                                        <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
-                                                                    {% else %}
-                                                                        <td>Picked Up Passenger</p>
-                                                                    {% endif %}
-                                                                <td>{{carpool_service.fare}}</td>
-                                                                <td>{{carpool_service.pick_up_location}}</td>
-                                                                <td>{{carpool_service.destination}}</td>
-                                                                <td>{{carpool_service.date_dropped.date}}</td>
-                                                                <td>
-                                                                    <button class="approve-button">Dropped</button>
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
+                                                            {% get_all_carpool_services as all_carpool_services %}
+                                                            {% for carpool_service in all_carpool_services %}
+                                                                <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Carpool</td>
+                                                                        {% if carpool_service.passenger_id %}
+                                                                            <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
+                                                                        {% else %}
+                                                                            <td>Picked Up Passenger</p>
+                                                                        {% endif %}
+                                                                    <td>{{carpool_service.fare}}</td>
+                                                                    <td>{{carpool_service.pick_up_location}}</td>
+                                                                    <td>{{carpool_service.destination}}</td>
+                                                                    <td>{{carpool_service.date_dropped.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Dropped</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                {% elif account_type == 'Passenger' %}
+                                    <div class="col-lg-12 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                        <div class="custom-block custom-block-topics-listing bg-white shadow-lg mt-3">
+                                            <div class='display-flex'>
+                                                <h2 style='font-size:1rem;'>My Pending Bookings</h2>
+                                                
+                                                <select name="transaction_filter" class="form-control mb-2" style='width:35%;  border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="transaction_filter" onchange='changeRecords(this);' onchange="">
+                                                    <option disabled selected>--- Select Filter --- </option>
+                                                    <option value='Carpool'>--- Carpool --- </option>
+                                                    <option value='Rental'>--- Rental --- </option>
+                                                </select>
+                                            </div><br>
+                                            <div class="d-flex">
+                                                <div class="table-responsive table-x-overflow">
+                                                    <table class="table table-striped table-full">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">#</th>
+                                                                <th scope="col">Service</th>
+                                                                <th scope="col">Fare</th>
+                                                                <th scope="col">From Destination</th>
+                                                                <th scope="col">To Destination</th>
+                                                                <th scope="col">Date</th>
+                                                                <th scope="col">Status</th>
+                                                            </tr>
+                                                        </thead>
+                
+                                                        <tbody>
+                                                            {% get_all_rental_services as all_rental_services %}
+                                                            {% for rental_service in all_rental_services %}
+                                                                <tr id='rental_services_{{forloop.counter}}'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Rental</td>
+                                                                    <td>{{rental_service.package_price}}</td>
+                                                                    <td>{{rental_service.from_destination}}</td>
+                                                                    <td>{{rental_service.to_destination}}</td>
+                                                                    <td>{{rental_service.travel_date.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Done</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+
+                                                            {% get_all_carpool_services as all_carpool_services %}
+                                                            {% for carpool_service in all_carpool_services %}
+                                                                <tr id='carpool_services_{{forloop.counter}}' style='display:none;'>
+                                                                    <td class="font-bold">{{forloop.counter}}</td>
+                                                                    <td>Carpool</td>
+                                                                        {% if carpool_service.passenger_id %}
+                                                                            <td>{{carpool_service.passenger_id.user_id.first_name}} {{carpool_service.passenger_id.user_id.last_name}}</td>
+                                                                        {% else %}
+                                                                            <td>Picked Up Passenger</p>
+                                                                        {% endif %}
+                                                                    <td>{{carpool_service.fare}}</td>
+                                                                    <td>{{carpool_service.pick_up_location}}</td>
+                                                                    <td>{{carpool_service.destination}}</td>
+                                                                    <td>{{carpool_service.date_dropped.date}}</td>
+                                                                    <td>
+                                                                        <button class="approve-button">Dropped</button>
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
 
@@ -1004,40 +1114,42 @@
         <script src="{% static 'assets/js/scroll-up.js' %}"></script> 
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         
+
+        <!-- ####################### FIRST CHART ####################### -->
         <script>
-            const ctx = document.getElementById('myChart');
-            let currentChartType = 'line'; // Default chart type
-            let rentalOrCarpooling = 'rental'
+            const ctx = document.getElementById('chartOfSales');
+            let currentChartTypeSales = 'line'; // Unique variable name for the first chart
+            let rentalOrCarpoolingSales = 'rental'
 
-            let x_axis = [];
-            let y_axis = [];
+            let x_axisSales = [];
+            let y_axisSales = [];
 
-            const fetchData = (rentalOrCarpooling) => {
+            const fetchDataSales = (rentalOrCarpooling) => {
                 fetch(`get-chart-values/${rentalOrCarpooling}/`)
                     .then(response => response.json())
                     .then(data => {
-                        x_axis = data['x_axis'];
-                        y_axis = data['y_axis'];
+                        x_axisSales = data['x_axis'];
+                        y_axisSales = data['y_axis'];
                         console.log(data);
-                        initializeChart();
+                        initializeChartSales();
                     })
                     .catch(error => {
                         console.error("Error:", error);
                     });
             }
 
-            function initializeChart() {
-                if (chart) {
-                    chart.destroy();
+            function initializeChartSales() {
+                if (chartSales) {
+                    chartSales.destroy();
                 }
 
-                chart = new Chart(ctx, {
-                    type: currentChartType,
+                chartSales = new Chart(ctx, {
+                    type: currentChartTypeSales,
                     data: {
-                        labels: y_axis,
+                        labels: y_axisSales,
                         datasets: [{
-                            label: '# of Votes',
-                            data: x_axis,
+                            label: 'Sales in Php',
+                            data: x_axisSales,
                             borderWidth: 1,
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             fill: true,
@@ -1054,30 +1166,185 @@
                 });
             }
 
-            function updateChartType() {
-                const chartTypeSelect = document.getElementById('chart_type');
+            function updateChartTypeSales() {
+                const chartTypeSelect = document.getElementById('chart_of_sales_type');
                 const selectedChartType = chartTypeSelect.value;
-                rentalOrCarpooling = chartTypeSelect.value;
-                fetchData(rentalOrCarpooling);
+                rentalOrCarpoolingSales = chartTypeSelect.value;
+                fetchDataSales(rentalOrCarpoolingSales);
 
                 if (selectedChartType === 'line') {
-                    currentChartType = 'line';
-                    initializeChart();
+                    currentChartTypeSales = 'line';
+                    initializeChartSales();
                 } else if (selectedChartType === 'bar') {
-                    currentChartType = 'bar';
-                    initializeChart();
+                    currentChartTypeSales = 'bar';
+                    initializeChartSales();
                 }
             }
 
-            fetchData(rentalOrCarpooling);
+            fetchDataSales(rentalOrCarpoolingSales);
 
-            let chart = null; // Initialize chart variable
+            let chartSales = null; // Initialize chart variable
 
-            const chartTypeSelect = document.getElementById('chart_type');
-            chartTypeSelect.addEventListener('change', updateChartType);
-
+            const chartTypeSelectSales = document.getElementById('chart_of_sales_type');
+            chartTypeSelectSales.addEventListener('change', updateChartTypeSales);
         </script>
+        <!-- ####################### FIRST CHART ####################### -->
 
+
+
+        <!-- ####################### SECOND CHART ####################### -->
+        <script>
+            const cctx = document.getElementById('chartOfServices');
+            let currentChartTypeServices = 'line'; // Unique variable name for the second chart
+            let rentalOrCarpoolingServices = 'rental'
+
+            let x_axisServices = [];
+            let y_axisServices = [];
+
+            const fetchDataServices = (rentalOrCarpooling) => {
+                fetch(`get-chart-values/${rentalOrCarpooling}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        x_axisServices = data['x_axis'];
+                        y_axisServices = data['y_axis'];
+                        console.log(data);
+                        initializeChartServices();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            }
+
+            function initializeChartServices() {
+                if (newChartServices) {
+                    newChartServices.destroy();
+                }
+
+                newChartServices = new Chart(cctx, {
+                    type: currentChartTypeServices,
+                    data: {
+                        labels: y_axisServices,
+                        datasets: [{
+                            label: '# of Services',
+                            data: x_axisServices,
+                            borderWidth: 1,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateChartTypeServices() {
+                const chartTypeSelect = document.getElementById('chart_of_services_type');
+                const selectedChartType = chartTypeSelect.value;
+                rentalOrCarpoolingServices = chartTypeSelect.value;
+                fetchDataServices(rentalOrCarpoolingServices);
+
+                if (selectedChartType === 'line') {
+                    currentChartTypeServices = 'line';
+                    initializeChartServices();
+                } else if (selectedChartType === 'bar') {
+                    currentChartTypeServices = 'bar';
+                    initializeChartServices();
+                }
+            }
+
+            fetchDataServices(rentalOrCarpoolingServices);
+
+            let newChartServices = null; // Initialize chart variable
+
+            const chartTypeSelectServices = document.getElementById('chart_of_services_type');
+            chartTypeSelectServices.addEventListener('change', updateChartTypeServices);
+        </script>
+        <!-- ####################### SECOND CHART ####################### -->
+        
+
+
+        <!-- ####################### THIRD CHART ####################### -->
+        <script>
+            const tctx = document.getElementById('chartOfTour');
+            let currentChartTypeTour = 'line'; // Unique variable name for the third chart
+            let rentalOrCarpoolingTour = 'rental'
+        
+            let x_axisTour = [];
+            let y_axisTour = [];
+        
+            const fetchDataTour = (rentalOrCarpooling) => {
+                fetch(`get-chart-values/${rentalOrCarpooling}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        x_axisTour = data['x_axis'];
+                        y_axisTour = data['y_axis'];
+                        console.log(data);
+                        initializeChartTour();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            }
+        
+            function initializeChartTour() {
+                if (tourChart) {
+                    tourChart.destroy();
+                }
+        
+                tourChart = new Chart(tctx, {
+                    type: currentChartTypeTour,
+                    data: {
+                        labels: y_axisTour,
+                        datasets: [{
+                            label: '# of Tour',
+                            data: x_axisTour,
+                            borderWidth: 1,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        
+            function updateChartTypeTour() {
+                const chartTypeSelect = document.getElementById('chart_of_tour_type');
+                const selectedChartType = chartTypeSelect.value;
+                rentalOrCarpoolingTour = chartTypeSelect.value;
+                fetchDataTour(rentalOrCarpoolingTour);
+        
+                if (selectedChartType === 'line') {
+                    currentChartTypeTour = 'line';
+                    initializeChartTour();
+                } else if (selectedChartType === 'bar') {
+                    currentChartTypeTour = 'bar';
+                    initializeChartTour();
+                }
+            }
+        
+            fetchDataTour(rentalOrCarpoolingTour);
+        
+            let tourChart = null; // Initialize chart variable
+        
+            const chartTypeSelectTour = document.getElementById('chart_of_tour_type');
+            chartTypeSelectTour.addEventListener('change', updateChartTypeTour);
+        </script>
+        <!-- ####################### THIRD CHART ####################### -->
+
+        
 
         <script>
             function changeRecords(event){
