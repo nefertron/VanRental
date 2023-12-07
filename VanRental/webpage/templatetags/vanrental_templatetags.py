@@ -729,7 +729,19 @@ def get_color_coding(van):
         return all_color_coding
     else:
         return ''
+    
 
 
+@register.simple_tag
+def get_all_years():
+    today = datetime.now()
 
-        
+    all_years = []
+
+    year_today = today.year
+
+    while year_today != 2019:
+        all_years.append(year_today)
+        year_today -= 1
+
+    return all_years

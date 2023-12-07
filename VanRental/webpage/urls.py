@@ -42,5 +42,6 @@ urlpatterns = [
     path('get-chart-values/<rentalOrCarpooling>/', get_chart_values, name='get_chart_values'),
     path('disable-gallery-image/<id>/', disable_gallery_image, name='disable_gallery_image'),
     
+    path('get_van_info/<id>/', get_van_info, name='get_van_info'),
     # path('test', add_municipality, name='add_municipality'),
 ]

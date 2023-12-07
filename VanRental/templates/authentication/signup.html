@@ -33,64 +33,9 @@
     <body id="top">
 
         <main>
-
-            <nav class="navbar navbar-expand-lg">
-                <div class="container">
-                    <button class='menu-button'>
-                        <img src="{% static 'assets/images/car.svg' %}" class='h-45 w-45'/>
-                        <span>Passenger Connect</span>
-                    </button>
-
-                    <div class="d-lg-none ms-auto me-4">
-                        <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
-                    </div>
-    
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-    
-                    <div class="collapse navbar-collapse" id="navbarNav">
-                        <ul class="navbar-nav ms-lg-5 me-lg-auto">
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index">Home</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#rent_section">Rent</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#reviews_section">Reviews</a>
-                            </li>
-    
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#how_does_it_work">How it works</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#frequently_asked_questions">FAQs</a>
-                            </li>
-    
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/index#get_in_touch">Contact</a>
-                            </li>
-
-                            {% if not user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link click-scroll" href="/login">Login</a>
-                            </li>
-                            {% endif %}
-                        </ul>
-
-                        {% if user.is_authenticated %}
-                        <div class="d-none d-lg-block">
-                            <a href="#top" class="navbar-icon bi-person smoothscroll"></a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </nav>
-            
+            <!-- NAVIGATION BAR -->
+            {% include 'navbar.html' %}
+            <!-- NAVIGATION BAR -->
 
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">

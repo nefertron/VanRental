@@ -15,7 +15,6 @@ function closeModal(overlayId) {
 
 
 function openPendingDriverModal(button) {
-    
     var userId = button.getAttribute('data-userid');
     var email = undefined;
 
@@ -41,26 +40,6 @@ function openPendingDriverModal(button) {
         .catch(error => {
             console.error("Error:", error);
         });
-    
-
-    
-    
-    // var userId = button.getAttribute('data-userid');
-    // console.log("Opening modal for User ID:", userId);
-
-
-
-
-    // var apiUrl = `approve-pending-driver/${userId}/`;
-    
-    // fetch(apiUrl)
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         console.log("Response from the backend:", data.message);
-    //     })
-    //     .catch(error => {
-    //         console.error("Error:", error);
-    //     });
 }
 
 function closePendingDriverModal() {
