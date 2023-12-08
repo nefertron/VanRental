@@ -287,12 +287,11 @@ def get_my_notifications(user):
 def get_all_messages(user):
     if user:
         all_users = User.objects.filter(~Q(id=user.id)).all()
-
         last_messages = []
 
         for acc in all_users:
             # Get the last message sent by acc to the user
-            last_msg = Messages.objects.filter(receiver=user, sender=acc).last()
+            last_msg = Messages.objects.filter(Q(receiver=user, sender=acc) | Q(receiver=acc, sender=user)).last()
 
             # print(last_msg)
             if last_msg:
@@ -304,8 +303,13 @@ def get_all_messages(user):
         return last_messages
 
 
-        
+@register.simple_tag
+def get_unseen_messages(user):
+    if user:
+        all_received_messages = Messages.objects.filter(receiver=user, is_seen = False).count()
+        return all_received_messages
     
+
 @register.simple_tag
 def get_unseen_notifications(user):
     if user:

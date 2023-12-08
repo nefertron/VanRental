@@ -39,9 +39,13 @@ urlpatterns = [
     path('pending-driver-info/<id>/', get_pending_driver_info, name='get_pending_driver_info'),
     path('get-address-destination/<id>/', get_destination_address, name='get_destination_address'),
     path('get-carpooling-information/<id>/', get_carpooling_information, name='get_carpooling_information'),
-    path('get-chart-values/<rentalOrCarpooling>/', get_chart_values, name='get_chart_values'),
     path('disable-gallery-image/<id>/', disable_gallery_image, name='disable_gallery_image'),
     
     path('get_van_info/<id>/', get_van_info, name='get_van_info'),
+
+
+    path('get-chart-values/<rentalOrCarpooling>/', get_chart_values, name='get_chart_values'),
+    path('get-chart-values-cancelled-and-rejected/<year>/', get_chart_values_cancelled_and_rejected, name='get_chart_values_cancelled_and_rejected'),
+
     # path('test', add_municipality, name='add_municipality'),
 ]

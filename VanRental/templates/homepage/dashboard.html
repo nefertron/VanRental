@@ -40,193 +40,10 @@
             {% include 'navbar.html' %}
             <!-- NAVIGATION BAR -->
 
-            {% if user.is_authenticated %}
-            <div class="side-bar-header">   
-                <div class="side-bar" id="van-rental-sidebar">
-                    <div class="van-nav-items">
-                        <ul>
-                            <li>
-                                <a href="/index" class='display-flex'>
-                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Homepage
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/dashboard" class='display-flex'>
-                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Dashboard
-                                    </div>
-                                </a>
-                            </li>
-                            {% if not user.is_superuser %}
-                            <li>
-                                <a href="/rent-a-van" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Rent A Van
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            <li>
-                                <a href="/gallery" class='display-flex'>
-                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Gallery
-                                    </div>
-                                </a>
-                            </li>
-                            {% if not user.is_superuser %}
-                            <li>
-                                <a href="/available-carpooling" class='display-flex'>
-                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Carpooling
-                                        {% get_total_open_carpool as total_open_carpool %} 
-                                        {% if total_open_carpool > 0%}
-                                            <div class='side-bar-circle-alert'>
-                                                {{total_open_carpool}}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            {% if user.is_superuser %}
-                            <li>
-                                <a href="/rent-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Open Bookings
-                                        {% get_total_open_bookings as total_open_bookings %} 
-                                        {% if total_open_bookings > 0%}
-                                            <div class='side-bar-circle-alert'>
-                                                {{total_open_bookings}}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-
-                            {% if not user.is_superuser %}
-                            <li>
-                                <a href="/pending-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-alert.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Pending Bookings
-                                        {% get_total_pending_bookings user as total_open_bookings %} 
-                                        {% if total_open_bookings > 0%}
-                                            <div class='side-bar-circle-alert'>
-                                                {{total_open_bookings}}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                            </li>
-                            {% endif %}
-                            
-                            <li>
-                                <a href="/confirmed-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Confirmed Bookings
-                                        {% get_total_confirmed_bookings as total_confirmed_bookings %} 
-                                        {% if total_confirmed_bookings > 0 %}
-                                            <div class='side-bar-circle-alert'>
-                                                {{total_confirmed_bookings}}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/past-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Past Bookingss
-                                    </div>
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/past-carpooling" class='display-flex'>
-                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Past Carpooling
-                                    </div>
-                                </a>
-                            </li>
-                            
-                            <li>
-                                <a href="/cancelled-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-cancel.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Cancelled Bookings
-                                    </div>
-                                </a>
-                            </li>
-                            
-                            <li>
-                                <a href="/rejected-booking" class='display-flex'>
-                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Rejected Bookings
-                                    </div>                                    
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/profile" class='display-flex'>
-                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Settings
-                                    </div>                                    
-                                </a>
-                            </li>
-                            {% if user.is_superuser %}
-                            <li>
-                                <a href="/list-of-vans" class='display-flex'>
-                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        All Vans
-                                    </div>                                    
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/pending-drivers" class='display-flex'>
-                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Pending Drivers
-                                        {% get_total_pending_drivers as total_pending_drivers %}
-                                        {% if total_pending_drivers > 0 %}
-                                            <div class='side-bar-circle-alert'>
-                                                {{total_pending_drivers}}
-                                            </div>
-                                        {% endif %}
-                                    </div>                                    
-                                </a>
-                            </li>
-
-                            <li>
-                                <a href="/modify-landing-page-content" class='display-flex'>
-                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
-                                    <div class='side-bar-row'>
-                                        Modify Landing Page
-                                    </div>                                    
-                                </a>
-                            </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
+            
+            <!-- SIDE BAR -->
+            {% include 'sidebar.html' %}
+            <!-- SIDE BAR -->
 
 
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
@@ -451,6 +268,42 @@
                                             </select>
                                         </div><br>
                                         <canvas id='chartOfServices'></canvas>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class='display-flex'>
+                                            <h2 style='font-size:1rem;'>Tour Analytics</h2>
+
+                                            <select name="chart_of_tour_year" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_tour_year">
+                                                <option selected>--- Year ---</option>
+                                                {% get_all_years as all_years %}
+                                                {% for year in all_years %}
+                                                    <option value="{{year}}">--- {{year}} ---</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div><br>
+                                        <canvas id='chartOfTour'></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6 col-md-12 col-12 mt-3 mb-4 mb-lg-0">
+                                    <div class="custom-block bg-white shadow-lg">
+                                        <div class='display-flex'>
+                                            <h2 style='font-size:1rem;'>Cancelled and Rejected</h2>
+
+                                            <select name="chart_of_cancelled_year" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_cancelled_year">
+                                                <option selected>--- Year ---</option>
+                                                {% get_all_years as all_years %}
+                                                {% for year in all_years %}
+                                                    <option value="{{year}}">--- {{year}} ---</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div><br>
+                                        <canvas id='chartOfCancelledAndRejected'></canvas>
                                     </div>
                                 </div>
                             </div>
@@ -935,12 +788,11 @@
         <!-- ####################### SECOND CHART ####################### -->
         
 
-
         <!-- ####################### THIRD CHART ####################### -->
         <script>
             const tctx = document.getElementById('chartOfTour');
             let currentChartTypeTour = 'line'; // Unique variable name for the third chart
-            let rentalOrCarpoolingTour = 'rental'
+            let rentalOrCarpoolingTour = new Date().getFullYear();
         
             let x_axisTour = [];
             let y_axisTour = [];
@@ -988,7 +840,7 @@
             }
         
             function updateChartTypeTour() {
-                const chartTypeSelect = document.getElementById('chart_of_tour_type');
+                const chartTypeSelect = document.getElementById('chart_of_tour_year');
                 const selectedChartType = chartTypeSelect.value;
                 rentalOrCarpoolingTour = chartTypeSelect.value;
                 fetchDataTour(rentalOrCarpoolingTour);
@@ -1006,12 +858,92 @@
         
             let tourChart = null; // Initialize chart variable
         
-            const chartTypeSelectTour = document.getElementById('chart_of_tour_type');
+            const chartTypeSelectTour = document.getElementById('chart_of_tour_year');
             chartTypeSelectTour.addEventListener('change', updateChartTypeTour);
         </script>
         <!-- ####################### THIRD CHART ####################### -->
 
-        
+
+        <!-- ####################### FOURTH CHART ####################### -->
+        <script>
+            const cancelledRejectedCtx = document.getElementById('chartOfCancelledAndRejected');
+            let currentChartTypeCancelledRejected = 'line';
+            let cancelledRejectedYear = new Date().getFullYear();
+
+            let x_axisCancelledRejected = [];
+            let y_axisCancelledRejected = [];
+
+            const fetchDataCancelledRejected = (selectedYear) => {
+                fetch(`get-chart-values-cancelled-and-rejected/${selectedYear}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        x_axisCancelledRejected = data['x_axis'];
+                        y_axisCancelledRejected = data['y_axis'];
+                        console.log('cancelled', data);
+                        initializeChartCancelledRejected();
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            }
+
+            function initializeChartCancelledRejected() {
+                
+                if (cancelledRejectedChart) {
+                    cancelledRejectedChart.destroy();
+                }
+
+                cancelledRejectedChart = new Chart(cancelledRejectedCtx, {
+                    type: currentChartTypeCancelledRejected,
+                    data: {
+                        labels: y_axisCancelledRejected,
+                        datasets: [{
+                            label: 'Cancelled',
+                            data: x_axisCancelledRejected[0],
+                            borderWidth: 1,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                        },
+                        {
+                            label: 'Rejected',
+                            data: x_axisCancelledRejected[1],
+                            borderWidth: 1,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            fill: true,
+                            tension: 0.4,
+                        },
+                        ]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateChartYearCancelledRejected() {
+                const chartYearSelect = document.getElementById('chart_of_cancelled_year');
+                const selectedYear = chartYearSelect.value;
+                cancelledRejectedYear = selectedYear;
+                fetchDataCancelledRejected(cancelledRejectedYear);
+            }
+
+            fetchDataCancelledRejected(cancelledRejectedYear);
+
+            let cancelledRejectedChart = null;
+
+            const chartYearSelectCancelledRejected = document.getElementById('chart_of_cancelled_year');
+            chartYearSelectCancelledRejected.addEventListener('change', updateChartYearCancelledRejected);
+        </script>
+        <!-- ####################### FOURTH CHART ####################### -->
+
+
+
+
 
         <script>
             function changeRecords(event){

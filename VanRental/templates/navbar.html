@@ -28,10 +28,10 @@
 
             <button class="profile-button" onclick="openMessage('mobile');">
                 <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
-                {% get_unseen_notifications user as unseen_notifications %}
-                {% if unseen_notifications > 0 %}
+                {% get_unseen_messages user as unseen_messages %}
+                {% if unseen_messages > 0 %}
                     <div class='notification-alert'>
-                        {{unseen_notifications}}
+                            {{unseen_messages}}
                     </div>
                 {% endif %}
             </button>
@@ -85,35 +85,41 @@
                         {% get_all_messages user as all_my_messages %}
                         {% if all_my_messages|length > 0 %}
                             {% for msg in all_my_messages %}
-                            
-                            <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
-                                {% if msg.sender.passengeraccount %}
-                                        {% if msg.sender.passengeraccount.profile %}
-                                            <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' 
+                                        {% if msg.sender != user %}
+                                            onclick="location.href='/messages-{{msg.sender.id}}/'"
                                         {% else %}
-                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
-                                        {% endif %}
-                                    {% elif msg.sender.driveraccount %}
-                                        {% if msg.sender.driveraccount.profile %}
-                                            <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
-                                        {% else %}
-                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
-                                        {% endif %}
-                                    {% else %}
-                                        {% if msg.sender.adminaccount.profile %}
-                                            <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
-                                        {% else %}
-                                            <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
-                                        {% endif %}
-                                    {% endif %}
+                                            onclick="location.href='/messages-{{msg.receiver.id}}/'"
+                                        {% endif %}>
 
-                                <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
-                                            width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
-                                    <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
-                                    <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
-                                    <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
-                                </div>
-                            </li>
+
+                                        {% if msg.sender.passengeraccount %}
+                                            {% if msg.sender.passengeraccount.profile %}
+                                                <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                            {% else %}
+                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                            {% endif %}
+                                        {% elif msg.sender.driveraccount %}
+                                            {% if msg.sender.driveraccount.profile %}
+                                                <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                            {% else %}
+                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if msg.sender.adminaccount.profile %}
+                                                <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                            {% else %}
+                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                            {% endif %}
+                                        {% endif %}
+
+                                    <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                        <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                        <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                        <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                    </div>
+                                </li>
                             {% endfor %}
                         {% else %}
                         <li class="custom-button" style='display: flex;'>
@@ -187,7 +193,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link click-scroll" href="/index#get_in_touch">Tour Gallery</a>
+                    <a class="nav-link click-scroll" href="/gallery">Tour Gallery</a>
                 </li>
 
                 {% if not user.is_authenticated %}
@@ -205,10 +211,10 @@
 
                 <button class="profile-button" onclick="openMessage('desktop');">
                     <img src="{% static 'assets/images/facebook-messenger.svg' %}"/>
-                    {% get_unseen_notifications user as unseen_notifications %}
-                    {% if unseen_notifications > 0 %}
+                    {% get_unseen_messages user as unseen_messages %}
+                    {% if unseen_messages > 0 %}
                         <div class='notification-alert'>
-                                {{unseen_notifications}}
+                                {{unseen_messages}}
                         </div>
                     {% endif %}
                 </button>
@@ -269,9 +275,15 @@
                             {% get_all_messages user as all_my_messages %}
                             {% if all_my_messages|length > 0 %}
                                 {% for msg in all_my_messages %}
-                                
-                                <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' onclick="location.href='/messages-{{msg.sender.id}}/'">
-                                    {% if msg.sender.passengeraccount %}
+                                    <li class="custom-button" style='display: flex; {% if not msg.is_seen %} background-color: #c7e9fc; {% endif %}' 
+                                        {% if msg.sender != user %}
+                                            onclick="location.href='/messages-{{msg.sender.id}}/'"
+                                        {% else %}
+                                            onclick="location.href='/messages-{{msg.receiver.id}}/'"
+                                        {% endif %}>
+
+
+                                        {% if msg.sender.passengeraccount %}
                                             {% if msg.sender.passengeraccount.profile %}
                                                 <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
                                             {% else %}
@@ -291,13 +303,13 @@
                                             {% endif %}
                                         {% endif %}
 
-                                    <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
-                                                width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
-                                        <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
-                                        <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
-                                        <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
-                                    </div>
-                                </li>
+                                        <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                    width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                            <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                            <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                            <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                        </div>
+                                    </li>
                                 {% endfor %}
                             {% else %}
                             <li class="custom-button" style='display: flex;'>

@@ -709,7 +709,7 @@ def rent_booking_list(request):
             create_notification(request, booking_target.rented_by.user_id, message_to_passenger)
 
             messages.info(request, message_to_admin)
-            return redirect('/rent-booking')
+            return redirect('/confirmed-booking')
         
 
         elif not rejected_booking_id is None:
@@ -868,6 +868,26 @@ def cancelled_booking(request):
         context['profile'] = passenger_account
         context['all_cancelled_bookings']= RentedVan.objects.filter(is_cancelled = True).all().order_by('-date_recorded')
 
+
+
+    if request.method == 'POST':
+        to_reopen_booking_id = request.POST.get('to_reopen_booking_id')
+
+        if to_reopen_booking_id:
+            to_reopen = RentedVan.objects.filter(id = to_reopen_booking_id).first()
+            to_reopen.driver_id = None
+            to_reopen.my_offer = 0
+            to_reopen.is_cancelled = False
+            to_reopen.save()
+
+            message_to_passenger = f'Your booking with ID {to_reopen.rent_id} has been reopened by the admin. Please check it out!'
+            message_to_admin = f'You successfully reopened the booking with ID {to_reopen.rent_id}!'
+
+            create_notification(request, request.user, message_to_admin)
+            create_notification(request, to_reopen.rented_by.user_id, message_to_passenger)
+
+            messages.info(request, message_to_admin)
+            return redirect('/rent-booking')
 
     return render(request, 'vans/cancelled-booking.html', context)
 
@@ -1663,7 +1683,6 @@ def filtered_gallery(request, id):
 
     context = {}
 
-
     find_tour = TourGallery.objects.filter(id = id).first()
 
     if find_tour:
@@ -1862,11 +1881,8 @@ def get_carpooling_information(request, id):
 
     return JsonResponse(response)
 
-
-
+################# GET CHART VALUES 1
 def get_chart_values(request, rentalOrCarpooling):
-
-
     admin_account = AdminAccount.objects.filter(user_id = request.user).first()
     driver_account = DriverAccount.objects.filter(user_id = request.user).first()
     passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
@@ -2011,10 +2027,79 @@ def get_chart_values(request, rentalOrCarpooling):
             response['x_axis'] = temp_x_axis
             response['y_axis'] = temp_y_axis
     ########## FOR PASSENGER ##########
+    return JsonResponse(response)
+
+################# GET CHART VALUES 1
+
+
+################# GET CHART VALUES 2
+def get_chart_values_cancelled_and_rejected(request, year):
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    response = {}
+
+    list_of_months = ['Jan', 'Feb', 'Mar', 'Aprl', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+    temp_x_axis = [[], []]
+    temp_y_axis = []
+
+
+    if not admin_account is None:
+
+        for i in range(0, len(list_of_months)):
+            all_cancelled_rental_booking = RentedVan.objects.filter(is_cancelled=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_cancelled_carpool_booking = BookedPassenger.objects.filter(is_cancelled=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            all_rejected_rental_booking = RentedVan.objects.filter(is_rejected=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_rejected_carpool_booking = BookedPassenger.objects.filter(is_rejected=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            temp_x_axis[0].append(all_cancelled_rental_booking + all_cancelled_carpool_booking) # cancelled
+            temp_x_axis[1].append(all_rejected_rental_booking + all_rejected_carpool_booking) # rejected
+
+            temp_y_axis.append(list_of_months[i])
         
+        response['x_axis'] = temp_x_axis
+        response['y_axis'] = temp_y_axis
+        return JsonResponse(response)
     
 
-    return JsonResponse(response)
+    elif not driver_account is None:
+        for i in range(0, len(list_of_months)):
+            all_cancelled_rental_booking = RentedVan.objects.filter(driver_id = driver_account, is_cancelled=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_cancelled_carpool_booking = BookedPassenger.objects.filter(carpool_id__driver_id = driver_account, is_cancelled=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            all_rejected_rental_booking = RentedVan.objects.filter(driver_id = driver_account, is_rejected=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_rejected_carpool_booking = BookedPassenger.objects.filter(carpool_id__driver_id = driver_account, is_rejected=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            temp_x_axis[0].append(all_cancelled_rental_booking + all_cancelled_carpool_booking) # cancelled
+            temp_x_axis[1].append(all_rejected_rental_booking + all_rejected_carpool_booking) # rejected
+
+            temp_y_axis.append(list_of_months[i])
+        
+        response['x_axis'] = temp_x_axis
+        response['y_axis'] = temp_y_axis
+        return JsonResponse(response)
+    
+
+    elif not passenger_account is None:
+        for i in range(0, len(list_of_months)):
+            all_cancelled_rental_booking = RentedVan.objects.filter(rented_by = passenger_account, is_cancelled=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_cancelled_carpool_booking = BookedPassenger.objects.filter(passenger_id = passenger_account, is_cancelled=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            all_rejected_rental_booking = RentedVan.objects.filter(rented_by = passenger_account, is_rejected=True, travel_date__year = year, travel_date__month = i + 1).count()
+            all_rejected_carpool_booking = BookedPassenger.objects.filter(passenger_id = passenger_account, is_rejected=True, date_dropped__year = year, date_dropped__month = i + 1).count()
+
+            temp_x_axis[0].append(all_cancelled_rental_booking + all_cancelled_carpool_booking) # cancelled
+            temp_x_axis[1].append(all_rejected_rental_booking + all_rejected_carpool_booking) # rejected
+
+            temp_y_axis.append(list_of_months[i])
+
+        response['x_axis'] = temp_x_axis
+        response['y_axis'] = temp_y_axis
+        return JsonResponse(response)
+
+################# GET CHART VALUES 2
 
 
 
