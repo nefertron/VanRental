@@ -225,19 +225,12 @@
                                                 <h2 style='font-size:1rem;'>Spending</h2>
                                             {% endif %}
 
-                                            <select name="chart_of_services_year" class="form-control" style='width:20%; border-radius: 50px; position:absolute; margin-left:10rem;' required id="chart_of_services_year">
+                                            <select name="chart_of_services_year" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_services_year">
                                                 <option selected>--- Year ---</option>
                                                 {% get_all_years as all_years %}
                                                 {% for year in all_years %}
                                                     <option value="{{year}}">--- {{year}} ---</option>
                                                 {% endfor %}
-                                            </select>
-
-
-                                            <select name="chart_of_sales_type" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_sales_type">
-                                                <option value="rental" selected>--- Rental ---</option>
-                                                <option value="carpooling">--- Carpooling ---</option>
-                                                <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
                                             </select>
                                         </div><br>
                                         <canvas id='chartOfSales'></canvas>
@@ -253,18 +246,12 @@
                                                 <h2 style='font-size:1rem;'>Availed Services</h2>
                                             {% endif %}
                                             
-                                            <select name="chart_of_services_year" class="form-control" style='width:20%; border-radius: 50px; position:absolute; margin-left:10rem;' required id="chart_of_services_year">
+                                            <select name="chart_of_services_year" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_services_year">
                                                 <option selected>--- Year ---</option>
                                                 {% get_all_years as all_years %}
                                                 {% for year in all_years %}
                                                     <option value="{{year}}">--- {{year}} ---</option>
                                                 {% endfor %}
-                                            </select>
-
-                                            <select name="chart_of_services_type" class="form-control" style='width:40%; border-radius: 50px; position:absolute; right:0; margin-right:20px;' required id="chart_of_services_type">
-                                                <option value="rental" selected>--- Rental ---</option>
-                                                <option value="carpooling">--- Carpooling ---</option>
-                                                <option value="rental_and_carpooling">--- Rental and Carpooling ---</option>
                                             </select>
                                         </div><br>
                                         <canvas id='chartOfServices'></canvas>
@@ -667,14 +654,24 @@
                     type: currentChartTypeSales,
                     data: {
                         labels: y_axisSales,
-                        datasets: [{
-                            label: 'Sales in Php',
-                            data: x_axisSales,
-                            borderWidth: 1,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: true,
-                            tension: 0.4,
-                        }]
+                        datasets: [
+                            {
+                                label: 'Van Rental (in Php)',
+                                data: x_axisSales[0],
+                                borderWidth: 1,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                            {
+                                label: 'Carpooling (in Php)',
+                                data: x_axisSales[1],
+                                borderWidth: 1,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ]
                     },
                     options: {
                         scales: {
@@ -687,7 +684,7 @@
             }
 
             function updateChartTypeSales() {
-                const chartTypeSelect = document.getElementById('chart_of_sales_type');
+                const chartTypeSelect = document.getElementById('chart_of_sales_year');
                 const selectedChartType = chartTypeSelect.value;
                 rentalOrCarpoolingSales = chartTypeSelect.value;
                 fetchDataSales(rentalOrCarpoolingSales);
@@ -705,7 +702,7 @@
 
             let chartSales = null; // Initialize chart variable
 
-            const chartTypeSelectSales = document.getElementById('chart_of_sales_type');
+            const chartTypeSelectSales = document.getElementById('chart_of_sales_year');
             chartTypeSelectSales.addEventListener('change', updateChartTypeSales);
         </script>
         <!-- ####################### FIRST CHART ####################### -->
@@ -716,7 +713,7 @@
         <script>
             const cctx = document.getElementById('chartOfServices');
             let currentChartTypeServices = 'line'; // Unique variable name for the second chart
-            let rentalOrCarpoolingServices = 'rental'
+            let rentalOrCarpoolingServices = new Date().getFullYear();
 
             let x_axisServices = [];
             let y_axisServices = [];
@@ -744,14 +741,26 @@
                     type: currentChartTypeServices,
                     data: {
                         labels: y_axisServices,
-                        datasets: [{
-                            label: '# of Services',
-                            data: x_axisServices,
-                            borderWidth: 1,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: true,
-                            tension: 0.4,
-                        }]
+                        datasets: [
+                            {
+                                label: 'Van Rental',
+                                data: x_axisServices[0],
+                                borderWidth: 1,
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                            {
+                                label: 'Carpool',
+                                data: x_axisServices[1],
+                                borderWidth: 1,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ]
+                        //'rgba(255, 99, 132, 0.2)',
+
                     },
                     options: {
                         scales: {
@@ -764,10 +773,10 @@
             }
 
             function updateChartTypeServices() {
-                const chartTypeSelect = document.getElementById('chart_of_services_type');
+                const chartTypeSelect = document.getElementById('chart_of_services_year');
                 const selectedChartType = chartTypeSelect.value;
                 rentalOrCarpoolingServices = chartTypeSelect.value;
-                fetchDataServices(rentalOrCarpoolingServices);
+                fetchDataServices(chartTypeSelect);
 
                 if (selectedChartType === 'line') {
                     currentChartTypeServices = 'line';
@@ -782,7 +791,7 @@
 
             let newChartServices = null; // Initialize chart variable
 
-            const chartTypeSelectServices = document.getElementById('chart_of_services_type');
+            const chartTypeSelectServices = document.getElementById('chart_of_services_year');
             chartTypeSelectServices.addEventListener('change', updateChartTypeServices);
         </script>
         <!-- ####################### SECOND CHART ####################### -->
@@ -796,14 +805,16 @@
         
             let x_axisTour = [];
             let y_axisTour = [];
+            let tour_Names = [];
         
             const fetchDataTour = (rentalOrCarpooling) => {
-                fetch(`get-chart-values/${rentalOrCarpooling}/`)
+                fetch(`get-chart-values-tour-analytics/${rentalOrCarpooling}/`)
                     .then(response => response.json())
                     .then(data => {
                         x_axisTour = data['x_axis'];
                         y_axisTour = data['y_axis'];
-                        console.log(data);
+                        tour_Names = data['tour_names']
+                        console.log('tour data', data);
                         initializeChartTour();
                     })
                     .catch(error => {
@@ -816,18 +827,30 @@
                     tourChart.destroy();
                 }
         
+                function randomColor() {
+                    const r = Math.floor(Math.random() * 256);
+                    const g = Math.floor(Math.random() * 256);
+                    const b = Math.floor(Math.random() * 256);
+                    const alpha = 0.2; // You can adjust the alpha value as needed
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                }
+
+
                 tourChart = new Chart(tctx, {
                     type: currentChartTypeTour,
                     data: {
                         labels: y_axisTour,
-                        datasets: [{
-                            label: '# of Tour',
-                            data: x_axisTour,
-                            borderWidth: 1,
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            fill: true,
-                            tension: 0.4,
-                        }]
+                        datasets: tour_Names.map((tourName, index) => {
+                            return {
+                                label: `${tourName}`,
+                                data: x_axisTour[index],
+                                borderWidth: 1,
+                                backgroundColor: randomColor(),
+                                fill: true,
+                                tension: 0.4,
+                            };
+                        }),
+                        //'rgba(255, 99, 132, 0.2)',
                     },
                     options: {
                         scales: {

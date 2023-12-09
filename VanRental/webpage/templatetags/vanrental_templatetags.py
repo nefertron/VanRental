@@ -57,6 +57,32 @@ def get_all_pending_gallery_images(tour_gallery):
 
 
 @register.simple_tag
+def get_highest_reaction_tour():
+
+    all_approved_gallery = TourGallery.objects.filter(is_enabled = True).all().order_by('id')
+
+    highest_heart = 0
+    highest_heart_container = None
+    for approved in all_approved_gallery:
+        heart_reacts_count = HeartReactions.objects.filter(tour = approved, is_hearted = True).count()
+
+        if highest_heart == 0 and heart_reacts_count == 0:
+            highest_heart = heart_reacts_count
+            highest_heart_container = approved
+
+        elif heart_reacts_count > highest_heart:
+            highest_heart = heart_reacts_count
+            highest_heart_container = approved
+
+    return highest_heart_container
+
+
+@register.simple_tag
+def get_first_approved_gallery_image(tour_gallery):
+    all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).first()
+    return all_images
+
+@register.simple_tag
 def get_all_pending_gallery_indices(tour_gallery):
     all_images = TourGalleryImages.objects.filter(tour_gallery = tour_gallery, is_enabled = True).count()
     indexes = []

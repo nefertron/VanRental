@@ -268,38 +268,96 @@
                 <div class="container">
                     <div class="row justify-content-center">
 
-                        <div class="col-lg-4 col-12 mb-4 mb-lg-0">
-                            <div class="custom-block bg-white shadow-lg">
-                                <div class="d-flex">
-                                    <div>
-                                        <h5 class="mb-2">Book Now!</h5>
+                        {% get_highest_reaction_tour as highest_reaction_tour %}
 
-                                        <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia tenetur necessitatibus quaerat veniam nisi, cumque, est debitis labore facilis reprehenderit qui ut! Esse aperiam corporis dolor, saepe molestiae mollitia eaque?</p>
+                        {% if highest_reaction_tour %}
+                            <div class="col-lg-4 col-12 mb-4 mb-lg-0" style='cursor: pointer;' onclick="location.href='/gallery/{{highest_reaction_tour.id}}/';">
+                                <div class="custom-block bg-white shadow-lg">
+                                    <div class="d-flex">
+                                        <div>
+                                            <h5 class="mb-2">Book Now!</h5>
+
+                                            <p>
+                                                <b style='color:#13547a;'>
+                                                    #{{ highest_reaction_tour.tour_category.category|slugify|title|cut:'-' }} &nbsp;&nbsp;
+                                                    #{{highest_reaction_tour.title|slugify|title|cut:'-' }} &nbsp;&nbsp;
+                                                    #TrendToday &nbsp;&nbsp;
+                                                </b>
+                                                
+                                                <br/>
+                                                {{highest_reaction_tour.rented_van.travel_date}}
+                                            </p>
+
+                                            <p class="mb-0" style='overflow: hidden;
+                                                        display: -webkit-box;
+                                                        -webkit-box-orient: vertical;
+                                                        -webkit-line-clamp: 6;
+                                                        margin-bottom: 100px;'>
+                                                {{highest_reaction_tour.description}}
+                                            </p>
+                                            <br/>
+                                        </div>
+
+                                        <span class="badge bg-design rounded-pill ms-auto">✔</span>
                                     </div>
 
-                                    <span class="badge bg-design rounded-pill ms-auto">✔</span>
-                                </div>
+                                    {% get_first_approved_gallery_image highest_reaction_tour as gallery_image %}
+                                    <img src="{{gallery_image.image}}" class="custom-block-image img-fluid" alt="">
 
-                                <img src="{% static 'assets/images/van-rental-bg-2.png' %}" class="custom-block-image img-fluid" alt="">
+                                    <hr/>
+                                    <div class='interactions-container'>
+                                        {% get_all_heart_reactions_count 'None' highest_reaction_tour as all_heart_reactions_count %}
+                                        <div style='display: flex;'>
+                                            <b>{{all_heart_reactions_count}}</b>
+                                            <button class='heart-btn'>
+                                                <img src="{% static 'assets/images/heart.svg' %}"/>
+                                            </button>
+                                        </div>
 
-                                <hr/>
-                                <div class='interactions-container'>
-                                    <div style='display: flex;'>
-                                        <b>120</b>
-                                        <button class='heart-btn'>
-                                            <img src="{% static 'assets/images/heart.svg' %}"/>
-                                        </button>
-                                    </div>
-
-                                    <div style='display: flex; margin-left: 20px;'>
-                                        <b>100</b>
-                                        <button class='message-btn'>
-                                            <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
-                                        </button>
+                                        {% get_all_tour_comments highest_reaction_tour as all_tour_comments %}
+                                        <div style='display: flex; margin-left: 20px;'>
+                                            <b>{{all_tour_comments|length}}</b>
+                                            <button class='message-btn'>
+                                                <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        {% else %}
+                            <div class="col-lg-4 col-12 mb-4 mb-lg-0">
+                                <div class="custom-block bg-white shadow-lg">
+                                    <div class="d-flex">
+                                        <div>
+                                            <h5 class="mb-2">Book Now!</h5>
+
+                                            <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia tenetur necessitatibus quaerat veniam nisi, cumque, est debitis labore facilis reprehenderit qui ut! Esse aperiam corporis dolor, saepe molestiae mollitia eaque?</p>
+                                        </div>
+
+                                        <span class="badge bg-design rounded-pill ms-auto">✔</span>
+                                    </div>
+
+                                    <img src="{% static 'assets/images/van-rental-bg-2.png' %}" class="custom-block-image img-fluid" alt="">
+
+                                    <hr/>
+                                    <div class='interactions-container'>
+                                        <div style='display: flex;'>
+                                            <b>120</b>
+                                            <button class='heart-btn'>
+                                                <img src="{% static 'assets/images/heart.svg' %}"/>
+                                            </button>
+                                        </div>
+
+                                        <div style='display: flex; margin-left: 20px;'>
+                                            <b>100</b>
+                                            <button class='message-btn'>
+                                                <img src="{% static 'assets/images/message.svg' %}" style='height: 30px; width: auto;'/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
 
                         <div class="col-lg-6 col-12">
                             <div class="custom-block custom-block-overlay">

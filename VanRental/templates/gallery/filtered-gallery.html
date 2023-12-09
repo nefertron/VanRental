@@ -72,11 +72,9 @@
                                             <div>
                                                 <div class="mb-2">
                                                     <h5><a href='/gallery/{{approved.id}}/'>{{approved.title}}</a></h5>
-                                                    <p style='color:#13547a;'><b>#{{ approved.tour_category.category|slugify|title|cut:'-' }}</b></p>
-
                                                     <p>
-                                                        <b>Location : </b> {{approved.rented_van.to_destination}}<br>
-                                                        <b>Date : </b> {{approved.rented_van.travel_date}}
+                                                        <b style='color:#13547a;'>#{{ approved.tour_category.category|slugify|title|cut:'-' }}</b><br/>
+                                                        {{approved.rented_van.travel_date}}
                                                     </p>
                                                 </div>
     
@@ -198,9 +196,10 @@
                                                 </div>
                                             {% endfor %}
 
-                                            <button id="open-tour-comments_{{approved.id}}_rental_user_comments" onclick="openAllTourComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                            <button id="hide-tour-comments_{{approved.id}}_rental_user_comments"  onclick="hideAllTourComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
-                                            
+                                            {% if all_tour_comments|length > 1 %}
+                                                <button id="open-tour-comments_{{approved.id}}_rental_user_comments" onclick="openAllTourComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                <button id="hide-tour-comments_{{approved.id}}_rental_user_comments"  onclick="hideAllTourComments('{{approved.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                            {% endif %}
                                             
                                             <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                                                 {% csrf_token %}
