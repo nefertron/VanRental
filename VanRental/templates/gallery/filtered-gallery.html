@@ -72,6 +72,7 @@
                                             <div>
                                                 <div class="mb-2">
                                                     <h5><a href='/gallery/{{approved.id}}/'>{{approved.title}}</a></h5>
+                                                    <p style='color:#13547a;'><b>#{{ approved.tour_category.category|slugify|title|cut:'-' }}</b></p>
 
                                                     <p>
                                                         <b>Location : </b> {{approved.rented_van.to_destination}}<br>
@@ -82,7 +83,8 @@
                                             </div>
                                             <span class="badge bg-finance rounded-pill ms-auto">✔</span>
                                         </div>
-                                        <div id="approvedGallery_{{approved.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+
+                                        <div id="approvedGallery_{{approved.id}}" class="carousel slide van-slider" data-bs-ride="carousel" style='width: 100%;'>
                                             <!-- Indicators/dots -->
                                             <div class="carousel-indicators">
                                                 {% get_all_approved_gallery_indices approved as approved_gallery_indices %}
@@ -102,13 +104,13 @@
                                                     {% if forloop.counter0 == 0 %}
                                                         <div class="carousel-item active">
                                                             <div class='slider-image-container'>
-                                                                <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                                <img src="{{gallery_image.image}}" alt="" class="slider-image" style='height:100%; width: auto;'> 
                                                             </div>
                                                         </div>
                                                     {% else %}
                                                         <div class="carousel-item">
                                                             <div class='slider-image-container'>
-                                                                <img src="{{gallery_image.image}}" alt="" class="slider-image">
+                                                                <img src="{{gallery_image.image}}" alt="" class="slider-image" style='height:100%; width: auto;'>
                                                             </div>
                                                         </div>
                                                     {% endif %}
@@ -123,24 +125,7 @@
                                                 <span class="carousel-control-next-icon"></span>
                                             </button>
 
-                                            <p>
-                                                <b>Van Used :</b> {{approved.rented_van.plate_no.brand_name}} <br>
-                                                <b>Plate No :</b> {{approved.rented_van.plate_no.plate_no}} <br>
-                                                <b>Color :</b> {{approved.rented_van.plate_no.color}}<br>
-                                                <b>No. Of Seats :</b> {{approved.rented_van.plate_no.number_of_seats}} <br>
-                                                <b>Air Conditioned :</b> 
-                                                    {% if approved.rented_van.plate_no.is_airconditioned %}
-                                                        YES
-                                                    {% else %}
-                                                        NO
-                                                    {% endif %}
-                                                <br>
-                                            </p>
                                         </div>
-                                        <br>
-                                        <br>
-                                        <br>
-                                        <br>
                                         <br>
                                         <p class="mb-2">
                                             {{approved.description}}
@@ -230,6 +215,19 @@
                                             </form>
                                         {% else %}
                                             <p style="font-size: 0.75rem;">No comments found</p>
+                                            {% if user.is_authenticated %}
+                                                <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                                    {% csrf_token %}
+                                                    <input type='hidden' name='tour_id' value='{{approved.id}}'/>
+
+                                                    <div class="new-message-container" id="scroll-to-form">
+                                                        <input type="text" name="new_comment" class="form-control message-input " id="comment" required>
+                                                        <button type="submit" class="message-submit-button" style='width: 40px; height: 40px;'>
+                                                            <img src="{% static 'assets/images/send.svg' %}" alt="Submit">
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            {% endif %}
                                         {% endif %}
                                     </div>
                                 </div>

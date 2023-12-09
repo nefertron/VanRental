@@ -212,9 +212,18 @@ class GetInTouch(models.Model):
     
     def __str__(self):
         return f'OFFICE ADDRESS {self.office_address}'
-    
+
+  
+
+class TourCategories(models.Model):
+    category  = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.category}'
+      
 
 class TourGallery(models.Model):
+    tour_category = models.ForeignKey(TourCategories, on_delete=models.CASCADE, default=None, null=True, blank=True)
     tour_gallery_id = models.CharField(max_length=50, default=None, null=True, blank=True)
     rented_van = models.ForeignKey(RentedVan, on_delete=models.CASCADE)
     description = models.TextField(default=None, null=True, blank=True)
@@ -233,6 +242,7 @@ class TourGalleryImages(models.Model):
     def __str__(self):
         return f'ID : {self.id} || IS ENABLED : {self.is_enabled}'
     
+
 
 class HeartReactions(models.Model):
     tour = models.ForeignKey(TourGallery, on_delete=models.CASCADE)

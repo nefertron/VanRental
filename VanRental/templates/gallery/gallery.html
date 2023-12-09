@@ -47,7 +47,7 @@
             <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
                 <div class="container">
                     <div class="row align-items-center">
-                        <div class="col-lg-5 col-12">
+                        <div class="col-lg-12 col-12">
                             <nav aria-label="breadcrumb" style="display:flex;">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/index">Homepage</a></li>
@@ -56,19 +56,32 @@
                                 {% if user.is_authenticated %}
                                     {% user_type_checker user as user_type %}
                                     {% if user_type == 'Driver' %}
+                                        {% get_all_new_pending_gallery user as all_new_pending_galleries %}
+                                        {% if all_new_pending_galleries|length > 0 %}
+                                            <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_pending_gallery');">{{all_new_pending_galleries|length}} Pending Gallery</button>
+                                        {% endif %}
+
                                         {% get_all_new_gallery user as all_new_galleries %}
-                                            {% if all_new_galleries|length > 0 %}
-                                                <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_tour');">{{all_new_galleries|length}} New Gallery</button>
-                                            {% endif %}
+                                        {% if all_new_galleries|length > 0 %}
+                                            <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_tour');">{{all_new_galleries|length}} New Gallery</button>
+                                        {% endif %}
+
                                     {% elif user_type == 'Admin' %}
+                                        <button type='button' class="add-btn" onclick="openCategoryModal('category-modal');">+ Tour Category</button>
+
                                         {% get_all_pending_new_gallery user as all_pending_new_galleries %}
                                         {% if all_pending_new_galleries|length > 0 %}
-                                            <button type='button' class="add-btn" onclick="openNewGalleryModal('list_of_tour');">{{all_pending_new_galleries|length}} Pending Gallery</button>
+                                            <button type='button' class="add-btn" onclick="openNewGalleryModal('pending_list_of_tour');">{{all_pending_new_galleries|length}} Pending Gallery</button>
                                         {% endif %}
                                     {% endif %}
                                 {% endif %}
+
+
+
                             </nav>
+
                         </div>
+
                         
                         {% for message in messages %}
                             <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -107,6 +120,7 @@
                                                     <div>
                                                         <div class="mb-2">
                                                             <h5><a href='/gallery/{{approved.id}}/'>{{approved.title}}</a></h5>
+                                                            <p style='color:#13547a;'><b>#{{ approved.tour_category.category|slugify|title|cut:'-' }}</b></p>
         
                                                             <p>
                                                                 <b>Location : </b> {{approved.rented_van.to_destination}}<br>
@@ -157,25 +171,7 @@
                                                     <button class="carousel-control-next" type="button" data-bs-target="#approvedGallery_{{approved.id}}" data-bs-slide="next">
                                                         <span class="carousel-control-next-icon"></span>
                                                     </button>
-        
-                                                    <p>
-                                                        <b>Van Used :</b> {{approved.rented_van.plate_no.brand_name}} <br>
-                                                        <b>Plate No :</b> {{approved.rented_van.plate_no.plate_no}} <br>
-                                                        <b>Color :</b> {{approved.rented_van.plate_no.color}}<br>
-                                                        <b>No. Of Seats :</b> {{approved.rented_van.plate_no.number_of_seats}} <br>
-                                                        <b>Air Conditioned :</b> 
-                                                            {% if approved.rented_van.plate_no.is_airconditioned %}
-                                                                YES
-                                                            {% else %}
-                                                                NO
-                                                            {% endif %}
-                                                        <br>
-                                                    </p>
                                                 </div>
-                                                <br>
-                                                <br>
-                                                <br>
-                                                <br>
                                                 <br>
                                                 <p class="mb-2">
                                                     {{approved.description}}
@@ -270,109 +266,21 @@
                                         </div>
                                     {% endfor %}
                                 {% else %}
-                                    <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
-                                        <div class="custom-block bg-white shadow-lg">
-                                            <div class="d-flex">
-                                                <div>
-                                                    <div class="mb-2">
-                                                        <h5><a href=''>Baguio Tour</a></h5>
-                                                        <p>
-                                                            <b>Location : </b> Baguio Eneme<br>
-                                                            <b>Date : </b> August 9, 2023
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <span class="badge bg-finance rounded-pill ms-auto">✔</span>
-                                            </div>
-                                            <div id="demo" class="carousel slide van-slider" data-bs-ride="carousel">
-                                                <!-- Indicators/dots -->
-                                                <div class="carousel-indicators">
-                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="0" class="active"></button>
-                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="1"></button>
-                                                    <button type="button" data-bs-target="#demo" data-bs-slide-to="2"></button>
-                                                </div>
-                                            
-                                                <!-- The slideshow/carousel -->
-                                                <div class="carousel-inner">
-                                                    <div class="carousel-item active">
-                                                        <img src="{% static 'assets/images/car-favicon.svg' %}" alt="" class="d-block w-100">
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <img src="{% static 'assets/images/car-select.svg' %}" alt="" class="d-block w-100">
-                                                    </div>
-                                                    <div class="carousel-item">
-                                                        <img src="{% static 'assets/images/van-icon.svg' %}" alt="" class="d-block w-100">
-                                                    </div>
-                                                </div>
-                                            
-                                                <!-- Left and right controls/icons -->
-                                                <button class="carousel-control-prev" type="button" data-bs-target="#demo" data-bs-slide="prev">
-                                                    <span class="carousel-control-prev-icon"></span>
-                                                </button>
-                                                <button class="carousel-control-next" type="button" data-bs-target="#demo" data-bs-slide="next">
-                                                    <span class="carousel-control-next-icon"></span>
-                                                </button>
 
-                                                <p>
-                                                    <b>Van Used :</b> Toyota High Ace <br>
-                                                    <b>Plate No :</b> HGH343 <br>
-                                                    <b>Color :</b> Red <br>
-                                                    <b>No. Of Seats :</b> 12 <br>
-                                                    <b>Air Conditioned :</b> 
-                                                        YES
-                                                    <br>
-                                                </p>
-                                            </div>
-                                            
-                                            <br>
-                                            <br>
-                                            <br>
-                                            <br>
-                                            <br>
-                                            <p class="mb-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                            </p>
-                                            <hr/>
-
-                                            <div class='interactions-container'>
-                                                <div style='display: flex;'>
-                                                    <b>150</b>
-                                                    <button class='heart-btn'>
-                                                        <img src="{% static 'assets/images/heart.svg' %}"/>
-                                                    </button>
-                                                </div>
-
-                                                <div style='display: flex; margin-left: 20px;'>
-                                                    <b>150</b>
-                                                    <button class='message-btn'>
-                                                        <img src="{% static 'assets/images/message.svg' %}"/>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-
-                                            <div id="1_rental_user_comments0">
-                                                <div class='comment-section'>
-                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
-                                                    <div class='comment-box'>
-                                                        <h6 style="font-size: 0.875rem;">
-                                                            Sample User
-                                                        </h6>
-                                                        
-                                                        <p style="font-size: 0.75rem;">
-                                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perspiciatis impedit earum numquam porro, repudiandae blanditiis optio sequi dolorem vitae distinctio.
-                                                        </p>
-                                                        
-                                                        <p style="font-size: 0.75rem; margin-bottom: 0;">
-                                                            Date : August 9, 2023
-                                                        </p>
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0">
+                                            <div class="custom-block bg-white shadow-lg">
+                                                <div class="d-flex">
+                                                    <div>
+                                                        <div class="mb-2">
+                                                            <p><i>Sorry,  we couldn't find any gallery.</i></p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
                                 {% endif %}
                             </div>
                         </div>
@@ -396,7 +304,7 @@
                                     <table class="table table-striped table-full" id='gallery_list'>
                                         <thead>
                                             <tr>
-                                                <th scope="col">#</th>
+                                                <th scope="col">Rent ID</th>
                                                 <th scope="col">Destination</th>
                                                 <th scope="col">Date</th>
                                                 <th scope="col">Action</th>
@@ -405,8 +313,8 @@
                                         {% get_all_new_gallery user as all_new_galleries %}
                                         {% for gallery in all_new_galleries %}
                                             <tbody>
-                                                <td>{{gallery.id}}</td>
-                                                <td>{{gallery.rented_van.from_destination}}</td>
+                                                <td>{{gallery.rented_van.rent_id}}</td>
+                                                <td>{{gallery.rented_van.to_destination}}</td>
                                                 <td>{{gallery.rented_van.travel_date}}</td>
                                                 <td class='display-flex'>
                                                     <button class="approve-button" onclick='openGalleryForm({{gallery.id}})' type="button">Select</button>
@@ -424,8 +332,9 @@
                             {% for gallery in all_new_galleries %}
                                 <div id='gallery_form_{{gallery.id}}' style='display:none;'>
                                     <p>
-                                        <b>Location : </b> {{gallery.rented_van.from_destination}}<br>
-                                        <b>Date : </b> {{gallery.rented_van.travel_date}}
+                                        <b>FROM : </b> {{gallery.rented_van.from_destination}}<br>
+                                        <b>TO : </b> {{gallery.rented_van.to_destination}}<br>
+                                        <b>TRAVEL DATE : </b> {{gallery.rented_van.travel_date}}
                                         <br>
                                         <br>
                                         <b><i>Note that : </i></b> for this to be posted, the admin must approve this.
@@ -468,12 +377,145 @@
                                         <input type="hidden" multiple name="images" class="form-control" required>
                                         <input type="hidden" value='{{gallery.id}}' name="gallery_id"  class="form-control" required>
         
-        
-                                        <label class="form-label">Tour Title</label>
-                                        <input type="text" name="title" class="form-control" placeholder="(ex. Baguio Tour) ..." required>
+                                        <label class="form-label">Category</label>
+                                        <select name="tour_category_id" class="form-control" required id="tour_category_id">
+                                            {% get_all_tour_categories as all_categories %}
+                                            <option disabled selected>--- Select Category --- </option>
+                                                {% for category in all_categories %}
+                                                    <option value="{{category.id}}">--- {{category.category}} --- </option>
+                                                {% endfor %}
+                                        </select>
+
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="title" class="form-control" placeholder="(ex. Exploring Baguio: A Photo Diary) ..." required>
                                         
                                         <label class="form-label">Description</label>
                                         <input type="text" name="description" class="form-control" placeholder="Enter description ..." required>
+        
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <button type="submit" class="form-control">Save</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="modal-overlay" id="list_of_pending_gallery" style="width:40%;">
+                    <div class="modal">
+                        <div class="modal-body">
+                            <h2 class="modal-title">Pending Galleries
+                                <button type='button' class="close-btn" onclick="closePendingGalleryModal('list_of_pending_gallery')">Close</button>
+                            </h2>
+
+                            <div class="d-flex">
+                                <div class="table-responsive table-x-overflow">
+                                    <table class="table table-striped table-full" id='pending_gallery_list'>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Rent ID</th>
+                                                <th scope="col">Destination</th>
+                                                <th scope="col">Date</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        {% get_all_new_pending_gallery user as all_new_pending_galleries %}
+                                        {% for gallery in all_new_pending_galleries %}
+                                            <tbody>
+                                                <td>{{gallery.rented_van.rent_id}}</td>
+                                                <td>{{gallery.rented_van.to_destination}}</td>
+                                                <td>{{gallery.rented_van.travel_date}}</td>
+                                                <td class='display-flex'>
+                                                    <button class="approve-button" onclick='openPendingGalleryForm({{gallery.id}})' type="button">Select</button>
+                                                    <button class="approve-button btn-danger ml-10" type="button">Remove</button>
+                                                </td>
+                                            </tbody>
+                                        {% endfor %}
+                                    </table>
+                                    <br>
+                                </div>
+                            </div>
+
+
+                            {% get_all_new_pending_gallery user as all_new_pending_galleries %}
+                            {% for gallery in all_new_pending_galleries %}
+                                <div id='pending_gallery_form_{{gallery.id}}' style='display:none;'>
+                                    <p>
+                                        <b>FROM : </b> {{gallery.rented_van.from_destination}}<br>
+                                        <b>TO : </b> {{gallery.rented_van.to_destination}}<br>
+                                        <b>TRAVEL DATE : </b> {{gallery.rented_van.travel_date}}
+                                        <br>
+                                        <br>
+                                        <b><i>Note that : </i></b> for this to be posted, the admin must approve this.
+                                        Another, the admin can modify the content of this gallery. 
+                                    </p>
+
+                                    <div id="add_gallery_{{gallery.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                        <!-- Indicators/dots -->
+                                        <div class="carousel-indicators" id='carousel-indicators'>
+                                            {% get_all_pending_gallery_images gallery as all_images %}
+                                            {% for img in all_images %}
+                                                {% with forloop.counter0 as counter %}
+                                                    <button type="button" data-bs-target="#add_van_{{counter}}" 
+                                                        data-bs-slide-to="{{ counter }}" 
+                                                        class="{% if counter == 0 %}active{% endif %}">
+                                                    </button>
+                                                {% endwith %}
+                                            {% endfor %}
+                                        </div>
+                                    
+                                        <!-- The slideshow/carousel -->
+                                        <div class="carousel-inner" id="carousel-inner">
+                                            <!-- images will go here using the format below, wherein the first image will have "active" class to activate the first child -->
+                                            {% get_all_pending_gallery_images gallery as all_images %}
+                                            {% for img in all_images %}
+                                                {% with forloop.counter0 as counter %}
+                                                    <div class="carousel-item {% if counter == 0 %}active{% endif %}">
+                                                        <div class='slider-image-container'>
+                                                            <img src="{{img.image}}" class="slider-image">
+                                                        </div>
+                                                    </div> 
+                                                {% endwith %}
+                                            {% endfor %}
+                                        </div>
+                                    
+                                        <!-- Left and right controls/icons -->
+                                        <button class="carousel-control-prev" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="prev">
+                                            <span class="carousel-control-prev-icon"></span>
+                                        </button>
+                                        <button class="carousel-control-next" type="button" data-bs-target="#add_gallery_{{gallery.id}}" data-bs-slide="next">
+                                            <span class="carousel-control-next-icon"></span>
+                                        </button>
+                                    </div>
+        
+                                    <h2 class="text-center" id='carousel_title' style='display:none;'>The images of the gallery will appear here</h2>
+                                    <h2 class="text-center" id='carousel_title_1' style='font-size:1rem;'>The images of the gallery will appear here</h2>
+                                    <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                        {% csrf_token %}
+                                        <label class="form-label">Attach Images</label>
+                                        <input type="file" multiple name="attached_images" class="form-control"  onchange="displayPendingUploadedPreview(event)">
+                                        <input type="hidden" multiple name="pending_images" class="form-control">
+                                        <input type="hidden" value='{{gallery.id}}' name="pending_gallery_id"  class="form-control" required>
+        
+                                        <label class="form-label">Category</label>
+                                        <select name="pending_tour_category_id" class="form-control" required id="tour_category_id">
+                                            {% get_all_tour_categories as all_categories %}
+                                            <option value='{{gallery.tour_category.id}}'>--- {{gallery.tour_category.category}} --- </option>
+                                                {% for category in all_categories %}
+                                                    <option value="{{category.id}}">--- {{category.category}} --- </option>
+                                                {% endfor %}
+                                        </select>
+
+                                        <label class="form-label">Title</label>
+                                        <input type="text" name="pending_title" class="form-control" value='{{gallery.title}}' placeholder="(ex. Exploring Baguio: A Photo Diary) ..." required>
+                                        
+                                        <label class="form-label">Description</label>
+                                        <input type="text" name="pending_description" class="form-control" value='{{gallery.description}}' placeholder="Enter description ..." required>
         
                                         <div class="row">
                                             <div class="col-md-12">
@@ -490,11 +532,11 @@
 
 
             {% if user_type == 'Admin' %}
-                <div class="modal-overlay" id="list_of_tour" style="width:40%;">
+                <div class="modal-overlay" id="pending_list_of_tour" style="width:40%;">
                     <div class="modal">
                         <div class="modal-body">
                             <h2 class="modal-title">Pending Galleries
-                                <button type='button' class="close-btn" onclick="closeGalleryModal('list_of_tour')">Close</button>
+                                <button type='button' class="close-btn" onclick="closePendingGalleryModal('pending_list_of_tour')">Close</button>
                             </h2>
 
                             <div class="d-flex">
@@ -530,8 +572,9 @@
                             {% for gallery in all_pending_new_galleries %}
                                 <div id='gallery_form_{{gallery.id}}' style='display:none;'>
                                     <p>
-                                        <b>Location : </b> {{gallery.rented_van.from_destination}}<br>
-                                        <b>Date : </b> {{gallery.rented_van.travel_date}}
+                                        <b>FROM : </b> {{gallery.rented_van.from_destination}}<br>
+                                        <b>TO : </b> {{gallery.rented_van.to_destination}}<br>
+                                        <b>TRAVEL DATE : </b> {{gallery.rented_van.travel_date}}
                                         <br>
                                     </p>
 
@@ -584,9 +627,18 @@
                                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                                         {% csrf_token %}
         
+                                        <label class="form-label">Category</label>
+                                        <select name="tour_category_id" class="form-control" required id="tour_category_id">
+                                            <option value='{{gallery.tour_category.id}}'>{{gallery.tour_category.category}}</option>
+                                            {% get_all_tour_categories as all_categories %}
+                                            {% for category in all_categories %}
+                                                <option value="{{category.id}}">--- {{category.category}} --- </option>
+                                            {% endfor %}
+                                        </select>
+
                                         <label class="form-label">Title</label>
                                         <input type="hidden" name="to_approve_gallery_id" value='{{gallery.id}}' class="form-control" required>
-                                        <input type="text" name="title" class="form-control" value='{{gallery.title}}' placeholder="(ex. Baguio Tour) ..." required>
+                                        <input type="text" name="title" class="form-control" value='{{gallery.title}}' placeholder="(ex. Exploring Baguio: A Photo Diary) ..." required>
                                         
                                         <label class="form-label">Description</label>
                                         <textarea name="description" class="form-control" style='height: 150px; border-radius: 15px;' value='{{gallery.description}}'  placeholder="Enter description ..." required>{{gallery.description}}</textarea>
@@ -602,6 +654,33 @@
                         </div>
                     </div>
                 </div>
+
+
+
+
+                <div class="modal-overlay" id="category-modal" style="width:40%;">
+                    <div class="modal">
+                        <div class="modal-body">
+                            <h2 class="modal-title">Add Tour Category
+                                <button type='button' class="close-btn" onclick="closePendingGalleryModal('category-modal')">Close</button>
+                            </h2>
+
+                            <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                {% csrf_token %}
+
+                                <label class="form-label">Category Name</label>
+                                <input type="text" name="category_name" class="form-control" placeholder="(ex. Baguio Tour) ..." required>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="form-control">Add</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             {% endif %}
         {% endif %}
        
@@ -619,6 +698,7 @@
         <script src="{% static 'assets/js/update-notification.js' %}"></script> 
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
+        <script src="{% static 'assets/js/display-pending-attached-images.js' %}"></script> 
         {% comment %} <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
         <script src="{% static 'assets/js/display-fetched-images.js' %}"></script>  {% endcomment %}
         
@@ -644,7 +724,16 @@
         </script>
 
 
-        <script>            
+        <script>      
+            
+            function openCategoryModal(overlayId){
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.add("active");
+                modal.classList.add("active");
+            }
+
+
             function openNewGalleryModal(overlayId){
                 const modalOverlay = document.getElementById(overlayId);
                 const modal = modalOverlay.querySelector(".modal");
@@ -677,6 +766,46 @@
 
                 openGalleryForm('')
 
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+
+
+
+            function openPendingGalleryForm(gallery_id){
+                var all_gallery_forms = document.querySelectorAll('[id^="pending_gallery_form_"]');
+                
+                for (var x = 0; x < all_gallery_forms.length; x++){
+                    if (all_gallery_forms[x].id !== `pending_gallery_form_${gallery_id}`){
+                        all_gallery_forms[x].style.display = 'none';
+                    }
+                    else{
+                        all_gallery_forms[x].style.display = '';
+                        var gallery_list = document.getElementById('pending_gallery_list')
+                        gallery_list.style.display = 'none'
+                    }
+                }
+                document.getElementById('carousel_title_1').textContent = 'Tour Images'
+            }
+
+
+            function closePendingGalleryModal(overlayId) {
+                var gallery_list = document.getElementById('pending_gallery_list')
+                gallery_list.style.display = ''
+
+                openGalleryForm('')
+
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+
+
+
+            function closePendingGalleryModal(overlayId) {
                 const modalOverlay = document.getElementById(overlayId);
                 const modal = modalOverlay.querySelector(".modal");
                 modalOverlay.classList.remove("active");

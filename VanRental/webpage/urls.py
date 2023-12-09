@@ -31,7 +31,6 @@ urlpatterns = [
     path('modify-landing-page-content', modify_landing_page, name='modify_landing_page'),
 
 
-
     path('get-unavailable-dates/<id>/', get_unavailable_dates, name='get_unavailable_dates'),
     path('rent-a-van/<id>/', rent_a_van, name='rent_a_van'),
     path('open/notification/<id>/', open_notification, name='open_notification'),

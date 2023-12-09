@@ -994,12 +994,8 @@ def confirmed_bookings(request):
 
             van = Van.objects.filter(id = done_rent.plate_no.id).first()
 
-            create_tour_gallery = TourGallery.objects.create(rented_van = done_rent)
-            create_tour_gallery.tour_gallery_id = f'GAL{create_tour_gallery.id}'
-            create_tour_gallery.save()
 
             if enable_carpooling == "True":
-
                 carpool_available_seats = None
                 carpool_from_destination_city = None
                 carpool_to_destination_city = None
@@ -1072,8 +1068,17 @@ def confirmed_bookings(request):
             create_notification(request, done_rent.rented_by.user_id, message_to_passenger)
 
             messages.info(request, f'The rent booking with RENT ID : {done_rent.rent_id} has been marked as done successfully.')
-            messages.info(request, message_to_driver_2)
             
+            
+            # for tour gallery
+            create_tour_gallery = TourGallery.objects.create(rented_van = done_rent)
+            create_tour_gallery.tour_gallery_id = f'GAL{create_tour_gallery.id}'
+            create_tour_gallery.save()
+            messages.info(request, f'A gallery for this travel with ID {done_rent.rent_id} has been opened. Please upload the necessary images and other details.')
+            # for tour gallery
+            
+
+            messages.info(request, message_to_driver_2)
             return redirect('/confirmed-booking')
         
     return render(request, 'vans/confirmed-booking.html', context)
@@ -1499,29 +1504,36 @@ def gallery(request):
         title = request.POST.get('title')
         description = request.POST.get('description')
         gallery_id = request.POST.get('gallery_id')
+        tour_category_id = request.POST.get('tour_category_id')
 
         to_approve_gallery_id = request.POST.get('to_approve_gallery_id')
-
         to_heart_react_tour_id = request.POST.get('to_heart_react_tour_id')
 
         tour_id = request.POST.get('tour_id')
         new_comment = request.POST.get('new_comment')
+        category_name = request.POST.get('category_name')
 
+
+        pending_gallery_id = request.POST.get('pending_gallery_id')
 
 
         if images:
             images_list = images.split('|||')
 
             target_tour = TourGallery.objects.filter(id = gallery_id).first()
+            target_tour.tour_category = TourCategories.objects.filter(id = tour_category_id).first()
             target_tour.title = title
             target_tour.description = description
             target_tour.tour_gallery_id = f'TOUR{target_tour.id}'
             target_tour.is_modified = True
             target_tour.save()
             
+            # delete old gallery
+            old_gallery = TourGalleryImages.objects.filter(tour_gallery = target_tour).all()
+            old_gallery.delete()
+                
             for img in images_list:
-                new_gallery = TourGalleryImages.objects.create(tour_gallery = target_tour,
-                                                               image = img)
+                new_gallery = TourGalleryImages.objects.create(tour_gallery = target_tour, image = img)
                 new_gallery.save()
             
             message_to_admin = f'PENDING GALLERY || {request.user.first_name} {request.user.last_name} added new gallery. It requires your approval. Please check it out!'
@@ -1531,9 +1543,44 @@ def gallery(request):
             create_notification(request, request.user, message_to_driver)
 
             messages.info(request, message_to_driver)
-
             return redirect('gallery')
         
+        # update the gallery
+        elif pending_gallery_id:
+            pending_images = request.POST.get('pending_images')
+            pending_title = request.POST.get('pending_title')
+            pending_description = request.POST.get('pending_description')
+            pending_tour_category_id = request.POST.get('pending_tour_category_id')
+
+            images_list = pending_images.split('|||')
+
+            target_tour = TourGallery.objects.filter(id = pending_gallery_id).first()
+            target_tour.tour_category = TourCategories.objects.filter(id = pending_tour_category_id).first()
+            target_tour.title = pending_title
+            target_tour.description = pending_description
+            target_tour.tour_gallery_id = f'TOUR{target_tour.id}'
+            target_tour.is_modified = True
+            target_tour.save()
+            
+            # delete old gallery
+            if len(images_list) > 0 and not images_list[0] == '':
+                print('images list' , images_list)
+                old_gallery = TourGalleryImages.objects.filter(tour_gallery = target_tour).all()
+                old_gallery.delete()
+                    
+                for img in images_list:
+                    new_gallery = TourGalleryImages.objects.create(tour_gallery = target_tour, image = img)
+                    new_gallery.save()
+            
+
+            message_to_driver = f'UPDATED GALLERY || You updated a pending gallery with title `{pending_title}`. Waiting for the admin`s approval.'
+            create_notification(request, request.user, message_to_driver)
+
+            messages.info(request, message_to_driver)
+            return redirect('gallery')
+        
+
+
         elif to_approve_gallery_id:
             to_approve = TourGallery.objects.filter(id = to_approve_gallery_id).first()
             to_approve.title = title
@@ -1587,10 +1634,27 @@ def gallery(request):
                                                             comment = new_comment)
             create_new_comment.save()
             return redirect('gallery')  
+        
+
+        elif category_name:
+            target_category = TourCategories.objects.filter(category__iexact = category_name.lower()).first()
+
+            if target_category:
+                messages.info(request, f'Sorry the category name {category_name} already exists. Please try another!')
+            else:
+                new_category = TourCategories.objects.create(category = category_name)
+                new_category.save()
+
+                messages.info(request, f'{category_name} has been added!')
+
+            return redirect('gallery')  
+            
 
 
 
     return render(request, 'gallery/gallery.html')
+
+
 
 
 

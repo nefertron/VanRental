@@ -28,17 +28,24 @@ def user_type_checker(user):
 
 @register.simple_tag
 def get_all_new_gallery(user):
-
-    tour_galleries = TourGallery.objects.filter(is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
-
+    tour_galleries = TourGallery.objects.filter(tour_category = None, is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
     return tour_galleries
 
 
 @register.simple_tag
+def get_all_new_pending_gallery(user):
+    tour_galleries = TourGallery.objects.filter(is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
+    return tour_galleries
+
+@register.simple_tag
+def get_all_tour_categories():
+    tour_categories = TourCategories.objects.filter().all()
+    return tour_categories
+
+
+@register.simple_tag
 def get_all_pending_new_gallery(user):
-
     pending_tour_galleries = TourGallery.objects.filter(is_enabled = False, is_modified = True).all().order_by('id')
-
     return pending_tour_galleries
 
 
