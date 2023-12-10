@@ -15,6 +15,12 @@
 
         <title>Rent A Van | Passenger Connect</title>
 
+        <!-- Bootstrap Datepicker CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker3.standalone.min.css">
+        <!-- Include Bootstrap DateTimePicker CDN -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css"rel="stylesheet">
+     
+
         <!-- CSS FILES -->        
         <link rel="icon" href="{% static 'assets/images/car-favicon.svg' %}" type="image/x-icon">
 
@@ -40,11 +46,195 @@
             {% include 'navbar.html' %}
             <!-- NAVIGATION BAR -->
 
-            <!-- SIDE BAR -->
-            {% include 'sidebar.html' %}
-            <!-- SIDE BAR -->
+            {% if user.is_authenticated %}
+            <div class="side-bar-header" style='margin-top: -1rem;'>   
+                <div class="side-bar" id="van-rental-sidebar">
+                    <div class="van-nav-items">
+                        <ul>
+                            <li>
+                                <a href="/index" class='display-flex'>
+                                    <img src="{% static 'assets/images/home-circle.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Homepage
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/dashboard" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-dashboard.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Dashboard
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/rent-a-van" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-heart.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rent A Van
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li>
+                                <a href="/gallery" class='display-flex'>
+                                    <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Gallery
+                                    </div>
+                                </a>
+                            </li>
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/available-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-select.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Carpooling
+                                        {% get_total_open_carpool as total_open_carpool %} 
+                                        {% if total_open_carpool > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_carpool}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/rent-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-clock.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Open Bookings
+                                        {% get_total_open_bookings as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
 
-            <header class="site-header d-flex flex-column justify-content-center align-items-center -mt-50">
+                            {% if not user.is_superuser %}
+                            <li>
+                                <a href="/pending-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-alert.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Bookings
+                                        {% get_total_pending_bookings user as total_open_bookings %} 
+                                        {% if total_open_bookings > 0%}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_open_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li>
+                                <a href="/confirmed-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-check.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Confirmed Bookings
+                                        {% get_total_confirmed_bookings as total_confirmed_bookings %} 
+                                        {% if total_confirmed_bookings > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_confirmed_bookings}}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Bookingss
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/past-carpooling" class='display-flex'>
+                                    <img src="{% static 'assets/images/car-search.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Past Carpooling
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/cancelled-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-cancel.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Cancelled Bookings
+                                    </div>
+                                </a>
+                            </li>
+                            
+                            <li>
+                                <a href="/rejected-booking" class='display-flex'>
+                                    <img src="{% static 'assets/images/book-x.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Rejected Bookings
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/profile" class='display-flex'>
+                                    <img src="{% static 'assets/images/settings.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Settings
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% if user.is_superuser %}
+                            <li>
+                                <a href="/list-of-vans" class='display-flex'>
+                                    <img src="{% static 'assets/images/van-icon.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        All Vans
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/pending-drivers" class='display-flex'>
+                                    <img src="{% static 'assets/images/pending-driver.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Pending Drivers
+                                        {% get_total_pending_drivers as total_pending_drivers %}
+                                        {% if total_pending_drivers > 0 %}
+                                            <div class='side-bar-circle-alert'>
+                                                {{total_pending_drivers}}
+                                            </div>
+                                        {% endif %}
+                                    </div>                                    
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/modify-landing-page-content" class='display-flex'>
+                                    <img src="{% static 'assets/images/monitor-shimmer.svg' %}" class="h-30 w-30"/>
+                                    <div class='side-bar-row'>
+                                        Modify Landing Page
+                                    </div>                                    
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <header class="site-header d-flex flex-column justify-content-center align-items-center" style='margin-top: -100px;'>
                 <div class="container">
                     <div class="row align-items-center">
                         <div class="col-lg-5 col-12">
@@ -207,7 +397,6 @@
                         Rent a van
                     </h2>
 
-                    <h2 class="text-center" id='rent-van-brand-name'><!--BRAND NAME WILL BE ASSIGNED HERE--></h2>
                     <div id="rent_van" class="carousel slide van-slider" data-bs-ride="carousel">
                         <!-- Indicators/dots -->
                         <div class="carousel-indicators" id='fetched-carousel-indicators'>
@@ -235,15 +424,14 @@
                         <button class="carousel-control-next" type="button" data-bs-target="#rent_van" data-bs-slide="next">
                             <span class="carousel-control-next-icon"></span>
                         </button>
-                        <p class="text-left text-bold" id='rent-van-plate-no'><!--PLATE NUMBER WILL BE ASSIGNED HERE--></h2>
                     </div>
-                    
-                    <br>
-                    <br>
+                    <h2 class="text-center" id='rent-van-brand-name'><!--BRAND NAME WILL BE ASSIGNED HERE--></h2>
+                    <p class="text-center" id='rent-van-plate-no'><!--PLATE NUMBER WILL BE ASSIGNED HERE--></h2>
 
                     <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
                         {% csrf_token %}
-
+                        {% comment %} <label class="form-label">Package Rent (in Php) starts at</label>
+                        <input type="number" name="package_rent" class="form-control" id='package_rent' placeholder="Package Rent..." required> {% endcomment %}
                         <input type="hidden" name="van_id" class="form-control" id='van_id' required>
                         
                         <label class="form-label">From Destination</label>
@@ -272,13 +460,33 @@
                             <option disabled selected>--- Select To Destination --- </option>
                         </select>
 
-                        <label class="form-label">Travel Date</label>
-                        <input type="date" name="travel_date"  min="{% now 'Y-m-d' %}" id="travel_date" onchange="dateChecker('travel_date')"  class="form-control" required>
+                        <label class="form-label">Travel Date (Start)</label>
+                        <div class='row'>
+                            <div class="col-md-6">
+                                <input id="travelDateFrom" onchange="openTravelDateTo()" name="travel_date_start" class="form-control"  placeholder="Enter your Travel Date (FROM)" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" id="datetimeFrom" value='' name="time_start"/>
+                            </div>
+                        </div>
 
+                        <label class="form-label">Travel Date (End)</label>
+                        <div class='row'>
+                            <div class="col-md-6">
+                                <input id="travelDateTo" onchange="chooseTravelDateTo()" disabled name="travel_date_end" class="form-control"  placeholder="Enter your Travel Date (TO)" required/>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" id="datetimeTo" value='' name="time_end" />
+                            </div>
+                        </div>
 
+                        <label class="form-label">Pick Up Location</label>
+                        <input name="pick_up_location" placeholder='Pick Up Location...' class="form-control" required/>
+
+                            
                         <button type="submit" class="custom-btn mt-2 mt-lg-3 w-100">Book Now</button>
                         <br/>
-                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeModal('setRentVan')">Close</button>
+                        <button type='button' class="custom-btn mt-2 mt-lg-3 btn-danger w-100" onclick="closeRentModal('setRentVan')">Close</button>
                     </form>
                 </div>
             </div>
@@ -315,10 +523,12 @@
         <script src="{% static 'assets/js/open-sidebar.js' %}"></script> 
         <script src="{% static 'assets/js/display-attached-images.js' %}"></script> 
         <script src="{% static 'assets/js/display-fetched-images.js' %}"></script> 
+        <script src="{% static 'assets/js/book-date-checker.js' %}"></script> 
         
         <script>
-            function setRent(button, plate_no, package_rent){
+            function setRent(button, plate_no){ //package_rent
                 var rent_data_id = button.getAttribute('rent-data-id');
+
                 openModal('setRentVan')
 
                 fetch(`rent-a-van/${rent_data_id}/`)
@@ -331,8 +541,8 @@
                         var plate_no = document.getElementById('rent-van-plate-no');
                         plate_no.textContent = `Plate No. : ${data['plate_no']}`
 
-                        var package_rent = document.getElementById('package_rent');
-                        package_rent.value = data['package_rent']
+                        //var package_rent = document.getElementById('package_rent');
+                        //package_rent.value = data['package_rent']
 
                         var van_id = document.getElementById('van_id');
                         van_id.value = rent_data_id;
@@ -341,8 +551,140 @@
                     .catch(error => {
                         console.error("Error:", error);
                     });
+
+
+                fetch(`get-unavailable-dates/${rent_data_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+                        var datesForDisable = data;
+                        
+                        console.log('From dates disabled', rent_data_id, '', datesForDisable)
+                        
+                        const config = {
+                            format: 'yyyy-mm-dd',
+                            autoclose: true,
+                            weekStart: 1,
+                            calendarWeeks: true,
+                            todayHighlight: true,
+                            datesDisabled: data,
+                            startDate: new Date()
+                        }
+
+                        $("[id^='travelDateFrom']").datepicker(config);
+                    })
+
+            }
+            
+            function openTravelDateTo(){
+                $("[id^='travelDateTo']").datepicker('destroy'); 
+                const van_id = document.getElementById('van_id').value;
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value
+
+                const travelDateTo = document.getElementById('travelDateTo');
+                travelDateTo.disabled = false
+                travelDateTo.value = ''
+
+                const allDisabledDates = []
+
+                fetch(`get-unavailable-dates/${van_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+
+                        for (var x = 0; x < data.length; x++){
+                            allDisabledDates.push(data[x])
+                        }
+
+                        var endDate = new Date(travelDateFrom.value);
+                        var today = new Date();
+                        var dateArray = [];
+
+                        while (today <= endDate) {
+                            allDisabledDates.push(today.toISOString().split('T')[0]);
+                            today.setDate(today.getDate() + 1);
+                        }
+                        
+                        const config = {
+                            format: 'yyyy-mm-dd',
+                            autoclose: true,
+                            weekStart: 1,
+                            calendarWeeks: true,
+                            todayHighlight: true,
+                            datesDisabled: allDisabledDates,
+                            startDate: new Date()
+                        }
+
+                        console.log('To dates disabled', allDisabledDates)
+
+                        $("[id^='travelDateTo']").datepicker(config);
+
+                        if (allDisabledDates.includes(travelDateFrom.value)){
+                            alert('Please select another date. The date you entered is shaded with red!')
+                            travelDateFrom.value=''
+                        }
+                    })
+            }
+
+
+            // this code will get all the future dates from the time the user set its travel date
+            function chooseTravelDateTo(){
+
+                const van_id = document.getElementById('van_id').value;
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value
+
+                const travelDateTo = document.getElementById('travelDateTo');
+
+                
+
+                const allDisabledDates = []
+
+                fetch(`get-unavailable-dates/${van_id}/`)
+                    .then(response => response.json())
+                    .then(data =>{
+
+                        for (var x = 0; x < data.length; x++){
+                            allDisabledDates.push(data[x])
+                        }
+
+                        var endDate = new Date(travelDateFrom.value);
+                        var today = new Date();
+                        var dateArray = [];
+
+                        while (today <= endDate) {
+                            allDisabledDates.push(today.toISOString().split('T')[0]);
+                            today.setDate(today.getDate() + 1);
+                        }
+
+                        if (allDisabledDates.includes(travelDateTo.value)){
+                            alert('Please select another date. The date you entered is shaded with red!')
+                            travelDateTo.value=''
+                        }
+                    })
             }
         </script>
+
+        <script>
+            function closeRentModal(overlayId) {
+                $("[id^='travelDateFrom']").datepicker('destroy'); 
+                $("[id^='travelDateTo']").datepicker('destroy'); 
+
+                const travelDateFrom = document.getElementById('travelDateFrom');
+                travelDateFrom.value = '';
+
+                const travelDateTo = document.getElementById('travelDateTo');
+                travelDateTo.disabled = true;
+                travelDateTo.value = '';
+
+                
+                
+                const modalOverlay = document.getElementById(overlayId);
+                const modal = modalOverlay.querySelector(".modal");
+                modalOverlay.classList.remove("active");
+                modal.classList.remove("active");
+            }
+        </script>
+
 
         <script>
             function getDestination(parent_id, child_id){
@@ -378,5 +720,39 @@
 
             }
         </script>
+
+        <!-- Include Bootstrap CDN -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+        <!-- Include Moment.js CDN -->
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/js/bootstrap-datetimepicker.min.js"></script>
+
+        <script>
+            $('#datetimeFrom').datetimepicker({
+                format: 'hh:mm a'
+            });
+        </script>
+
+        <script>
+            $('#datetimeTo').datetimepicker({
+                format: 'hh:mm a'
+            });
+        </script>
+
+        <!-- jQuery -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        
+        <!-- Moment.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.1/moment.min.js"></script>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+        <!-- Bootstrap Datepicker JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
     </body>
 </html>

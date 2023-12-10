@@ -44,7 +44,7 @@ urlpatterns = [
 
 
     path('get-chart-values/<year>/', get_chart_values, name='get_chart_values'),
-    path('get-chart-values-sales/<year>/', get_chart_values, name='get_chart_values'),
+    path('get-chart-values-sales/<year>/', get_chart_values_sales, name='get_chart_values_sales'),
     path('get-chart-values-cancelled-and-rejected/<year>/', get_chart_values_cancelled_and_rejected, name='get_chart_values_cancelled_and_rejected'),
     path('get-chart-values-tour-analytics/<year>/', get_chart_values_tour_analytics, name='get_chart_values_tour_analytics'),
     # path('test', add_municipality, name='add_municipality'),

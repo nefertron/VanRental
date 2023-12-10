@@ -164,6 +164,16 @@ class Review(models.Model):
         return f'REVIEW ID : {self.review_id} || RATING : {self.rating}'
 
 
+class VanReviews(models.Model):
+    reviewed_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    van = models.ForeignKey(Van, on_delete=models.CASCADE)
+    rating = models.IntegerField(default=5)
+    comment = models.TextField()
+    date_recorded = models.DateTimeField(default=datetime.now())
+    review_id = models.CharField(max_length=30)
+
+    def __str__(self):
+        return f'STAR : {self.rating}  || BY {self.reviewed_by.first_name} || VAN : {self.van.plate_no}'
 
 class Messages(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')

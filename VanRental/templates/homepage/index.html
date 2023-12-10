@@ -370,7 +370,7 @@
 
                                             <p class="text-white">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Fugiat hic nulla consequuntur facere, repellendus, illo animi totam quasi doloribus unde, iste aperiam odit cum voluptatibus odio ipsum. Esse, deserunt ex!</p>
 
-                                            <a href="topics-detail.html" class="btn custom-btn mt-5 mt-lg-3">Learn More</a>
+                                            <a href="#how_does_it_work" class="btn custom-btn mt-5 mt-lg-3">Learn More</a>
                                         </div>
 
                                         <span class="badge bg-finance rounded-pill ms-auto">✔</span>
@@ -661,7 +661,7 @@
                                     </div>
                                 </button>
                             </li>
-
+ 
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="rent-review-tab" data-bs-toggle="tab" data-bs-target="#rent-review-tab-pane" type="button" role="tab" aria-controls="rent-review-tab-pane" aria-selected="false">
                                     Rent Reviews
@@ -834,8 +834,12 @@
                                                                     </div>
                                                                 </div>
                                                             {% endfor %}
-                                                            <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                            <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+
+                                                            {% if all_rental_reviews|length > 1 %}
+                                                                <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                                <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            {% endif %}
+                                                        
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
                                                         {% endif %}
@@ -1008,8 +1012,12 @@
                                                                     </div>
                                                                 </div>
                                                             {% endfor %}
-                                                            <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                            <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+
+                                                            {% if all_rental_reviews|length > 1 %}
+                                                                <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                                <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            {% endif %}
+                                                            
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
                                                         {% endif %}
@@ -1181,8 +1189,12 @@
                                                                     </div>
                                                                 </div>
                                                             {% endfor %}
-                                                            <button id="open-comments_{{done_carpool.id}}_carpool_user_comments" onclick="openAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                            <button id="hide-comments_{{done_carpool.id}}_carpool_user_comments"  onclick="hideAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+
+                                                            {% if all_rental_reviews|length > 0 %}
+                                                                <button id="open-comments_{{done_carpool.id}}_carpool_user_comments" onclick="openAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                                <button id="hide-comments_{{done_carpool.id}}_carpool_user_comments"  onclick="hideAllComments('{{done_carpool.id}}_carpool_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            {% endif %}
+
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
                                                         {% endif %}
@@ -1732,12 +1744,6 @@
             }
         </script>
 
-
-        <script>
-
-
-        </script>
-
         <script>
             function closeRentModal(overlayId) {
                 $("[id^='travelDateFrom']").datepicker('destroy'); 
@@ -1757,7 +1763,6 @@
                 modalOverlay.classList.remove("active");
                 modal.classList.remove("active");
             }
-
         </script>
 
 

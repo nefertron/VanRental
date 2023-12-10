@@ -114,7 +114,7 @@
                                 {% get_all_approved_gallery as approved_gallery  %}
                                 {% if approved_gallery|length > 0 %}
                                     {% for approved in approved_gallery %}
-                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-1'>
+                                        <div class="col-lg-6 col-md-6 col-12 mt-3 mb-4 mb-lg-0" id='tour-title-{{forloop.counter}}'>
                                             <div class="custom-block bg-white shadow-lg">
                                                 <div class="d-flex">
                                                     <div>
@@ -259,7 +259,21 @@
                                                         </div>
                                                     </form>
                                                 {% else %}
-                                                    <p style="font-size: 0.75rem;">No comments found</p>
+                                                    <p style="font-size: 0.75rem;">No comments found</p> 
+
+                                                    {% if user.is_authenticated %}
+                                                        <form class="custom-form subscribe-form g-3 needs-validation" novalidate method='POST'>
+                                                            {% csrf_token %}
+                                                            <input type='hidden' name='tour_id' value='{{approved.id}}'/>
+
+                                                            <div class="new-message-container" id="scroll-to-form">
+                                                                <input type="text" name="new_comment" class="form-control message-input " id="comment" required>
+                                                                <button type="submit" class="message-submit-button" style='width: 40px; height: 40px;'>
+                                                                    <img src="{% static 'assets/images/send.svg' %}" alt="Submit">
+                                                                </button>
+                                                            </div>
+                                                        </form>
+                                                    {% endif %}
                                                 {% endif %}
                                             </div>
                                         </div>

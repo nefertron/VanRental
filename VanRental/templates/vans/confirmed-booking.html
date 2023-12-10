@@ -102,14 +102,26 @@
                                                         </div>
                                                     </div>
                                                     <br>
-                                                    <div class='mb-2 line-height-5'>
-                                                        <p><b>Assigned Driver : </b></p>
-                                                        <div class='ml-10'>
-                                                            <p><b>Fullname :</b> {{confirmed_booking.driver_id.user_id.first_name}}  {{confirmed_booking.driver_id.user_id.last_name}}</p>
-                                                            <p><b>Contact No :</b>  {{confirmed_booking.driver_id.contact_no}}  </p>
-                                                            <p><b>Email :</b> {{confirmed_booking.driver_id.user_id.email}} </p>
+
+                                                    {% if user.passengeraccount %}
+                                                        <div class='mb-2 line-height-5' style='cursor: pointer;' onclick="location.href='/messages-{{confirmed_booking.driver_id.user_id.id}}';">
+                                                            <p><b>Assigned Driver : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><u><b>Fullname :</b> {{confirmed_booking.driver_id.user_id.first_name}}  {{confirmed_booking.driver_id.user_id.last_name}}</u></p>
+                                                                <p><b>Contact No :</b>  {{confirmed_booking.driver_id.contact_no}}  </p>
+                                                                <p><b>Email :</b> {{confirmed_booking.driver_id.user_id.email}} </p>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    {% else %}
+                                                        <div class='mb-2 line-height-5'>
+                                                            <p><b>Assigned Driver : </b></p>
+                                                            <div class='ml-10'>
+                                                                <p><b>Fullname :</b> {{confirmed_booking.driver_id.user_id.first_name}}  {{confirmed_booking.driver_id.user_id.last_name}}</p>
+                                                                <p><b>Contact No :</b>  {{confirmed_booking.driver_id.contact_no}}  </p>
+                                                                <p><b>Email :</b> {{confirmed_booking.driver_id.user_id.email}} </p>
+                                                            </div>
+                                                        </div>
+                                                    {% endif %}
                                                 </div>
 
                                                 <h4 class='text-center'>

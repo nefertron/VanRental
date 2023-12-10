@@ -216,8 +216,12 @@
                                                             </div>
                                                         </div>
                                                     {% endfor %}
-                                                    <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                    <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+
+                                                    {% if all_rental_reviews|length > 1 %}
+                                                        <button id="open-comments1_user_comments" onclick="openAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                        <button id="hide-comments1_user_comments"  onclick="hideAllComments('1_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                    {% endif %}
+                                                    
                                                     <br>
                                                     <br>
                                                     <br>

@@ -486,38 +486,55 @@ def rent_van(request):
 
 
     if request.method == 'POST':
-        package_rent = request.POST.get('package_rent')
+        # package_rent = request.POST.get('package_rent')
+        # van_id = request.POST.get('van_id')
+        # from_destination_municipality_id = request.POST.get('from_destination_municipality')
+        # from_destination = request.POST.get('from_destination')
+        # to_destination_municipality_id = request.POST.get('to_destination_municipality')
+        # to_destination = request.POST.get('to_destination')
+        # travel_date = request.POST.get('travel_date')
+
         van_id = request.POST.get('van_id')
         from_destination_municipality_id = request.POST.get('from_destination_municipality')
         from_destination = request.POST.get('from_destination')
         to_destination_municipality_id = request.POST.get('to_destination_municipality')
         to_destination = request.POST.get('to_destination')
-        travel_date = request.POST.get('travel_date')
 
+        travel_start_date = request.POST.get('travel_date_start')
+        time_start = request.POST.get('time_start')
+        
+        travel_end_date = request.POST.get('travel_date_end')
+        time_end = request.POST.get('time_end')
+
+        pick_up_location  = request.POST.get('pick_up_location')
 
         _from_municipality = ListOfMunicipalities.objects.filter(id = from_destination_municipality_id).first()
         _to_municipality = ListOfMunicipalities.objects.filter(id = to_destination_municipality_id).first()
 
+        travel_date_from = convertTravelDateFrom(travel_start_date, time_start)
+        travel_date_to = convertTravelDateTo(travel_end_date, time_end)
+
         create_rent_van = RentedVan.objects.create(plate_no = Van.objects.filter(id = van_id).first(),
                                                     rented_by = request.user.passengeraccount,
-                                                    package_price = package_rent,
                                                     from_destination = f'{from_destination}, {_from_municipality.municipality_name}',
                                                     to_destination = f'{to_destination}, {_to_municipality.municipality_name}',
-                                                    travel_date = travel_date,
+                                                    travel_date = travel_date_from,
+                                                    travel_date_end = travel_date_to,
+                                                    pick_up_location = pick_up_location,
                                                     date_recorded = datetime.now())
         create_rent_van.rent_id = f'RENT{create_rent_van.id}'
         create_rent_van.save()
 
-        message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent is subjected to an adjustment.'
+        message = f'You successfully set a booking. Please wait for the confirmation of the admin. Please note that the rent will be set later by the admin after. You can either set an offer or accept the set price.'
         create_notification(request, request.user, message)
 
         admin_account = User.objects.filter(is_superuser = True).first()
-        message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date}. Please visit the booking section for more details.'
+        message_to_admin = f'{request.user.first_name} {request.user.last_name} set a booking with a scheduled date {travel_date_from}. Please visit the booking section for more details.'
         create_notification(request, admin_account, message_to_admin)
 
         messages.info(request, message)
-        return redirect('/pending-booking')
 
+        return redirect('/pending-booking')
 
 
 
@@ -1079,7 +1096,7 @@ def confirmed_bookings(request):
             
 
             messages.info(request, message_to_driver_2)
-            return redirect('/confirmed-booking')
+            return redirect('/available-carpooling')
         
     return render(request, 'vans/confirmed-booking.html', context)
 
@@ -1945,7 +1962,104 @@ def get_carpooling_information(request, id):
 
     return JsonResponse(response)
 
+
+
+
+
 ################# GET CHART VALUES 1
+def get_chart_values_sales(request, year):
+    admin_account = AdminAccount.objects.filter(user_id = request.user).first()
+    driver_account = DriverAccount.objects.filter(user_id = request.user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = request.user).first()
+
+    response = {}
+
+    temp_x_axis = [[], []]
+    temp_y_axis = ['Jan', 'Feb', 'Mar', 'Aprl', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec']
+
+    ########## FOR ADMIN ##########
+    if not admin_account is None:
+
+        for i in range(0, len(temp_y_axis)):
+            # ... rental
+            all_rental = RentedVan.objects.filter(is_done = True, travel_date__year = year, travel_date__month = i + 1).all()
+            
+            total_package_price = 0 
+            for rent in all_rental:
+                total_package_price += rent.package_price
+            temp_x_axis[0].append(total_package_price)
+
+
+            # ... carpool
+            all_carpool = CarpoolVan.objects.filter(is_done = True, date_recorded__year = year, date_recorded__month = i + 1).all()
+            total_carpool_price = all_carpool.aggregate(Sum('bookedpassenger__fare'))['bookedpassenger__fare__sum'] or 0
+            temp_x_axis[1].append(total_carpool_price)
+        
+        print('i am an admin')
+        response['x_axis'] = temp_x_axis
+        response['y_axis'] = temp_y_axis
+        
+    ########## FOR ADMIN ##########
+
+    
+    ########## FOR DRIVER ##########
+    elif not driver_account is None:
+            
+        for i in range(0, len(temp_y_axis)):
+            # ... rental
+            all_rental = RentedVan.objects.filter(driver_id = driver_account, is_done = True, travel_date__year = year, travel_date__month = i + 1).all()
+            
+            total_package_price = 0 
+            for rent in all_rental:
+                total_package_price += rent.package_price
+            temp_x_axis[0].append(total_package_price)
+
+
+            # ... carpool
+            all_carpool = CarpoolVan.objects.filter(driver_id = driver_account, is_done = True, date_recorded__year = year, date_recorded__month = i + 1).all()
+            total_carpool_price = all_carpool.aggregate(Sum('bookedpassenger__fare'))['bookedpassenger__fare__sum'] or 0
+            temp_x_axis[1].append(total_carpool_price)
+        print('i am a driver')
+        response['x_axis'] = temp_x_axis
+        response['y_axis'] = temp_y_axis
+        
+    ########## FOR DRIVER ##########
+    
+
+
+    ########## FOR PASSENGER ##########
+    elif not passenger_account is None:
+
+            for i in range(0, len(temp_y_axis)):
+                # ... rental
+                all_rental = RentedVan.objects.filter(rented_by = passenger_account, is_done = True, travel_date__year = year, travel_date__month = i + 1).all()
+                
+                total_package_price = 0 
+                for rent in all_rental:
+                    total_package_price += rent.package_price
+                temp_x_axis[0].append(total_package_price)
+
+
+                # ... carpool
+                all_carpool_booking = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True, date_dropped__year = year, date_dropped__month = i + 1).all()
+
+                total_carpool_price = 0
+                for my_carpool in all_carpool_booking:
+                    total_carpool_price += my_carpool.fare
+                temp_x_axis[1].append(total_carpool_price)
+            print('i am a passenger')
+
+            response['x_axis'] = temp_x_axis
+            response['y_axis'] = temp_y_axis
+        
+    ########## FOR PASSENGER ##########
+    return JsonResponse(response)
+
+################# GET CHART VALUES 1
+
+
+
+################# GET CHART VALUES 2
 def get_chart_values(request, year):
     admin_account = AdminAccount.objects.filter(user_id = request.user).first()
     driver_account = DriverAccount.objects.filter(user_id = request.user).first()
@@ -2005,10 +2119,10 @@ def get_chart_values(request, year):
     ########## FOR PASSENGER ##########
     return JsonResponse(response)
 
-################# GET CHART VALUES 1
-
-
 ################# GET CHART VALUES 2
+
+
+################# GET CHART VALUES 3
 def get_chart_values_cancelled_and_rejected(request, year):
     admin_account = AdminAccount.objects.filter(user_id = request.user).first()
     driver_account = DriverAccount.objects.filter(user_id = request.user).first()
@@ -2075,10 +2189,10 @@ def get_chart_values_cancelled_and_rejected(request, year):
         response['y_axis'] = temp_y_axis
         return JsonResponse(response)
 
-################# GET CHART VALUES 2
-
-
 ################# GET CHART VALUES 3
+
+
+################# GET CHART VALUES 4
 def get_chart_values_tour_analytics(request, year):
 
 
@@ -2107,7 +2221,7 @@ def get_chart_values_tour_analytics(request, year):
     response['tour_names'] = tour_names
 
     return JsonResponse(response)
-################# GET CHART VALUES 3
+################# GET CHART VALUES 4
 
 
 def get_unavailable_dates(request, id):

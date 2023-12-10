@@ -34,7 +34,7 @@ def get_all_new_gallery(user):
 
 @register.simple_tag
 def get_all_new_pending_gallery(user):
-    tour_galleries = TourGallery.objects.filter(is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
+    tour_galleries = TourGallery.objects.filter(~Q(tour_category = None), is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
     return tour_galleries
 
 @register.simple_tag
@@ -45,8 +45,26 @@ def get_all_tour_categories():
 
 @register.simple_tag
 def get_all_pending_new_gallery(user):
-    pending_tour_galleries = TourGallery.objects.filter(is_enabled = False, is_modified = True).all().order_by('id')
+    pending_tour_galleries = TourGallery.objects.filter(~Q(tour_category = None), is_enabled = False, is_modified = True).all().order_by('id')
     return pending_tour_galleries
+
+@register.simple_tag
+def get_all_pending_gallery(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        pending_tour_galleries = TourGallery.objects.filter(~Q(tour_category = None), is_enabled = False, is_modified = True).all().order_by('id')
+        return pending_tour_galleries
+    
+    elif driver_account:
+        pending_tour_galleries = TourGallery.objects.filter(is_enabled = False, rented_van__driver_id__user_id = user).all().order_by('id')
+        return pending_tour_galleries
+    
+    else:
+        return None
 
 
 @register.simple_tag
@@ -300,14 +318,84 @@ def get_my_number_of_travel_this_month(driver_account):
 
 
 @register.simple_tag
-def get_all_rental_services():
-    all_rental_services = RentedVan.objects.filter(is_done = True).all()
-    return all_rental_services
+def get_all_rental_services(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        all_rental_services = RentedVan.objects.filter(is_done = True).all().order_by('-id')
+        return all_rental_services
+    
+    elif driver_account:
+        all_rental_services = RentedVan.objects.filter(driver_id = driver_account, is_done = True).all().order_by('-id')
+        return all_rental_services
+    
+    elif passenger_account:
+        all_rental_services = RentedVan.objects.filter(rented_by = passenger_account, is_done = True).all().order_by('-id')
+        return all_rental_services
+
 
 @register.simple_tag
-def get_all_carpool_services():
-    all_booked_carpool = BookedPassenger.objects.filter(is_dropped = True).all()
-    return all_booked_carpool
+def get_all_carpool_services(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        all_booked_carpool = BookedPassenger.objects.filter(is_dropped = True).all().order_by('-id')
+        return all_booked_carpool
+    
+    elif driver_account:
+        all_booked_carpool = BookedPassenger.objects.filter(carpool_id__driver_id = driver_account, is_dropped = True).all().order_by('-id')
+        return all_booked_carpool
+    
+    elif passenger_account:
+        all_booked_carpool = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = True).all().order_by('-id')
+        return all_booked_carpool
+
+
+@register.simple_tag
+def get_all_pending_rental_services(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        all_rental_services = RentedVan.objects.filter(is_done = False).all().order_by('-id')
+        return all_rental_services
+    
+    elif driver_account:
+        all_rental_services = RentedVan.objects.filter(driver_id = driver_account, is_done = False).all().order_by('-id')
+        return all_rental_services
+    
+    elif passenger_account:
+        all_rental_services = RentedVan.objects.filter(rented_by = passenger_account, is_done = False).all().order_by('-id')
+        return all_rental_services
+
+
+@register.simple_tag
+def get_all_pending_carpool_services(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        all_booked_carpool = BookedPassenger.objects.filter(is_dropped = False, is_confirmed = False).all().order_by('-id')
+        return all_booked_carpool
+    
+    elif driver_account:
+        all_booked_carpool = BookedPassenger.objects.filter(carpool_id__driver_id = driver_account, is_dropped = False, is_confirmed = False).all().order_by('-id')
+        return all_booked_carpool
+    
+    elif passenger_account:
+        all_booked_carpool = BookedPassenger.objects.filter(passenger_id = passenger_account, is_dropped = False, is_confirmed = False).all().order_by('-id')
+        return all_booked_carpool
+
 
 
 @register.simple_tag

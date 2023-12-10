@@ -43,6 +43,40 @@
                         <img src="{% static 'assets/images/image-multiple.svg' %}" class="h-30 w-30"/>
                         <div class='side-bar-row'>
                             Gallery
+
+                            {% if user.is_authenticated %}
+                                {% user_type_checker user as user_type %}
+                                {% if user_type == 'Driver' %}
+                                
+                                    {% get_all_new_pending_gallery user as all_new_pending_galleries %}
+                                    {% get_all_new_gallery user as all_new_galleries %}
+                                    
+                                    {% with total_pending_galleries=all_new_pending_galleries|length %}
+                                        {% with total_galleries=all_new_galleries|length %}
+                                            {% with total_count=total_pending_galleries|add:total_galleries %}
+                                                {% if total_count > 0 %}
+                                                    <div class='side-bar-circle-alert'>
+                                                        {{ total_count }}
+                                                    </div>
+                                                {% endif %}
+                                            {% endwith %}
+                                        {% endwith %}
+                                    {% endwith %}
+
+                                
+                                {% elif user_type == 'Admin' %}
+
+                                    {% get_all_pending_new_gallery user as all_pending_new_galleries %}
+                                    {% if all_pending_new_galleries|length > 0 %}
+                                        <div class='side-bar-circle-alert'>
+                                            {{all_pending_new_galleries|length}}
+                                        </div>
+                                    {% endif %}
+                                    
+                                {% endif %}
+
+                            {% endif %}
+
                         </div>
                     </a>
                 </li>

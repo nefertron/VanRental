@@ -193,12 +193,20 @@
                 </li>
 
                 {% if not user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link click-scroll" href="/login">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link click-scroll" href="/signup">Signup</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="/gallery">Gallery</a>
+                    </li>
+                {% endif %}
+
+
+
+                {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link click-scroll" href="/signup">Signup</a>
+                    </li>
                 {% endif %}
             </ul>
 
@@ -279,32 +287,65 @@
                                         {% endif %}>
 
 
-                                        {% if msg.sender.passengeraccount %}
-                                            {% if msg.sender.passengeraccount.profile %}
-                                                <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                        {% if msg.sender != user %}
+
+                                            {% if msg.sender.passengeraccount %}
+                                                {% if msg.sender.passengeraccount.profile %}
+                                                    <img src="{{msg.sender.passengeraccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
+                                            {% elif msg.sender.driveraccount %}
+                                                {% if msg.sender.driveraccount.profile %}
+                                                    <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
                                             {% else %}
-                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% if msg.sender.adminaccount.profile %}
+                                                    <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
                                             {% endif %}
-                                        {% elif msg.sender.driveraccount %}
-                                            {% if msg.sender.driveraccount.profile %}
-                                                <img src="{{msg.sender.driveraccount.profile}}" class='inbox-profile'/>
-                                            {% else %}
-                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
-                                            {% endif %}
+                                        
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                    width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
+                                                <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                            </div>
                                         {% else %}
-                                            {% if msg.sender.adminaccount.profile %}
-                                                <img src="{{msg.sender.adminaccount.profile}}" class='inbox-profile'/>
+
+                                            {% if msg.receiver.passengeraccount %}
+                                                {% if msg.receiver.passengeraccount.profile %}
+                                                    <img src="{{msg.receiver.passengeraccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
+                                            {% elif msg.receiver.driveraccount %}
+                                                {% if msg.receiver.driveraccount.profile %}
+                                                    <img src="{{msg.receiver.driveraccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
                                             {% else %}
-                                                <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% if msg.receiver.adminaccount.profile %}
+                                                    <img src="{{msg.receiver.adminaccount.profile}}" class='inbox-profile'/>
+                                                {% else %}
+                                                    <img src="{% static 'assets/images/default-profile.png' %}" class='inbox-profile'/>
+                                                {% endif %}
                                             {% endif %}
+
+                                            <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
+                                                    width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
+                                                <p><b>{{msg.receiver.first_name}} {{msg.receiver.last_name}}</b></p>
+                                                <p style='margin-top: -15px; font-size: 0.75rem;'><b>You : </b>{{msg.message}}</p>
+                                                <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
+                                            </div>
                                         {% endif %}
 
-                                        <div style='margin-top: auto; margin-bottom: auto; margin-left: -10px;
-                                                    width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>
-                                            <p><b>{{msg.sender.first_name}} {{msg.sender.last_name}}</b></p>
-                                            <p style='margin-top: -15px; font-size: 0.75rem;'>{{msg.message}}</p>
-                                            <p class='text-muted' style='margin-top: -15px; font-size: 0.75rem;'><i>{{msg.date_sent}}</i></p>
-                                        </div>
+                                        
                                     </li>
                                 {% endfor %}
                             {% else %}
