@@ -25,6 +25,22 @@ def user_type_checker(user):
             return None
     else:
         return None
+    
+
+@register.simple_tag
+def get_user_account(user):
+    
+    admin_account = AdminAccount.objects.filter(user_id = user).first()
+    driver_account = DriverAccount.objects.filter(user_id = user).first()
+    passenger_account = PassengerAccount.objects.filter(user_id = user).first()
+
+    if admin_account:
+        return admin_account
+    elif driver_account:
+        return admin_account
+    elif passenger_account:
+        return passenger_account
+
 
 @register.simple_tag
 def get_all_new_gallery(user):
@@ -537,6 +553,36 @@ def get_all_passengers_in_carpool(carpool):
         return get_total_of_bookings, get_all_seats_occupied_by_passengers
     else:
         return 0, 0
+
+
+@register.simple_tag
+def get_all_vans():
+    return Van.objects.filter().all().order_by('-id')
+
+
+@register.simple_tag
+def get_all_specific_van_rating(van):
+
+    get_all_van_ratings = VanReviews.objects.filter(van = van).aggregate(get_all_van_ratings = Sum('rating'))['get_all_van_ratings']
+    get_all_van_reviews_count = VanReviews.objects.filter(van = van).count()
+
+    if get_all_van_reviews_count > 0:
+        rating = (get_all_van_ratings/get_all_van_reviews_count)
+        whole_number, decimal_part = divmod(rating, 1)
+
+        array = [digit for digit in range(int(whole_number))]
+        
+        return array, decimal_part
+    else:
+        return 0,0
+    
+
+
+@register.simple_tag
+def get_van_reviews(van):
+    all_reviews = VanReviews.objects.filter(van = van).all().order_by('-date_recorded')
+    return all_reviews
+
 
 @register.simple_tag
 def get_all_done_rental():

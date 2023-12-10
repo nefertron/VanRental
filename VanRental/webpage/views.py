@@ -146,6 +146,12 @@ def index(request):
 
 
 
+
+        van_rating = request.POST.get('van_rating')
+        van_review_or_comment = request.POST.get('van_review_or_comment')
+        van_rating_id = request.POST.get('van_rating_id')
+
+
         if username and password:
             log_in_attempt = loginAccount(request, username, password)
 
@@ -156,7 +162,7 @@ def index(request):
             else:
                 return redirect('/dashboard')
         
-        else:
+        elif pick_up_location:
             _from_municipality = ListOfMunicipalities.objects.filter(id = from_destination_municipality_id).first()
             _to_municipality = ListOfMunicipalities.objects.filter(id = to_destination_municipality_id).first()
 
@@ -184,6 +190,20 @@ def index(request):
             messages.info(request, message)
 
             return redirect('/pending-booking')
+        
+
+        elif van_rating:
+            create_review = VanReviews.objects.create(van = Van.objects.filter(id=van_rating_id).first(), 
+                                                        reviewed_by = request.user,
+                                                        rating = van_rating, 
+                                                        comment = van_review_or_comment, 
+                                                        date_recorded = datetime.now())
+            create_review.review_id = f'MVR{create_review.id}'
+            create_review.save()
+
+            message = 'You successfully posted a review!'
+            messages.info(request, message)
+            return redirect(f'/index#VanReviews{van_rating_id}')
 
 
     return render(request, 'homepage/index.html')

@@ -1948,6 +1948,7 @@ blockquote {
   fill : rgb(251 191 36);
 }
 
+/* BIG START RATING */
 .star-rating{
   background-color: #80d0c7;
   border-radius: 10px;
@@ -1972,6 +1973,40 @@ blockquote {
 .star-rating > input:checked ~ label ~ label {
   background-image: url('../images/full-star.svg');
 }
+/* BIG START RATING */
+
+
+
+/* SMALL STAR RATING */
+.new-star-rating {
+  background-color: #80d0c7;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.new-star-rating > input {
+  display: none;
+}
+
+.new-star-rating > label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-image: url('../images/empty-star.svg');
+  background-size: cover;
+  cursor: pointer;
+  transition: background-image 0.3s ease;
+}
+
+.new-star-rating > input:checked ~ label {
+  background-image: url('../images/full-star.svg');
+}
+
+.new-star-rating > input:checked ~ label,
+.new-star-rating > input:checked ~ label ~ label {
+  background-image: url('../images/full-star.svg');
+}
+/* SMALL STAR RATING */
 
 
  /* #################### FOR STAR RATING ################################# */

@@ -692,18 +692,18 @@
                                 <!-- FOR VAN REVIEWS PANEL -->
                                 <div class="tab-pane fade show active" id="van-review-tab-pane" role="tabpanel" aria-labelledby="van-tab" tabindex="0">   
                                     <div class="row">
-                                        {% get_all_done_rental as all_rental %}
-                                        {% if all_rental|length > 0 %}
-                                            {% for done_rental in all_rental %}
+                                        {% get_all_vans as all_vans %}
+                                        {% if all_vans|length > 0 %}
+                                            {% for van in all_vans %}
                                                 <div class="col-lg-6 col-md-6 col-12 mb-4 mb-lg-2">
                                                     <div class="custom-block bg-white shadow-lg">
                                                         <div class="d-flex">
                                                             <div>
-                                                                <h5 class="mb-2">{{done_rental.plate_no.brand_name}}</h5>
+                                                                <h5 class="mb-2">{{van.brand_name}}</h5>
                                                                 <div>
                                                                     <p class="mb-2">
                                                                         <b>Overall Ratings : </b>
-                                                                        {% get_overall_rental_rating done_rental.id as rating %}
+                                                                        {% get_all_specific_van_rating van as rating %}
 
                                                                         {% if rating.0 != 0 %}
                                                                             {% for i in rating.0 %}
@@ -717,33 +717,29 @@
                                                                             No ratings found
                                                                         {% endif %}
                                                                     </p>
-                                                                    <p class='mb-2'>
-                                                                        <b>From Destination : </b> {{done_rental.from_destination}} <br>
-                                                                        <b>To Destination : </b> {{done_rental.to_destination}}
-                                                                    </p>
                                                                 </div>
                                                             </div>
                                                             <span class="badge bg-finance rounded-pill ms-auto">
-                                                                {{done_rental.plate_no.number_of_seats}}
+                                                                {{van.number_of_seats}}
                                                             </span>
                                                         </div>
                                                         <br>
                                                         
-                                                        <div id="doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
+                                                        <div id="vanRental{{van.id}}_{{van.id}}" class="carousel slide van-slider" data-bs-ride="carousel">
                                                             <!-- Indicators/dots -->
-                                                            {% all_van_images_indices done_rental.plate_no as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
+                                                            {% all_van_images_indices van as van_images_indices %} <!-- get all the images of the van | located at templatetag-->
                                                             <div class="carousel-indicators">
                                                                 {% for van_index in van_images_indices %}
                                                                     {% if van_index == 0 %}
-                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
+                                                                        <button type="button" data-bs-target="#vanRental{{van.id}}_{{van.id}}" data-bs-slide-to="{{van_index}}" class="active"></button>
                                                                     {% else %}
-                                                                        <button type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide-to="{{van_index}}"></button>
+                                                                        <button type="button" data-bs-target="#vanRental{{van.id}}_{{van.id}}" data-bs-slide-to="{{van_index}}"></button>
                                                                     {% endif %}
                                                                 {% endfor %}
                                                             </div>
                                                         
                                                             <!-- The slideshow/carousel -->
-                                                            {% get_all_van_images done_rental.plate_no as all_van_images %} <!-- get all the images of the van | located at templatetag-->
+                                                            {% get_all_van_images van as all_van_images %} <!-- get all the images of the van | located at templatetag-->
                                                             <div class="carousel-inner">
                                                                 {% for van_image in all_van_images %}
                                                                     {% if forloop.counter0 == 0 %}
@@ -762,23 +758,26 @@
                                                                 {% endfor %}
                                                             </div>
                                                             <!-- Left and right controls/icons -->
-                                                            <button class="carousel-control-prev" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="prev">
+                                                            <button class="carousel-control-prev" type="button" data-bs-target="#vanRental{{van.id}}_{{van.id}}" data-bs-slide="prev">
                                                                 <span class="carousel-control-prev-icon"></span>
                                                             </button>
-                                                            <button class="carousel-control-next" type="button" data-bs-target="#doneRental{{done_rental.id}}_{{done_rental.plate_no.id}}" data-bs-slide="next">
+                                                            <button class="carousel-control-next" type="button" data-bs-target="#vanRental{{van.id}}_{{van.id}}" data-bs-slide="next">
                                                                 <span class="carousel-control-next-icon"></span>
                                                             </button>
 
                                                             <p class='mb-2'>
-                                                                <b>Brand Name : </b> {{done_rental.plate_no.brand_name}} <br>
-                                                                <b>Driver Name : </b> {{done_rental.driver_id.user_id.first_name}} {{done_rental.driver_id.user_id.last_name}}<br>
-                                                                <b>Driver Contact No : </b> {{done_rental.driver_id.contact_no}}<br>
-                                                                <b>Driver Email : </b> {{done_rental.driver_id.user_id.email}}<br>
-                                                                <b>Plate No : </b> {{done_rental.plate_no.plate_no}} <br>
-                                                                <b>Rental ID : </b> {{done_rental.rent_id}}
-                                                            </p>
+                                                                <b>Brand Name : </b> {{van.brand_name}} <br>
+                                                                <b>Plate No : </b> {{van.plate_no}} <br>
+                                                                <b>Color : </b> {{van.color}} <br>
+                                                                <b>No. Of Seats : </b> {{van.number_of_seats}} <br>
+                                                                <b>Air Conditioned : </b> 
+                                                                    {% if van.is_airconditioned %}
+                                                                        YES
+                                                                    {% else %}
+                                                                        NO
+                                                                    {% endif %}<br>
+                                                                </p>
                                                         </div>
-                                                        
                                                         <br>
                                                         <br>
                                                         <br>
@@ -786,46 +785,45 @@
                                                         <br>
                                                         <br>
                                                         <p class="mb-0">
-                                                            {{done_rental.plate_no.description}}
+                                                            {{van.description}}
                                                         </p>
-                                                        <hr/>
-
+                                                        <hr id='VanReviews{{van.id}}'/>
 
                                                         <!-- ALL COMMENTS -->
-                                                        {% get_rental_reviews done_rental.id as all_rental_reviews %}
-                                                        {% if all_rental_reviews|length > 0 %}
-                                                            {% for review in all_rental_reviews %}
+                                                        {% get_van_reviews van as all_reviews %}
+                                                        {% if all_reviews|length > 0 %}
+                                                            {% for review in all_reviews %}
                                                                 {% if forloop.counter0 < 1 %}
-                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter0}}">
+                                                                <div id="{{van.id}}_van_user_comments{{forloop.counter0}}">
                                                                 {% else %}
-                                                                <div id="{{done_rental.id}}_rental_user_comments{{forloop.counter}}" style="display:none;">
+                                                                <div id="{{van.id}}_van_user_comments{{forloop.counter}}" style="display:none;">
                                                                 {% endif %}
                                                                     <div class='comment-section'>
-                                                                        {% if review.rent_id.rented_by.profile %}
-                                                                            <img src="{{review.rent_id.rented_by.profile}}" class='comment-section-profile'/>
+
+                                                                        {% get_user_account review.reviewed_by as user_account %}
+                                                                        {% if user_account.profile %}
+                                                                            <img src="{{user_account.profile}}" class='comment-section-profile'/>
                                                                         {% else %}
                                                                             <img src="{% static 'assets/images/default-profile.png' %}" class='comment-section-profile'/>
                                                                         {% endif %}
+
                                                                         <div class='comment-box'>
                                                                             <h6 style="font-size: 0.875rem;">
-                                                                                {{review.rent_id.rented_by.user_id.first_name}} 
-                                                                                {{review.rent_id.rented_by.user_id.last_name}}
+                                                                                {{review.reviewed_by.first_name}} 
+                                                                                {{review.reviewed_by.last_name}}
                                                                             </h6>
                                                                             
                                                                             <p style="font-size: 0.75rem;">
                                                                                 {{review.comment}}
                                                                             </p>
                                                                             <p class="mb-0">
-                                                                                Ratings : 
+                                                                                Ratings : {{review.rating}}
 
-                                                                                {% convert_rating_to_array review.rating as my_rating%}
+                                                                                {% convert_rating_to_array review.rating as my_rating %}
                                                                                 {% for i in my_rating %}
                                                                                     <img src="{% static 'assets/images/full-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
                                                                                 {% endfor %}
-                
-                                                                                {% if rating.1 != 0 %}
-                                                                                    <img src="{% static 'assets/images/half-star.svg' %}" alt="Star" style="width: 20px; height: 20px; margin-right:-5px;">
-                                                                                {% endif %}
+
                                                                             </p>
                                                                             <p style="font-size: 0.75rem;">
                                                                                 Date Recorded : {{review.date_recorded}}
@@ -835,13 +833,64 @@
                                                                 </div>
                                                             {% endfor %}
 
-                                                            {% if all_rental_reviews|length > 1 %}
-                                                                <button id="open-comments_{{done_rental.id}}_rental_user_comments" onclick="openAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
-                                                                <button id="hide-comments_{{done_rental.id}}_rental_user_comments"  onclick="hideAllComments('{{done_rental.id}}_rental_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
+                                                            {% if all_reviews|length > 1 %}
+                                                                <button id="open-comments_{{van.id}}_van_user_comments" onclick="openAllComments('{{van.id}}_van_user_comments');" class="btn custom-btn mt-2 mt-lg-3">Show more comments</button>
+                                                                <button id="hide-comments_{{van.id}}_van_user_comments"  onclick="hideAllComments('{{van.id}}_van_user_comments');" class="btn custom-btn mt-2 mt-lg-3" style="display:none;">Hide comments</button>
                                                             {% endif %}
                                                         
+                                                            {% if user.is_authenticated %}
+                                                                <form method='POST' id='reviewForm'>
+                                                                    {% csrf_token %}
+                                                                    Ratings
+                                                                    <div class="new-star-rating">
+                                                                        <input type="radio" id="{{van.id}}_star5" name="van_rating" value="5">
+                                                                        <label for="{{van.id}}_star5"></label>
+                                                                        <input type="radio" id="{{van.id}}_star4" name="van_rating" value="4">
+                                                                        <label for="{{van.id}}_star4"></label>
+                                                                        <input type="radio" id="{{van.id}}_star3" name="van_rating" value="3">
+                                                                        <label for="{{van.id}}_star3"></label>
+                                                                        <input type="radio" id="{{van.id}}_star2" name="van_rating" value="2">
+                                                                        <label for="{{van.id}}_star2"></label>
+                                                                        <input type="radio" id="{{van.id}}_star1" name="van_rating" value="1">
+                                                                        <label for="{{van.id}}_star1"></label>
+                                                                    </div>
+                                                                    
+                                                                    <br>
+                                                                    <input type='hidden' name='van_rating_id' value='{{van.id}}'/>
+
+                                                                    <label>Comment / Suggestion / Review</label>
+                                                                    <textarea type="text" name="van_review_or_comment" class="form-control" placeholder="Enter your comment here" required></textarea>
+                                                                    <button class="btn custom-btn mt-2 mt-lg-3" type='submit'>Post Review</button>
+                                                                </form>
+                                                            {% endif %}
                                                         {% else %}
                                                             <p style="font-size: 0.75rem;">No comments found</p>
+
+                                                            {% if user.is_authenticated %}
+                                                                <form method='POST' id='reviewForm'>
+                                                                    {% csrf_token %}
+                                                                    Ratings
+                                                                    <div class="new-star-rating">
+                                                                        <input type="radio" id="{{van.id}}_star5" name="van_rating" value="5">
+                                                                        <label for="{{van.id}}_star5"></label>
+                                                                        <input type="radio" id="{{van.id}}_star4" name="van_rating" value="4">
+                                                                        <label for="{{van.id}}_star4"></label>
+                                                                        <input type="radio" id="{{van.id}}_star3" name="van_rating" value="3">
+                                                                        <label for="{{van.id}}_star3"></label>
+                                                                        <input type="radio" id="{{van.id}}_star2" name="van_rating" value="2">
+                                                                        <label for="{{van.id}}_star2"></label>
+                                                                        <input type="radio" id="{{van.id}}_star1" name="van_rating" value="1">
+                                                                        <label for="{{van.id}}_star1"></label>
+                                                                    </div>
+                                                                    
+                                                                    <br>
+                                                                    <input type='hidden' name='van_rating_id' value='{{van.id}}'/>
+
+                                                                    <label>Comment / Suggestion / Review</label>
+                                                                    <textarea type="text" name="van_review_or_comment" class="form-control" placeholder="Enter your comment here" required></textarea>
+                                                                    <button class="btn custom-btn mt-2 mt-lg-3" type='submit'>Post Review</button>
+                                                                </form>
+                                                            {% endif %}
                                                         {% endif %}
                                                         <!-- ALL COMMENTS -->
                                                     </div>

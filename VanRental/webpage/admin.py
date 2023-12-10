@@ -15,10 +15,14 @@ admin.site.register(Messages)
 admin.site.register(ListOfMunicipalities)
 admin.site.register(ListOfDestinations)
 
+admin.site.register(VanReviews)
+admin.site.register(HeartReactions)
+
 admin.site.register(FAQs)
 admin.site.register(GetInTouch)
 
 admin.site.register(TourGallery)
 admin.site.register(TourGalleryImages)
+admin.site.register(TourCategories)
 
 admin.site.register(TourCommentSection)
